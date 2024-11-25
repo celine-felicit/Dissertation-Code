@@ -100,7 +100,7 @@ merged_ucdp$intensity <- factor(merged_ucdp$intensity,
                                       labels = c("Minor armed conflicts", "War"))
 #Bar chart
 ggplot(merged_ucdp, aes(x=intensity)) +
-  geom_bar(width = 0.2, fill = "orange", color = "maroon")+
+  geom_bar(width = 0.2, fill = "#8c510a", color = "black")+
   labs(title = "Distribution of conflict intensity levels",
        x = "Intensity level",
        y = "Count of conflicts") +
@@ -117,10 +117,10 @@ intensity_summary <- merged_ucdp %>%
 #Create a stacked bar plot
 ggplot(intensity_summary, aes(x = year, y = conflict_count, fill = intensity)) +
   geom_bar(stat = "identity", position = "stack") +
-  labs(title = "World Armed Conflicts by Intensity Level",
+  labs(title = "World armed conflicts by intensity level",
        x = "Year",
        y = "Number of conflicts",
-       fill = "Conflict Intensity") +
+       fill = "Conflict intensity") +
   scale_fill_manual(values = c("grey", "black")) +
   scale_x_continuous(breaks = seq(min(intensity_summary$year), max(intensity_summary$year), by = 5)) + #Label years every 5 years
   theme_minimal() +
@@ -140,39 +140,148 @@ merged_ucdp$ext_coalition <- factor(merged_ucdp$ext_coalition,
 #Create a bar plot
 ggplot(merged_ucdp, aes(x = ext_coalition, fill = ext_coalition)) +
   geom_bar() +
-  labs(title = "Distribution of External Support: Bilateral vs Coalition",
-       x = "Type of External Support",
+  labs(title = "Distribution of external support: bilateral vs coalition",
+       x = "Type of external support",
        y = "Count",
-       fill = "Support Type") +
+       fill = "Support type") +
+  scale_fill_manual(
+    values = c(
+      "Bilateral Support" = "#8c510a",   
+      "Coalition Support" = "#01665e"
+    )
+  ) +
   theme_minimal()
+
+#2.1. Trend analysis coalition support
+# Summarize the data by year and ext_coalition
+coalition_summary <- merged_ucdp %>%
+  group_by(year, ext_coalition) %>%
+  summarise(conflict_count = n(), .groups = "drop")
+
+# Create the line chart
+ggplot(coalition_summary, aes(x = year, y = conflict_count, color = ext_coalition, group = ext_coalition)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Evolution of support types over time",
+    x = "Year",
+    y = "Number of conflicts",
+    color = "Support type"
+  ) +
+  scale_color_manual(
+    values = c(
+      "Bilateral Support" = "#8c510a",
+      "Coalition Support" = "#01665e"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
 
 #3. Distribution of incompatibility
 #Convert incompatibility to a factor for better labeling in the plot
 merged_ucdp$incompatibility <- factor(merged_ucdp$incompatibility,
                                       levels = c(1, 2, 3),
                                       labels = c("territory", "government", "territory and government"))
-#Create a bar plot
+
+# Create a bar plot
 ggplot(merged_ucdp, aes(x = incompatibility, fill = incompatibility)) +
   geom_bar() +
-  labs(title = "Distribution of incompatibility",
-       x = "Reason for conflict",
-       y = "Count",
-       fill = "Reason for conflict") +
+  labs(
+    title = "Distribution of incompatibility",
+    x = "Reason for conflict",
+    y = "Count",
+    fill = "Reason for conflict"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "territory" = "#8c510a",   
+      "government" = "#01665e",
+      "territory and government" = "#80cdc1"
+    )
+  ) +
   theme_minimal()
+
+#3.1. Trend analysis incompatibility
+# Summarize the data by year and incompatibility
+incompatibility_summary <- merged_ucdp %>%
+  group_by(year, incompatibility) %>%
+  summarise(conflict_count = n(), .groups = "drop")
+
+# Create the line chart
+ggplot(incompatibility_summary, aes(x = year, y = conflict_count, color = incompatibility, group = incompatibility)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Evolution of incompatibility over time",
+    x = "Year",
+    y = "Number of conflicts",
+    color = "Incompatibility"
+  ) +
+  scale_color_manual(
+    values = c(
+      "territory" = "#8c510a",   
+      "government" = "#01665e",
+      "territory and government" = "#80cdc1"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
+
 
 #4. Distribution of conflict type
 #Convert type_of_conflict to a factor for better labeling in the plot
 merged_ucdp$type <- factor(merged_ucdp$type,
                                        levels = c(1, 2, 3, 4),
-                                       labels = c("extrasystemic", "interstatet", "intrastate", "internationalised intrastate"))
+                                       labels = c("extrasystemic", "interstate", "intrastate", "internationalised intrastate"))
 #Create a bar plot
 ggplot(merged_ucdp, aes(x = type, fill = type)) +
   geom_bar() +
-  labs(title = "Distribution of Conflict types",
+  labs(title = "Distribution of conflict types",
        x = "Type of conflict",
        y = "Count",
-       fill = "Conflict Type") +
+       fill = "Conflict type") +
+  scale_fill_manual(
+    values = c(
+      "extrasystemic" = "#8c510a",
+      "interstate" = "#01665e",
+      "intrastate" = "#dfc27d",
+      "internationalised intrastate" = "#80cdc1"
+    )
+  ) +
   theme_minimal()
+
+#4.1. Evolution of conflict type
+# Prepare the data for visualization
+type_summary <- merged_ucdp %>%
+  group_by(year, type) %>%  # Group by year and conflict type
+  summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each type and year
+
+# Create the grouped line chart
+ggplot(type_summary, aes(x = year, y = conflict_count, color = type)) +
+  geom_line(size = 1) +  # Add lines for each conflict type
+  labs(
+    title = "Evolution of conflict types over time",
+    x = "Year",
+    y = "Number of conflicts",
+    color = "Conflict type"
+  ) +
+  scale_color_manual(
+    values = c(
+      "extrasystemic" = "#8c510a",
+      "interstate" = "#01665e",
+      "intrastate" = "#dfc27d",
+      "internationalised intrastate" = "#80cdc1"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "top"
+  )
 
 #5. Distribution of external support offered
 #Convert ext_sup to a factor for better labeling in the plot
@@ -183,11 +292,44 @@ merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
 #Create a bar plot
 ggplot(merged_ucdp, aes(x = ext_sup, fill = ext_sup)) +
   geom_bar() +
-  labs(title = "Distribution of External Support",
-       x = "External Support",
+  labs(title = "Distribution of external support",
+       x = "External support",
        y = "Count",
-       fill = "Support Offered") +
+       fill = "Support offered") +
+  scale_fill_manual(
+    values = c(
+      "No external support" = "#8c510a",
+      "External support" = "#01665e"
+    )
+  ) +
   theme_minimal()
+
+#5.1. Trend analysis external support
+# Summarize the data by year and ext_sup
+support_summary <- merged_ucdp %>%
+  group_by(year, ext_sup) %>%
+  summarise(conflict_count = n(), .groups = "drop")
+
+# Create the line chart
+ggplot(support_summary, aes(x = year, y = conflict_count, color = ext_sup, group = ext_sup)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Evolution of external support over time",
+    x = "Year",
+    y = "Number of conflicts",
+    color = "External support"
+  ) +
+  scale_color_manual(
+    values = c(
+      "No external support" = "#8c510a",
+      "External support" = "#01665e"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
 
 #BIVARIATE ANALYSIS#
 #Global relationship between military expenditure and conflict intensity level
