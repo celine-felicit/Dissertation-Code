@@ -131,11 +131,37 @@ merged_ucdp <- merged_ucdp %>%
         "troop support",
         "several forms of support"
       ),
-      ordered = TRUE
     )
   )
 #We now have 117 variables so seems to have worked
   ###add further tests to see whether it worked
+
+  ###Think about how to operationalise this variable
+    #Which forms of support are you specifically interested in: funding, weapons, troop
+
+#Creation of a variable to differentiate between indirect and direct support
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    ext_type = case_when(
+      ext_sum == 0 ~ "no support",                                # No support provided
+      ext_sum > 1 & (ext_x == 1 | ext_p == 1) &                  # Mixed direct and indirect
+        (ext_l == 1 | ext_i == 1 | ext_f == 1 | 
+           ext_t == 1 | ext_m == 1 | ext_w == 1 | ext_y == 1) ~ "direct and indirect",
+      ext_sum > 1 & (ext_x + ext_p == ext_sum) ~ "direct",        # All support is direct
+      ext_sum > 1 & (ext_l + ext_i + ext_f + ext_t + 
+                       ext_m + ext_w + ext_y == ext_sum) ~ "indirect", # All support is indirect
+      ext_x == 1 | ext_p == 1 ~ "direct",                        # Single direct support
+      ext_l == 1 | ext_i == 1 | ext_f == 1 | ext_t == 1 | 
+        ext_m == 1 | ext_w == 1 | ext_y == 1 ~ "indirect",         # Single indirect support
+      ext_u == 1 ~ "unknown"                                     # Unknown support
+    ),
+    ext_type = factor(
+      ext_type,
+      levels = c("no support", "indirect", "direct", "direct and indirect", "unknown") # Set the order
+    )
+  )
+  ##118 variables now so seems to have worked
+    ###add further checks
 
 #DESCRIPTIVE ANALYSIS#
 #1. Conflict intensity
@@ -381,6 +407,10 @@ ggplot(support_summary, aes(x = year, y = conflict_count, color = ext_sup, group
   )
 
 #6. Forms of support offered
+summary(merged_ucdp$ext_sum)
+  #Median: 4; Mean: 3.289 -> usually between 3-4 different forms of support are provided
+    ###Would be interesting to see whether there's any prevalent combinations of support
+
 #6.1. Distribution of forms of support
 # Bar plot for the distribution of support categories
 ggplot(merged_ucdp, aes(x = ext_category, fill = ext_category)) +
@@ -392,19 +422,19 @@ ggplot(merged_ucdp, aes(x = ext_category, fill = ext_category)) +
     fill = "Form of support"
   ) +
   scale_fill_manual(values = c(
-    "no support" = "#d9d9d9",
-    "unknown support" = "#bdbdbd",
-    "other support" = "#969696",
-    "access to territory" = "#737373",
-    "intelligence" = "#525252",
-    "funding" = "#252525",
-    "training and expertise" = "#084594",
-    "materiel and statistics" = "#2171b5",
-    "weapons" = "#4292c6",
-    "access to infrastructure/joint operations" = "#6baed6",
-    "foreign troop presence" = "#9ecae1",
-    "troop support" = "#c6dbef",
-    "several forms of support" = "#deebf7"
+    "no support" = "#E69F00",
+    "unknown support" = "#56B4E9",
+    "other support" = "#009E73",
+    "access to territory" = "#F0E442",
+    "intelligence" = "#0072B2",
+    "funding" = "#D55E00",
+    "training and expertise" = "#CC79A7",
+    "materiel and statistics" = "#999999",
+    "weapons" = "#9E77A8",
+    "access to infrastructure/joint operations" = "#FF9DA7",
+    "foreign troop presence" = "#7C7C7C",
+    "troop support" = "#F4A582",
+    "several forms of support" = "#66C2A5"
   )) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate x-axis labels for better readability
@@ -426,30 +456,70 @@ ggplot(support_trend, aes(x = year, y = count, color = ext_category, group = ext
     color = "Form of support"
   ) +
   scale_color_manual(values = c(
-    "no support" = "#d9d9d9",
-    "unknown support" = "#bdbdbd",
-    "other support" = "#969696",
-    "access to territory" = "#737373",
-    "intelligence" = "#525252",
-    "funding" = "#252525",
-    "training and expertise" = "#084594",
-    "materiel and statistics" = "#2171b5",
-    "weapons" = "#4292c6",
-    "access to infrastructure/joint operations" = "#6baed6",
-    "foreign troop presence" = "#9ecae1",
-    "troop support" = "#c6dbef",
-    "several forms of support" = "#deebf7"
+    "no support" = "#E69F00",
+    "unknown support" = "#56B4E9",
+    "other support" = "#009E73",
+    "access to territory" = "#F0E442",
+    "intelligence" = "#0072B2",
+    "funding" = "#D55E00",
+    "training and expertise" = "#CC79A7",
+    "materiel and statistics" = "#999999",
+    "weapons" = "#9E77A8",
+    "access to infrastructure/joint operations" = "#FF9DA7",
+    "foreign troop presence" = "#7C7C7C",
+    "troop support" = "#F4A582",
+    "several forms of support" = "#66C2A5"
   )) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate x-axis labels for better readability
 
+#7. Type of support
+#7.1. Distribution of support type
+#Create a bar plot
+ggplot(merged_ucdp, aes(x = ext_type, fill = ext_type)) +
+  geom_bar() +
+  labs(title = "Distribution of support types",
+       x = "Type of support",
+       y = "Count",
+       fill = "Type of support") +
+  scale_fill_manual(
+    values = c(
+      "no support" = "#8c510a",
+      "direct" = "#01665e",
+      "indirect" = "#dfc27d",
+      "direct and indirect" = "#80cdc1"
+    )
+  ) +
+  theme_minimal()
 
-#BIVARIATE ANALYSIS#
-#Global relationship between military expenditure and conflict intensity level
+#7.2. Evolution of support type
+# Prepare the data for visualization
+ext_type_summary <- merged_ucdp %>%
+  group_by(year, ext_type) %>%  # Group by year and support type
+  summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each type and year
 
-#Global relationship between arms imports and conflict intensity level
-
-#Global relationship between military expenditure and arms exports
+# Create the grouped line chart
+ggplot(ext_type_summary, aes(x = year, y = conflict_count, color = ext_type)) +
+  geom_line(size = 1) +  # Add lines for each support type
+  labs(
+    title = "Evolution of support types over time",
+    x = "Year",
+    y = "Number of conflicts",
+    color = "Support type"
+  ) +
+  scale_color_manual(
+    values = c(
+      "no support" = "#8c510a",
+      "direct" = "#01665e",
+      "indirect" = "#dfc27d",
+      "direct and indirect" = "#80cdc1"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "top"
+  )
 
 #REGRESSION ANALYSIS#
 #Preparation
@@ -520,73 +590,46 @@ summary(regress_l)
   #intercept, type (intrastate) and type (internationalised intrastate) are significant (***)
 exp(coef(regress_l))
 
-#Running a combined ordinal logistic regression
-#1. Preparation
+#Running a combined logistic regression
+#Preparation
 library(MASS)
 library(nnet)
 library(pscl)
 
-#2. Relevelling the variable
-merged_ucdp$ext_category <- factor(merged_ucdp$ext_category, 
-                                   levels = c("no support", "unknown support", "other support", "access to territory", 
-                                              "intelligence", "funding", "training and expertise", 
-                                              "materiel and statistics", "weapons", "access to infrastructure/joint operations", 
-                                              "foreign troop presence", "troop support", "several forms of support"), 
-                                   ordered = TRUE)
+#Fit the multinomial logistic regression model
+multinom_1 <- multinom(ext_category ~ incompatibility + type + intensity, data = merged_ucdp)
+summary(multinom_1)
 
-#3. Run the ordinal logistic regression
-# Fit the ordinal logistic regression model
-ordinal_model <- polr(ext_category ~ incompatibility + type + intensity, data = merged_ucdp, method = "logistic")
+#Calculate z-values and p-values for the coefficients
+z_values <- summary(multinom_1)$coefficients / summary(multinom_1)$standard.errors
+p_values <- (1 - pnorm(abs(z_values), 0, 1)) * 2  # Two-tailed test
 
-# Summary of the model
-summary(ordinal_model)
+z_values
+p_values
 
-  ###Error in polr(ext_category ~ incompatibility + type + intensity, data = merged_ucdp_clean,: attempt to find suitable starting values failed
-    #Checked structure of the data (whether all are factors) and NAs, 
-    #both didn't seem to be the issue
+# Predict probabilities for each observation
+predicted_probs <- predict(multinom_1, type = "probs")
 
-# Simplified model with one predictor
-ordinal_model_simple <- polr(ext_category ~ incompatibility, data = merged_ucdp, method = "logistic")
-summary(ordinal_model_simple)
+# Predict categories for each observation
+predicted_categories <- predict(multinom_1)
 
-#Check for perfect separation#
-  #Perfect separation occurs when one or more predictor variables perfectly predict the outcome variable, making it impossible to estimate coefficients. 
+#Logistic regression on type of external support provided
+# Fit the multinomial logistic regression model
+multinom_2 <- multinom(ext_type ~ incompatibility + type + intensity, data = merged_ucdp)
+summary(multinom_2)
 
-#Check for perfect separation by inspecting cross-tabulations:
-  #Rows (or columns) in the cross-tabulation that contain only zeros except for a single non-zero count. 
-  #This indicates that a particular level of the predictor is exclusively associated with a single level of the outcome variable.
-table(merged_ucdp_clean$ext_category, merged_ucdp_clean$incompatibility)
-  #Only non-zero count between no support + territory and government (1) & several forms of support + territory and government (10)
-  #This is close to perfect separation because territory and government is almost exclusively associated with several forms of support, with one exception.
-table(merged_ucdp_clean$ext_category, merged_ucdp_clean$type)
-  #For extrasystemic and internationalised intrastate, certain levels of ext_category are either absent or only associated with several forms of support.
-  #This suggests perfect or near-perfect separation, as some combinations of type and ext_category have no observations.
-  #There is evidence of perfect separation in the predictor type, especially for extrasystemic.
-table(merged_ucdp_clean$ext_category, merged_ucdp_clean$intensity)
-  #ext_category levels like foreign troop presence, materiel and statistics, intelligence, and others show very low counts overall, particularly for War.
-  #This indicates that some categories of intensity and ext_category may suffer from sparse data, but there isn’t clear perfect separation.
-  
-#If perfect separation exists, consider merging or re-coding levels of the problematic variable.
-  ##Do this???
+# Calculate z-values and p-values for the coefficients
+z_values_2 <- summary(multinom_2)$coefficients / summary(multinom_2)$standard.errors
+p_values_2 <- (1 - pnorm(abs(z_values_2), 0, 1)) * 2  # Two-tailed test
 
-#4. Interpreting model output
-  #The coefficients of the ordinal logistic regression are interpreted as the log-odds of being in a higher category of ext_category relative to the baseline category (the first level, unless specified otherwise).
+z_values_2
+p_values_2
 
-# Calculate z-values and p-values
-z <- summary(ordinal_model)$coefficients / summary(ordinal_model)$standard.errors
-p <- (1 - pnorm(abs(z), 0, 1)) * 2  # Two-tailed test
-p
+# Predict probabilities for each observation
+predicted_probs_2 <- predict(multinom_2, type = "probs")
 
-#5. Model diagnostics
-# Pseudo R-squared
-pR2(ordinal_model)
-
-# Predictions: probabilities for each category
-predicted_probs <- predict(ordinal_model, type = "probs")
-
-# Predicted categories
-predicted_categories <- predict(ordinal_model, type = "class")
-
+# Predict the category for each observation
+predicted_categories_2 <- predict(multinom_2)
 
 ##DRAFT: CONTINUATION OF REGRESSION INTERPRETATION##
 #Rescaling the input variables to tell which predictors have a stronger effect
