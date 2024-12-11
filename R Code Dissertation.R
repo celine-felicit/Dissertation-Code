@@ -7,6 +7,7 @@ library(readxl)
 library(tidyr)
 library(purrr)
 library(ggplot2)
+library(ggpattern)
 
 #Load datasets into R
 #1. UCDP Dyadic Dataset
@@ -94,8 +95,8 @@ glimpse(merged_ucdp)
 
 #COMBINATION OF FORMS OF SUPPORT#
 #Combining the separate forms of support variables into one
-  #ordinal categorical variable ranking different forms of support (from the lowest to the most extreme form of support/non-direct to direct support)
-# Add a new column for the ordinal categorical variable
+  #categorical variable ranking different forms of support (from the lowest to the most extreme form of support/non-direct to direct support)
+# Add a new column for the categorical variable
 merged_ucdp <- merged_ucdp %>%
   mutate(
     ext_category = case_when(
@@ -143,16 +144,16 @@ merged_ucdp <- merged_ucdp %>%
 merged_ucdp <- merged_ucdp %>%
   mutate(
     ext_type = case_when(
-      ext_sum == 0 ~ "no support",                                # No support provided
+      ext_sum == 0 ~ "no support",                               # No support provided
       ext_sum > 1 & (ext_x == 1 | ext_p == 1) &                  # Mixed direct and indirect
         (ext_l == 1 | ext_i == 1 | ext_f == 1 | 
            ext_t == 1 | ext_m == 1 | ext_w == 1 | ext_y == 1) ~ "direct and indirect",
-      ext_sum > 1 & (ext_x + ext_p == ext_sum) ~ "direct",        # All support is direct
+      ext_sum > 1 & (ext_x + ext_p == ext_sum) ~ "direct",       # All support is direct
       ext_sum > 1 & (ext_l + ext_i + ext_f + ext_t + 
                        ext_m + ext_w + ext_y == ext_sum) ~ "indirect", # All support is indirect
       ext_x == 1 | ext_p == 1 ~ "direct",                        # Single direct support
       ext_l == 1 | ext_i == 1 | ext_f == 1 | ext_t == 1 | 
-        ext_m == 1 | ext_w == 1 | ext_y == 1 ~ "indirect",         # Single indirect support
+        ext_m == 1 | ext_w == 1 | ext_y == 1 ~ "indirect",       # Single indirect support
       ext_u == 1 ~ "unknown"                                     # Unknown support
     ),
     ext_type = factor(
@@ -164,12 +165,17 @@ merged_ucdp <- merged_ucdp %>%
     ###add further checks
 
 #DESCRIPTIVE ANALYSIS#
+# Summarize total conflict counts per year for visualisations
+total_summary <- merged_ucdp %>%
+  group_by(year) %>%
+  summarise(conflict_count = n(), ext_type = "Total", .groups = "drop")  # Add "Total" as a type
+
 #1. Conflict intensity
 #1.1.Distribution of conflict intensity
 #Convert intensity_level to a factor for better labeling
 merged_ucdp$intensity <- factor(merged_ucdp$intensity,
                                       levels = c(1, 2),
-                                      labels = c("Minor armed conflicts", "War"))
+                                      labels = c("Minor armed conflict", "War"))
 #Bar chart
 ggplot(merged_ucdp, aes(x=intensity)) +
   geom_bar(width = 0.2, fill = "#8c510a", color = "black")+
@@ -181,10 +187,9 @@ ggplot(merged_ucdp, aes(x=intensity)) +
 #1.2. Trend analysis conflict intensity
 #Create a summary dataset by year and intensity_level
 intensity_summary <- merged_ucdp %>%
-  filter(!is.na(intensity)) %>%  #Remove any NA values in intensity_level
+  filter(!is.na(intensity) & year >= 1975 & year <= 2017) %>% # Filter the dataset to the desired year range
   group_by(year, intensity) %>%
-  summarise(conflict_count = n()) %>%
-  ungroup()
+  summarise(conflict_count = n(), .groups = "drop")
 
 #Create a stacked bar plot
 ggplot(intensity_summary, aes(x = year, y = conflict_count, fill = intensity)) +
@@ -197,6 +202,44 @@ ggplot(intensity_summary, aes(x = year, y = conflict_count, fill = intensity)) +
   scale_x_continuous(breaks = seq(min(intensity_summary$year), max(intensity_summary$year), by = 5)) + #Label years every 5 years
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) #Rotate x-axis labels for better readability
+
+#OR
+
+# Visualize conflict intensity over time
+ggplot(intensity_summary, aes(x = year, y = conflict_count, fill = intensity, pattern = intensity)) +
+  geom_bar_pattern(
+    stat = "identity", position = "stack",
+    pattern_density = 0.5, pattern_fill = "black", pattern_spacing = 0.02
+  ) +
+  labs(
+    title = "State-based conflicts by level of intensity (1975–2017)",
+    x = "Year",
+    y = "Number of state-based conflicts",
+    fill = "Conflict intensity",
+    pattern = "Conflict intensity"
+  ) +
+  scale_fill_manual(values = c("War" = "red", "Minor armed conflict" = "blue")) +
+  scale_pattern_manual(values = c("War" = "crosshatch", "Minor armed conflict" = "stripe")) +
+    scale_x_continuous(
+      breaks = seq(1975-2017/5),  # Breaks for every 5 years
+      limits = c(1975, 2017)      # Explicit limits
+    ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    plot.caption = element_text(hjust = 0),
+    plot.margin = margin(20, 20, 20, 20)
+  ) +
+  annotate("text", x = 1976, y = max(intensity_summary$conflict_count, na.rm = TRUE) * 0.95, 
+           label = "Based on UCDP 18.1 data", size = 3, hjust = 0)
+###Doesn't work but not sure what the error is 
+  #Used to receive error: Error in seq.default(from, to, by) : invalid '(to - from)/by'
+  #but thought its fixed by adapt in the format in seq()
+  #Code now also stops running after this when trying to run all code at once
+  #Now receiving the error: Error in UseMethod("depth") : 
+    #no applicable method for 'depth' applied to an object of class "NULL"
 
 #2. Descriptive statistics for ext_coalition
 ext_coalition_stats <- merged_ucdp |>
@@ -248,6 +291,34 @@ ggplot(coalition_summary, aes(x = year, y = conflict_count, color = ext_coalitio
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
+
+#OR
+
+# Combine datasets for coalition and total conflicts
+combined_coalition <- bind_rows(coalition_summary, total_summary)
+
+# Create the grouped line chart
+ggplot(combined_coalition, aes(x = year, y = conflict_count, linetype = ext_coalition)) +
+  geom_line(size = 1) +  # Add lines for each support type
+  geom_line(data = total_summary, aes(x = year, y = conflict_count, linetype = "Total"), color = "black", size = 1) +  # Add total line
+  labs(
+    title = "Coalition support, 1975–2017",
+    x = "Year",
+    y = "Number of conflict-dyads",
+    linetype = "Support type"
+  ) +
+  scale_linetype_manual(
+    values = c(
+      "Bilateral Support" = "dotted",   
+      "Coalition Support" = "dashed",
+      "Total" = "solid"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
     legend.position = "bottom"
   )
 
@@ -304,6 +375,49 @@ ggplot(incompatibility_summary, aes(x = year, y = conflict_count, color = incomp
     legend.position = "bottom"
   )
 
+#OR
+
+# Summarize the data by year and incompatibility
+incompatibility_summary <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  group_by(year, incompatibility) %>%
+  summarise(conflict_count = n(), .groups = "drop")
+
+# Create the stacked area chart
+ggplot(incompatibility_summary, aes(x = year, y = conflict_count, fill = incompatibility)) +
+  geom_area(alpha = 0.6, size = 1, color = "white") +  # Stacked area with transparent fill
+  labs(
+    title = "State-based conflicts by type of incompatibility (1975–2017)",
+    x = "Year",
+    y = "Number of conflicts",
+    fill = "Incompatibility"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "territory" = "#8c510a",   # Orange for territory
+      "government" = "#01665e",   # Dark green for government
+      "territory and government" = "#80cdc1"  # Light blue for territory and government
+    )
+  ) +
+  scale_x_continuous(
+    breaks = seq(1975, 2017, by = 5),  # Breaks for every 5 years
+    limits = c(1975, 2017)             # Explicit limits for the x-axis
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    plot.caption = element_text(hjust = 0),
+    plot.margin = margin(20, 20, 50, 20)
+  ) +
+  annotate("text", x = 2017,  # Set x to the last year
+           y = -5,    # Push the label below the plot area
+           label = "Based on UCDP 18.1 data", 
+           size = 3, 
+           hjust = 1,  # Right-align text
+           vjust = 1,  # Align text at the bottom
+           color = "black")  # Optional, adjust color if needed
+###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
 
 #4. Conflict type
 #4.1. Distribution of conflict type
@@ -356,6 +470,49 @@ ggplot(type_summary, aes(x = year, y = conflict_count, color = type)) +
     axis.text.x = element_text(angle = 90, hjust = 1),
     legend.position = "top"
   )
+
+# Summarize the data by year and type
+type_summary <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  group_by(year, type) %>%
+  summarise(conflict_count = n(), .groups = "drop")
+
+# Create the stacked area chart
+ggplot(type_summary, aes(x = year, y = conflict_count, fill = type)) +
+  geom_area(alpha = 0.6, size = 1, color = "white") +  # Stacked area with transparent fill
+  labs(
+    title = "State-based conflicts by type of conflict (1975–2017)",
+    x = "Year",
+    y = "Number of conflicts",
+    fill = "Conflict type"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "extrasystemic" = "#8c510a",
+      "interstate" = "#01665e",
+      "intrastate" = "#dfc27d",
+      "internationalised intrastate" = "#80cdc1"
+    )
+  ) +
+  scale_x_continuous(
+    breaks = seq(1975, 2017, by = 5),  # Breaks for every 5 years
+    limits = c(1975, 2017)             # Explicit limits for the x-axis
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    plot.caption = element_text(hjust = 0),
+    plot.margin = margin(20, 20, 50, 20)
+  ) +
+  annotate("text", x = 2017,  # Set x to the last year
+           y = -5,    # Push the label below the plot area
+           label = "Based on UCDP 18.1 data", 
+           size = 3, 
+           hjust = 1,  # Right-align text
+           vjust = 1,  # Align text at the bottom
+           color = "black")  # Optional, adjust color if needed
+###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
 
 #5. External support offered
 #5.1. Distribution of external support offered
@@ -521,6 +678,330 @@ ggplot(ext_type_summary, aes(x = year, y = conflict_count, color = ext_type)) +
     legend.position = "top"
   )
 
+#OR
+
+# Combine datasets for ext_type and total conflicts
+combined_type <- bind_rows(ext_type_summary, total_summary)
+
+# Create the grouped line chart
+ggplot(combined_type, aes(x = year, y = conflict_count, linetype = ext_type)) +
+  geom_line(size = 1) +  # Add lines for each support type
+  geom_line(data = total_summary, aes(x = year, y = conflict_count, linetype = "Total"), color = "black", size = 1) +  # Add total line
+  labs(
+    title = "Direct and Indirect Support, 1975–2017",
+    x = "Year",
+    y = "Number of conflict-dyads",
+    linetype = "Support type"
+  ) +
+  scale_linetype_manual(
+    values = c(
+      "direct" = "dotted",               # Direct support: dotted line
+      "indirect" = "dashed",             # Indirect support: dashed line
+      "direct and indirect" = "dotdash", # Direct and indirect: dot-dash line
+      "Total" = "solid"                  # Total: solid line
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "bottom"
+  )
+
+###8. Conflict duration
+#8.1. Distribution conflict duration
+#8.2. Trend analysis conflict duration (are conflicts getting shorter/longer)
+
+###9. Conflict parties
+#9.1.Distribution state vs. non-state
+#9.2. side_a/b_2nd (troop support): Always certain countries that provide troop support?
+
+
+#BIVARIATE ANALYSIS#
+#1. ext_coalition and ext_category 
+#Contingency table
+contingency_1 <- table(merged_ucdp$ext_coalition, merged_ucdp$ext_category)
+print(contingency_1)
+
+#Chi-square
+chi_1 <- chisq.test(contingency_1)
+print(chi_1)
+  #The chi-square test checks if there is a significant association between the variables.
+  #If p < 0.05, there is evidence of an association.
+  #If p >= 0.05, no significant association is found.
+
+  ###If the contingency table contains cells with low expected frequencies (e.g., less than 5), a chi-square test might not be appropriate. 
+  ###In such cases, you may use Fisher’s Exact Test:
+fisher_1 <- fisher.test(contingency_1)
+print(fisher_test)
+
+#Visualisation
+#Stacked bar chart
+ggplot(merged_ucdp, aes(x = ext_coalition, fill = ext_category)) +
+  geom_bar(position = "stack") +  # Stack bars
+  labs(
+    title = "Forms of Support by coalition status",
+    x = "Coalition Support",
+    y = "Count",
+    fill = "Form of Support"
+  ) +
+  scale_fill_manual(values = c(
+    "no support" = "#999999",
+    "unknown support" = "#E69F00",
+    "other support" = "#56B4E9",
+    "access to territory" = "#009E73",
+    "intelligence" = "#F0E442",
+    "funding" = "#0072B2",
+    "training and expertise" = "#D55E00",
+    "materiel and statistics" = "#CC79A7",
+    "weapons" = "#E5D8BD",
+    "access to infrastructure/joint operations" = "#F4A582",
+    "foreign troop presence" = "#92C5DE",
+    "troop support" = "#B2182B",
+    "several forms of support" = "#2166AC"
+  )) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "right"  # Adjust legend position
+  )
+
+#1.1. ext_coalition and ext_type 
+# Create a contingency table
+contingency_1.1 <- table(merged_ucdp$ext_coalition, merged_ucdp$ext_type)
+print(contingency_1.1)
+
+#Chi-square
+chi_1.1 <- chisq.test(contingency_1.1)
+print(chi_1.1)
+
+#Visualisation: Stacked bar chart
+ggplot(merged_ucdp, aes(x = ext_coalition, fill = ext_type)) +
+  geom_bar(position = "stack") +  # Stack bars
+  labs(
+    title = "Type of support by coalition support",
+    x = "Coalition support",
+    y = "Count",
+    fill = "Type of support"
+  ) +
+  scale_fill_manual(values = c(
+    "no support" = "#8c510a",
+    "direct" = "#01665e",
+    "indirect" = "#dfc27d",
+    "direct and indirect" = "#80cdc1"
+  )) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "right"  # Adjust legend position
+  )
+
+#3. type and ext_category 
+contingency_3 <- table(merged_ucdp$type, merged_ucdp$ext_category)
+print(contingency_3)
+
+#Chi-square
+chi_3 <- chisq.test(contingency_3)
+print(chi_3)
+
+#Visualisation: Stacked bar chart
+ggplot(merged_ucdp, aes(x = type, fill = ext_category)) +
+  geom_bar(position = "stack") +  # Stack bars
+  labs(
+    title = "Forms of support by conflict type",
+    x = "Type of conflict",
+    y = "Count",
+    fill = "Form of support"
+  ) +
+  scale_fill_manual(values = c(
+    "no support" = "#999999",
+    "unknown support" = "#E69F00",
+    "other support" = "#56B4E9",
+    "access to territory" = "#009E73",
+    "intelligence" = "#F0E442",
+    "funding" = "#0072B2",
+    "training and expertise" = "#D55E00",
+    "materiel and statistics" = "#CC79A7",
+    "weapons" = "#E5D8BD",
+    "access to infrastructure/joint operations" = "#F4A582",
+    "foreign troop presence" = "#92C5DE",
+    "troop support" = "#B2182B",
+    "several forms of support" = "#2166AC"
+  )) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "right"  # Adjust legend position
+  )
+
+#3.1. type and ext_type
+#Contingency table
+contingency_3.1 <- table(merged_ucdp$type, merged_ucdp$ext_type)
+print(contingency_3.1)
+
+#Chi-square
+chi_3.1 <- chisq.test(contingency_3.1)
+print(chi_3.1)
+
+#Visualisation: Stacked bar chart
+ggplot(merged_ucdp, aes(x = type, fill = ext_type)) +
+  geom_bar(position = "stack") +  # Stack bars
+  labs(
+    title = "Type of support by type of conflict",
+    x = "Conflict type",
+    y = "Count",
+    fill = "Type of support"
+  ) +
+  scale_fill_manual(values = c(
+    "no support" = "#8c510a",
+    "direct" = "#01665e",
+    "indirect" = "#dfc27d",
+    "direct and indirect" = "#80cdc1"
+  )) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "right"  # Adjust legend position
+  )
+
+#4.intensity and ext_category 
+contingency_4 <- table(merged_ucdp$intensity, merged_ucdp$ext_category)
+print(contingency_4)
+
+#Chi-square
+chi_4 <- chisq.test(contingency_4)
+print(chi_4)
+
+#Visualisation: Stacked bar chart
+ggplot(merged_ucdp, aes(x = intensity, fill = ext_category)) +
+  geom_bar(position = "stack") +  # Stack bars
+  labs(
+    title = "Forms of support by conflict intensity",
+    x = "Conflict intensity",
+    y = "Count",
+    fill = "Form of support"
+  ) +
+  scale_fill_manual(values = c(
+    "no support" = "#999999",
+    "unknown support" = "#E69F00",
+    "other support" = "#56B4E9",
+    "access to territory" = "#009E73",
+    "intelligence" = "#F0E442",
+    "funding" = "#0072B2",
+    "training and expertise" = "#D55E00",
+    "materiel and statistics" = "#CC79A7",
+    "weapons" = "#E5D8BD",
+    "access to infrastructure/joint operations" = "#F4A582",
+    "foreign troop presence" = "#92C5DE",
+    "troop support" = "#B2182B",
+    "several forms of support" = "#2166AC"
+  )) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "right"  # Adjust legend position
+  )
+
+#4.1. intensity and ext_type
+#Contingency table
+contingency_4.1 <- table(merged_ucdp$intensity, merged_ucdp$ext_type)
+print(contingency_4.1)
+
+#Chi-square
+chi_4.1 <- chisq.test(contingency_4.1)
+print(chi_4.1)
+
+#Visualisation: Stacked bar chart
+ggplot(merged_ucdp, aes(x = intensity, fill = ext_type)) +
+  geom_bar(position = "stack") +  # Stack bars
+  labs(
+    title = "Type of support by conflict intensity",
+    x = "Conflict intensity",
+    y = "Count",
+    fill = "Type of support"
+  ) +
+  scale_fill_manual(values = c(
+    "no support" = "#8c510a",
+    "direct" = "#01665e",
+    "indirect" = "#dfc27d",
+    "direct and indirect" = "#80cdc1"
+  )) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "right"  # Adjust legend position
+  )
+
+#5. incompatibility and ext_category 
+contingency_5 <- table(merged_ucdp$incompatibility, merged_ucdp$ext_category)
+print(contingency_5)
+
+#Chi-square
+chi_5 <- chisq.test(contingency_5)
+print(chi_5)
+
+#Visualisation: Stacked bar chart
+ggplot(merged_ucdp, aes(x = incompatibility, fill = ext_category)) +
+  geom_bar(position = "stack") +  # Stack bars
+  labs(
+    title = "Forms of Support by incompatibility",
+    x = "Incompatibility",
+    y = "Count",
+    fill = "Form of Support"
+  ) +
+  scale_fill_manual(values = c(
+    "no support" = "#999999",
+    "unknown support" = "#E69F00",
+    "other support" = "#56B4E9",
+    "access to territory" = "#009E73",
+    "intelligence" = "#F0E442",
+    "funding" = "#0072B2",
+    "training and expertise" = "#D55E00",
+    "materiel and statistics" = "#CC79A7",
+    "weapons" = "#E5D8BD",
+    "access to infrastructure/joint operations" = "#F4A582",
+    "foreign troop presence" = "#92C5DE",
+    "troop support" = "#B2182B",
+    "several forms of support" = "#2166AC"
+  )) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "right"  # Adjust legend position
+  )
+
+#5.1. incompatibility and ext_type
+#Contingency table
+contingency_5.1 <- table(merged_ucdp$incompatibility, merged_ucdp$ext_type)
+print(contingency_5.1)
+
+#Visualisation: Stacked bar chart
+ggplot(merged_ucdp, aes(x = incompatibility, fill = ext_type)) +
+  geom_bar(position = "stack") +  # Stack bars
+  labs(
+    title = "Type of support by incompatibility",
+    x = "Incompatibility",
+    y = "Count",
+    fill = "Type of support"
+  ) +
+  scale_fill_manual(values = c(
+    "no support" = "#8c510a",
+    "direct" = "#01665e",
+    "indirect" = "#dfc27d",
+    "direct and indirect" = "#80cdc1"
+  )) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "right"  # Adjust legend position
+  )
+
+#Chi-square
+chi_5.1 <- chisq.test(contingency_5.1)
+print(chi_5.1)
+
+###6. Conflict party and ext_category
+###6.1. Conflict party and ext_type
+
 #REGRESSION ANALYSIS#
 #Preparation
 library(arm)
@@ -631,7 +1112,7 @@ predicted_probs_2 <- predict(multinom_2, type = "probs")
 # Predict the category for each observation
 predicted_categories_2 <- predict(multinom_2)
 
-##DRAFT: CONTINUATION OF REGRESSION INTERPRETATION##
+###DRAFT: CONTINUATION OF REGRESSION INTERPRETATION##
 #Rescaling the input variables to tell which predictors have a stronger effect
 standardize(regress_1)
   #If the predictors stay the same, that indicates that the scales are already so close to each other that it doesn't change anything
@@ -639,7 +1120,7 @@ standardize(regress_1)
 #Obtaining confident intervals for the estimated coefficients
 confint(regress_1)
 
-#DRAFT: Visualizing the results
+###DRAFT: Visualizing the results
 #As a plot
 plot_model(regress_1, title = "Correlation between the forms of external support provided and conflict characteristics")
   #If a given confidence interval crosses 0 it is not statistically significant
