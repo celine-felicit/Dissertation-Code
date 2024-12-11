@@ -11,11 +11,13 @@ library(ggpattern)
 
 #Load datasets into R
 #1. UCDP Dyadic Dataset
-ucdp_dyadic <- read.csv("~/Studium/Dissertation/Datasets/ucdp-dyadic-181.csv")
+# ucdp_dyadic <- read.csv("~/Studium/Dissertation/Datasets/ucdp-dyadic-181.csv")
+ucdp_dyadic <- read.csv("Datasets/ucdp-dyadic-181.csv")
 
 #2. UCDP ESD Dataset
 # Read the first sheet from the Excel file
-ucdp_esd <- read_excel("~/Studium/Dissertation/Datasets/ucdp-esd-dy-181.xlsx")
+#ucdp_esd <- read_excel("~/Studium/Dissertation/Datasets/ucdp-esd-dy-181.xlsx")
+ucdp_esd <- read_excel("Datasets/ucdp-esd-dy-181.xlsx")
 
 #COMBINATION OF DATSETS#
 #Step 1. Merge UCDP ESD and UCDP dyadic datasets based on conflict dyad ID
@@ -1009,6 +1011,9 @@ library(gmodels)
 library(effects)
 library(sjPlot)
 
+## celine: look for package 'lme4'
+library(lme4)
+
 #Form of support provided (DV) ~ Reason for conflict/incompatibility (IV), Form of conflict (IV) and conflict intensity (IV), support as a coalition (IV)
 #Running logistic(?) regression for all forms of support seperately
 #Troop support
@@ -1016,6 +1021,20 @@ regress_x <- glm(ext_x ~ incompatibility + type + intensity, data = merged_ucdp,
 summary(regress_x)
   #incompatibility (government) and incompatibility (government + territory) are non-significant
 exp(coef(regress_x))
+
+#### celine: 
+# if a linear regression models looks like this:
+# model <- lm(y ~ x, data = data)
+# the lme4 model will look like this
+# model_randomintercepts <- lmer(y ~ x + (1 | CLUSTER), data = data)
+## what about random effects logistic regressions?
+# model_randomintercepts <- glmer(y ~ x + (1 | CLUSTER), data = data, family = "binomial")
+
+regress_RE_linear <- lmer(ext_x ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(regress_RE_linear)
+
+regress_RE_logistic <- glmer(ext_x ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(regress_RE_logistic)
 
 #OR
 library(lessR, quietly= TRUE)
