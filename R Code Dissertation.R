@@ -93,6 +93,9 @@ for (col_name in common_columns) {
 # Check the final dataset to confirm the changes
 glimpse(merged_ucdp)
 
+#Checking for missing values
+sum(is.na(merged_ucdp)) #5325
+
 #COMBINATION OF FORMS OF SUPPORT#
 #Combining the separate forms of support variables into one
   #categorical variable ranking different forms of support (from the lowest to the most extreme form of support/non-direct to direct support)
@@ -164,6 +167,34 @@ merged_ucdp <- merged_ucdp %>%
   ##118 variables now so seems to have worked
     ###add further checks
 
+#Factorising variables
+#intensity
+merged_ucdp$intensity <- factor(merged_ucdp$intensity,
+                                levels = c(1, 2),
+                                labels = c("Minor armed conflict", "War"))
+#ext_coalition
+merged_ucdp$ext_coalition <- factor(merged_ucdp$ext_coalition,
+                                    levels = c(0, 1),
+                                    labels = c("Bilateral Support", "Coalition Support"))
+#incompatibility
+merged_ucdp$incompatibility <- factor(merged_ucdp$incompatibility,
+                                      levels = c(1, 2, 3),
+                                      labels = c("territory", "government", "territory and government"))
+
+#type of conflict
+merged_ucdp$type <- factor(merged_ucdp$type,
+                           levels = c(1, 2, 3, 4),
+                           labels = c("extrasystemic", "interstate", "intrastate", "internationalised intrastate"))
+#ext_sup
+merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
+                              levels = c(0, 1),
+                              labels = c("No external support", "External support"))
+
+#Factorise region variable
+merged_ucdp$region <- factor(merged_ucdp$region,
+                             levels = c(1, 2, 3, 4, 5),
+                             labels = c("Europe", "Middle East", "Asia", "Africa", "Americas"))
+
 #DESCRIPTIVE ANALYSIS#
 # Summarize total conflict counts per year for visualisations
 total_summary <- merged_ucdp %>%
@@ -172,10 +203,6 @@ total_summary <- merged_ucdp %>%
 
 #1. Conflict intensity
 #1.1.Distribution of conflict intensity
-#Convert intensity_level to a factor for better labeling
-merged_ucdp$intensity <- factor(merged_ucdp$intensity,
-                                      levels = c(1, 2),
-                                      labels = c("Minor armed conflict", "War"))
 #Bar chart
 ggplot(merged_ucdp, aes(x=intensity)) +
   geom_bar(width = 0.2, fill = "#8c510a", color = "black")+
@@ -203,44 +230,6 @@ ggplot(intensity_summary, aes(x = year, y = conflict_count, fill = intensity)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) #Rotate x-axis labels for better readability
 
-#OR
-
-# Visualize conflict intensity over time
-ggplot(intensity_summary, aes(x = year, y = conflict_count, fill = intensity, pattern = intensity)) +
-  geom_bar_pattern(
-    stat = "identity", position = "stack",
-    pattern_density = 0.5, pattern_fill = "black", pattern_spacing = 0.02
-  ) +
-  labs(
-    title = "State-based conflicts by level of intensity (1975–2017)",
-    x = "Year",
-    y = "Number of state-based conflicts",
-    fill = "Conflict intensity",
-    pattern = "Conflict intensity"
-  ) +
-  scale_fill_manual(values = c("War" = "red", "Minor armed conflict" = "blue")) +
-  scale_pattern_manual(values = c("War" = "crosshatch", "Minor armed conflict" = "stripe")) +
-    scale_x_continuous(
-      breaks = seq(1975-2017/5),  # Breaks for every 5 years
-      limits = c(1975, 2017)      # Explicit limits
-    ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1),
-    legend.position = "bottom",
-    legend.title = element_blank(),
-    plot.caption = element_text(hjust = 0),
-    plot.margin = margin(20, 20, 20, 20)
-  ) +
-  annotate("text", x = 1976, y = max(intensity_summary$conflict_count, na.rm = TRUE) * 0.95, 
-           label = "Based on UCDP 18.1 data", size = 3, hjust = 0)
-###Doesn't work but not sure what the error is 
-  #Used to receive error: Error in seq.default(from, to, by) : invalid '(to - from)/by'
-  #but thought its fixed by adapt in the format in seq()
-  #Code now also stops running after this when trying to run all code at once
-  #Now receiving the error: Error in UseMethod("depth") : 
-    #no applicable method for 'depth' applied to an object of class "NULL"
-
 #2. Descriptive statistics for ext_coalition
 ext_coalition_stats <- merged_ucdp |>
   group_by(ext_coalition) |>
@@ -248,10 +237,6 @@ ext_coalition_stats <- merged_ucdp |>
   mutate(percentage = (count / sum(count)) * 100)
 
 #2.1. Distribution of ext_coalition
-#Convert ext_coalition to a factor for better labeling in the plot
-merged_ucdp$ext_coalition <- factor(merged_ucdp$ext_coalition,
-                                 levels = c(0, 1),
-                                 labels = c("Bilateral Support", "Coalition Support"))
 #Create a bar plot
 ggplot(merged_ucdp, aes(x = ext_coalition, fill = ext_coalition)) +
   geom_bar() +
@@ -313,7 +298,7 @@ ggplot(combined_coalition, aes(x = year, y = conflict_count, linetype = ext_coal
     values = c(
       "Bilateral Support" = "dotted",   
       "Coalition Support" = "dashed",
-      "Total" = "solid"
+      "Total armed conflicts" = "solid"
     )
   ) +
   theme_minimal() +
@@ -324,11 +309,6 @@ ggplot(combined_coalition, aes(x = year, y = conflict_count, linetype = ext_coal
 
 #3. Incompatibility
 #3.1. Distribution of incompatibility
-#Convert incompatibility to a factor for better labeling in the plot
-merged_ucdp$incompatibility <- factor(merged_ucdp$incompatibility,
-                                      levels = c(1, 2, 3),
-                                      labels = c("territory", "government", "territory and government"))
-
 # Create a bar plot
 ggplot(merged_ucdp, aes(x = incompatibility, fill = incompatibility)) +
   geom_bar() +
@@ -350,6 +330,7 @@ ggplot(merged_ucdp, aes(x = incompatibility, fill = incompatibility)) +
 #3.2. Trend analysis incompatibility
 # Summarize the data by year and incompatibility
 incompatibility_summary <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
   group_by(year, incompatibility) %>%
   summarise(conflict_count = n(), .groups = "drop")
 
@@ -376,12 +357,6 @@ ggplot(incompatibility_summary, aes(x = year, y = conflict_count, color = incomp
   )
 
 #OR
-
-# Summarize the data by year and incompatibility
-incompatibility_summary <- merged_ucdp %>%
-  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
-  group_by(year, incompatibility) %>%
-  summarise(conflict_count = n(), .groups = "drop")
 
 # Create the stacked area chart
 ggplot(incompatibility_summary, aes(x = year, y = conflict_count, fill = incompatibility)) +
@@ -421,10 +396,6 @@ ggplot(incompatibility_summary, aes(x = year, y = conflict_count, fill = incompa
 
 #4. Conflict type
 #4.1. Distribution of conflict type
-#Convert type_of_conflict to a factor for better labeling in the plot
-merged_ucdp$type <- factor(merged_ucdp$type,
-                                       levels = c(1, 2, 3, 4),
-                                       labels = c("extrasystemic", "interstate", "intrastate", "internationalised intrastate"))
 #Create a bar plot
 ggplot(merged_ucdp, aes(x = type, fill = type)) +
   geom_bar() +
@@ -445,7 +416,8 @@ ggplot(merged_ucdp, aes(x = type, fill = type)) +
 #4.2. Evolution of conflict type
 # Prepare the data for visualization
 type_summary <- merged_ucdp %>%
-  group_by(year, type) %>%  # Group by year and conflict type
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  group_by(year, type) %>%
   summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each type and year
 
 # Create the grouped line chart
@@ -470,12 +442,6 @@ ggplot(type_summary, aes(x = year, y = conflict_count, color = type)) +
     axis.text.x = element_text(angle = 90, hjust = 1),
     legend.position = "top"
   )
-
-# Summarize the data by year and type
-type_summary <- merged_ucdp %>%
-  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
-  group_by(year, type) %>%
-  summarise(conflict_count = n(), .groups = "drop")
 
 # Create the stacked area chart
 ggplot(type_summary, aes(x = year, y = conflict_count, fill = type)) +
@@ -516,11 +482,6 @@ ggplot(type_summary, aes(x = year, y = conflict_count, fill = type)) +
 
 #5. External support offered
 #5.1. Distribution of external support offered
-#Convert ext_sup to a factor for better labeling in the plot
-merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
-                           levels = c(0, 1),
-                           labels = c("No external support", "External support"))
-
 #Create a bar plot
 ggplot(merged_ucdp, aes(x = ext_sup, fill = ext_sup)) +
   geom_bar() +
@@ -565,8 +526,8 @@ ggplot(support_summary, aes(x = year, y = conflict_count, color = ext_sup, group
 
 #6. Forms of support offered
 summary(merged_ucdp$ext_sum)
-  #Median: 4; Mean: 3.289 -> usually between 3-4 different forms of support are provided
-    ###Would be interesting to see whether there's any prevalent combinations of support
+#Median: 4; Mean: 3.289 -> usually between 3-4 different forms of support are provided
+###Would be interesting to see whether there's any prevalent combinations of support
 
 #6.1. Distribution of forms of support
 # Bar plot for the distribution of support categories
@@ -595,15 +556,17 @@ ggplot(merged_ucdp, aes(x = ext_category, fill = ext_category)) +
   )) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate x-axis labels for better readability
+###Would be good to seperate 'several forms of support' into the most prevalent combinations
 
 #6.2. Evolution of forms of support
 # Grouped summary data for trend analysis
-support_trend <- merged_ucdp %>%
+category_summary <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
   group_by(year, ext_category) %>%
-  summarise(count = n(), .groups = "drop")
+  summarise(conflict_count = n(), .groups = "drop")
 
 # Line chart for evolution of support categories over time
-ggplot(support_trend, aes(x = year, y = count, color = ext_category, group = ext_category)) +
+ggplot(category_summary, aes(x = year, y = count, color = ext_category, group = ext_category)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -629,6 +592,54 @@ ggplot(support_trend, aes(x = year, y = count, color = ext_category, group = ext
   )) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate x-axis labels for better readability
+
+#OR
+
+# Create the stacked area chart
+ggplot(category_summary, aes(x = year, y = conflict_count, fill = ext_category)) +
+  geom_area(alpha = 0.6, size = 1, color = "white") +  # Stacked area with transparent fill
+  labs(
+    title = "State-based conflicts by forms of external support (1975–2017)",
+    x = "Year",
+    y = "Number of conflicts",
+    fill = "Category of external support"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "no support" = "#E69F00",
+      "unknown support" = "#56B4E9",
+      "other support" = "#009E73",
+      "access to territory" = "#F0E442",
+      "intelligence" = "#0072B2",
+      "funding" = "#D55E00",
+      "training and expertise" = "#CC79A7",
+      "materiel and statistics" = "#999999",
+      "weapons" = "#9E77A8",
+      "access to infrastructure/joint operations" = "#FF9DA7",
+      "foreign troop presence" = "#7C7C7C",
+      "troop support" = "#F4A582",
+      "several forms of support" = "#66C2A5"
+    )
+  ) +
+  scale_x_continuous(
+    breaks = seq(1975, 2017, by = 5),  # Breaks for every 5 years
+    limits = c(1975, 2017)             # Explicit limits for the x-axis
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    plot.caption = element_text(hjust = 0),
+    plot.margin = margin(20, 20, 50, 20)
+  ) +
+  annotate("text", x = 2017,  # Set x to the last year
+           y = -5,    # Push the label below the plot area
+           label = "Based on UCDP 18.1 data", 
+           size = 3, 
+           hjust = 1,  # Right-align text
+           vjust = 1,  # Align text at the bottom
+           color = "black")  # Optional, adjust color if needed
+###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
 
 #7. Type of support
 #7.1. Distribution of support type
@@ -707,14 +718,64 @@ ggplot(combined_type, aes(x = year, y = conflict_count, linetype = ext_type)) +
     legend.position = "bottom"
   )
 
-###8. Conflict duration
-#8.1. Distribution conflict duration
-#8.2. Trend analysis conflict duration (are conflicts getting shorter/longer)
+#8. Region
+#8.1. Distribution of conflicts by region
+#Create a bar plot
+ggplot(merged_ucdp, aes(x = region, fill = region)) +
+  geom_bar() +
+  labs(title = "Distribution of conflicts by region",
+       x = "Region",
+       y = "Count",
+       fill = "Region") +
+  scale_fill_manual(
+    values = c(
+      "Europe" = "#8c510a",
+      "Middle East" = "#01665e",
+      "Asia" = "#dfc27d",
+      "Africa" = "#80cdc1",
+      "Americas" = "#a6d854"
+    )
+  ) +
+  theme_minimal()
 
-###9. Conflict parties
-#9.1.Distribution state vs. non-state
-#9.2. side_a/b_2nd (troop support): Always certain countries that provide troop support?
+#8.2. Trend analysis of conflicts by region
+# Prepare the data for visualization
+region_summary <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  group_by(year, region) %>%
+  summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each region and year
 
+# Create the grouped line chart
+ggplot(region_summary, aes(x = year, y = conflict_count, color = region)) +
+  geom_line(size = 1) +  # Add lines for each region
+  labs(
+    title = "Evolution of conflicts by region over time",
+    x = "Year",
+    y = "Number of conflicts",
+    color = "Region"
+  ) +
+  scale_color_manual(
+    values = c(
+      "Europe" = "#8c510a",
+      "Middle East" = "#01665e",
+      "Asia" = "#dfc27d",
+      "Africa" = "#80cdc1",
+      "Americas" = "#a6d854"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "top"
+  )
+
+###9. Conflict duration
+#9.1. Distribution conflict duration
+#9.2. Trend analysis conflict duration (are conflicts getting shorter/longer)
+
+###10. Conflict parties
+#10.1.Distribution state vs. non-state
+#10.2. side_a/b_2nd (troop support): Always certain countries that provide troop support?
 
 #BIVARIATE ANALYSIS#
 #1. ext_coalition and ext_category 
@@ -728,11 +789,12 @@ print(chi_1)
   #The chi-square test checks if there is a significant association between the variables.
   #If p < 0.05, there is evidence of an association.
   #If p >= 0.05, no significant association is found.
+###p-value = NA -> the chi-square test cannot be computed because the contingency table contains cells with expected frequencies less than 5.
 
-  ###If the contingency table contains cells with low expected frequencies (e.g., less than 5), a chi-square test might not be appropriate. 
-  ###In such cases, you may use Fisher’s Exact Test:
-fisher_1 <- fisher.test(contingency_1)
-print(fisher_test)
+#If the contingency table contains cells with low expected frequencies (e.g., less than 5), a chi-square test might not be appropriate. 
+#In such cases, you may use Fisher’s Exact Test:
+fisher_1 <- fisher.test(contingency_1, simulate.p.value=TRUE)
+print(fisher_1)
 
 #Visualisation
 #Stacked bar chart
@@ -774,6 +836,10 @@ print(contingency_1.1)
 chi_1.1 <- chisq.test(contingency_1.1)
 print(chi_1.1)
 
+#Fisher test
+fisher_1.1 <- fisher.test(contingency_1.1, simulate.p.value=TRUE)
+print(fisher_1.1)
+
 #Visualisation: Stacked bar chart
 ggplot(merged_ucdp, aes(x = ext_coalition, fill = ext_type)) +
   geom_bar(position = "stack") +  # Stack bars
@@ -802,6 +868,11 @@ print(contingency_3)
 #Chi-square
 chi_3 <- chisq.test(contingency_3)
 print(chi_3)
+  #p-value = NA
+
+#Fisher test
+fisher_3 <- fisher.test(contingency_3, simulate.p.value=TRUE)
+print(fisher_3)
 
 #Visualisation: Stacked bar chart
 ggplot(merged_ucdp, aes(x = type, fill = ext_category)) +
@@ -841,6 +912,11 @@ print(contingency_3.1)
 #Chi-square
 chi_3.1 <- chisq.test(contingency_3.1)
 print(chi_3.1)
+  #p-value = NA
+
+#Fisher test
+fisher_3.1 <- fisher.test(contingency_3.1, simulate.p.value=TRUE)
+print(fisher_3.1)
 
 #Visualisation: Stacked bar chart
 ggplot(merged_ucdp, aes(x = type, fill = ext_type)) +
@@ -870,6 +946,7 @@ print(contingency_4)
 #Chi-square
 chi_4 <- chisq.test(contingency_4)
 print(chi_4)
+  #p-value = 2.745e-10
 
 #Visualisation: Stacked bar chart
 ggplot(merged_ucdp, aes(x = intensity, fill = ext_category)) +
@@ -909,6 +986,7 @@ print(contingency_4.1)
 #Chi-square
 chi_4.1 <- chisq.test(contingency_4.1)
 print(chi_4.1)
+  #p-value = < 2.2e-16
 
 #Visualisation: Stacked bar chart
 ggplot(merged_ucdp, aes(x = intensity, fill = ext_type)) +
@@ -938,6 +1016,7 @@ print(contingency_5)
 #Chi-square
 chi_5 <- chisq.test(contingency_5)
 print(chi_5)
+  #p-value = 0.001356
 
 #Visualisation: Stacked bar chart
 ggplot(merged_ucdp, aes(x = incompatibility, fill = ext_category)) +
@@ -998,6 +1077,7 @@ ggplot(merged_ucdp, aes(x = incompatibility, fill = ext_type)) +
 #Chi-square
 chi_5.1 <- chisq.test(contingency_5.1)
 print(chi_5.1)
+  #p-value < 2.2e-16
 
 ###6. Conflict party and ext_category
 ###6.1. Conflict party and ext_type
@@ -1008,91 +1088,115 @@ library(arm)
 library(gmodels)
 library(effects)
 library(sjPlot)
+library(lme4)
+
+#As the observations are part of a broader cluster (conflict), random effects logistic regression is appropriate
+  #calculates both within-cluster-variation and between-cluster-variation
+
+# if a linear regression models looks like this: model <- lm(y ~ x, data = data)
+# the lme4 model will look like this model_randomintercepts <- lmer(y ~ x + (1 | CLUSTER), data = data)
+# the random effects logistic regression model will look like this: model_randomintercepts <- glmer(y ~ x + (1 | CLUSTER), data = data, family = "binomial")
 
 #Form of support provided (DV) ~ Reason for conflict/incompatibility (IV), Form of conflict (IV) and conflict intensity (IV), support as a coalition (IV)
-#Running logistic(?) regression for all forms of support seperately
-#Troop support
-regress_x <- glm(ext_x ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_x)
-  #incompatibility (government) and incompatibility (government + territory) are non-significant
-exp(coef(regress_x))
+#Running robust effects logistic and linear regression for all forms of support seperately
 
-#OR
-library(lessR, quietly= TRUE)
-regress_xi <- Logit(ext_x ~ incompatibility + type + intensity, data = merged_ucdp, brief=TRUE)
-  ###Error message:Variable redundant with a prior predictor in the model: typeinternationalised.intrastate
+#1. Troop support
+#1.1. random effects linear regression
+linregress_x <- lmer(ext_x ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_x)
 
-#Foreign troop presence
-regress_p <- glm(ext_p ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_p)
-  #only intercept and intensity (war) are significant (*** and **)
-exp(coef(regress_p))
+#1.2. random effects logistic regression
+logregress_x <- glmer(ext_x ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_x)
 
-#Access to infrastructure/joint operations
-regress_y <- glm(ext_y ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_y)
-  #intercept and incompatibility territory + government are significant (***) 
-  #all other are not or only slightly (*) or non-significant
-exp(coef(regress_y))
+exp(coef(logregress_x))
+  ###Error in exp(coef(logregress_x)) : non-numeric argument to mathematical function
 
-#weapons
-regress_w <- glm(ext_w ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_w)
-  #internationalised intrastate (type) + intensity (war) are significant (***)
-exp(coef(regress_w))
+#2. Foreign troop presence
+#2.1. random effects linear regression
+linregress_p <- lmer(ext_p ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_p)
 
-#materiel and statistics
-regress_m <- glm(ext_m ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_m)
-  #all except for incompatibility (government) are significant (* or ***)
-exp(coef(regress_m))
+#2.2 random effects logistic regression
+logregress_p <- glmer(ext_p ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_p)
 
-#training and expertise
-regress_t <- glm(ext_t ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_t)
-  #only type (internationalised intrastate) and intensity (war) are significant (***)
-exp(coef(regress_t))
+#3. Access to infrastructure/joint operations
+#3.1. random effects linear regression
+linregress_y <- lmer(ext_y ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_y)
 
-#funding
-regress_f <- glm(ext_f ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_f)
-  #all except incompatibility (government) are significant (* or ***)
-exp(coef(regress_f))
+#3.2. random effects logistic regression
+logregress_y <- glmer(ext_y ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_y)
+  
+#4. weapons
+#4.1. random effects linear regression
+linregress_w <- lmer(ext_w ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_w)
 
-#intelligence
-regress_i <- glm(ext_i ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_i)
-  #all except intensity (war) are significant (ranging from * to ***)
-exp(coef(regress_i))
+#4.2. random effects logistic regression
+logregress_w <- glmer(ext_w ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_w)
 
-#access to territory
-regress_l <- glm(ext_l ~ incompatibility + type + intensity, data = merged_ucdp, family = "binomial")
-summary(regress_l)
-  #intercept, type (intrastate) and type (internationalised intrastate) are significant (***)
-exp(coef(regress_l))
+#5. materiel and statistics
+#5.1. random effects linear regression
+linregress_m <- lmer(ext_m ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_m)
+
+#5.2. random effects logistic regression
+logregress_m <- glmer(ext_m ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_m)
+
+#6. training and expertise
+#6.1. random effects linear regression
+linregress_t <- lmer(ext_t ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_t)
+
+#6.2. random effects logistic regression
+logregress_t <- glmer(ext_t ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_t)
+
+#7. funding
+#7.1. random effects linear regression
+linregress_f <- lmer(ext_f ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_f)
+
+#7.2. random effects logistic regression
+logregress_f <- glmer(ext_f ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_f)
+
+#8. intelligence
+#8.1. random effects linear regression
+linregress_i <- lmer(ext_i ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_i)
+
+#8.2. random effects logistic regression
+logregress_i <- glmer(ext_i ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_i)
+
+#9. access to territory
+#9.1. random effects linear regression
+linregress_l <- lmer(ext_l ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
+summary(linregress_l_)
+
+#9.2. random effects logistic regression
+logregress_l <- glmer(ext_l ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(logregress_l)
 
 #Running a combined logistic regression
 #Preparation
-library(MASS)
-library(nnet)
-library(pscl)
+library(nnet) # For multinomial logistic regression
+library(sandwich) # For robust standard errors
+library(lmtest) # For hypothesis testing with robust SEs
+library(brglm2) # For bias-reduced logistic regression
 
-#Fit the multinomial logistic regression model
-multinom_1 <- multinom(ext_category ~ incompatibility + type + intensity, data = merged_ucdp)
+# Fit the multinomial logistic regression model
+multinom_1 <- brmultinom(ext_category ~ incompatibility + type + intensity, data = merged_ucdp)
 summary(multinom_1)
 
-#Calculate z-values and p-values for the coefficients
-z_values <- summary(multinom_1)$coefficients / summary(multinom_1)$standard.errors
-p_values <- (1 - pnorm(abs(z_values), 0, 1)) * 2  # Two-tailed test
-
-z_values
-p_values
-
-# Predict probabilities for each observation
-predicted_probs <- predict(multinom_1, type = "probs")
-
-# Predict categories for each observation
-predicted_categories <- predict(multinom_1)
+# Extract coefficients
+coef(multinom_1)
 
 #Logistic regression on type of external support provided
 # Fit the multinomial logistic regression model
