@@ -168,6 +168,30 @@ merged_ucdp <- merged_ucdp %>%
   ##118 variables now so seems to have worked
     ###add further checks
 
+#Creation of a duration variable#
+# Ensure the dataset is sorted by dyad_id and year
+merged_ucdp <- merged_ucdp %>% arrange(dyad_id, year)
+
+# Calculate the new variables
+merged_ucdp <- merged_ucdp %>%
+  group_by(dyad_id) %>%
+  mutate(
+    # Calculate the first and last observed years for the dyad
+    start_year = min(year, na.rm = TRUE),  # First year in the dataset for the dyad
+    end_year = max(year, na.rm = TRUE),    # Last year in the dataset for the dyad
+    
+    # Calculate the duration including missing years
+    duration_cease = end_year - start_year + 1,
+    
+    # Calculate the duration excluding missing years
+    duration_peace = n()  # Count the actual number of rows (years) for the dyad
+  ) %>%
+  ungroup()
+
+# Reorder columns to place the new ones after 'year'
+merged_ucdp <- merged_ucdp %>%
+  relocate(start_year, end_year, duration_cease, duration_peace, .after = year)
+
 #Factorising variables
 #intensity
 merged_ucdp$intensity <- factor(merged_ucdp$intensity,
@@ -337,6 +361,14 @@ standardize(regress_1)
 
 #Obtaining confident intervals for the estimated coefficients
 confint(regress_1)
+
+#Checking for multicollinearity
+#Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model. 
+#It measures how much the variance of a regression coefficient increases due to collinearity with other predictors.
+vif(regress_1)
+  #VIF < 5: Low to moderate multicollinearity (acceptable).
+  #VIF = 5–10: Moderate multicollinearity (investigate further; might require adjustments).
+  #VIF > 10: High multicollinearity (likely problematic; consider corrective actions).
 
 ###DRAFT: Visualizing the results
 #As a plot

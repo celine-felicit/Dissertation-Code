@@ -166,7 +166,31 @@ merged_ucdp <- merged_ucdp %>%
     )
   )
 ##118 variables now so seems to have worked
-###add further checks+
+###add further checks
+
+#Creation of a duration variable#
+# Ensure the dataset is sorted by dyad_id and year
+merged_ucdp <- merged_ucdp %>% arrange(dyad_id, year)
+
+# Calculate the new variables
+merged_ucdp <- merged_ucdp %>%
+  group_by(dyad_id) %>%
+  mutate(
+    # Calculate the first and last observed years for the dyad
+    start_year = min(year, na.rm = TRUE),  # First year in the dataset for the dyad
+    end_year = max(year, na.rm = TRUE),    # Last year in the dataset for the dyad
+    
+    # Calculate the duration including missing years
+    duration_cease = end_year - start_year + 1,
+    
+    # Calculate the duration excluding missing years
+    duration_peace = n()  # Count the actual number of rows (years) for the dyad
+  ) %>%
+  ungroup()
+
+# Reorder columns to place the new ones after 'year'
+merged_ucdp <- merged_ucdp %>%
+  relocate(start_year, end_year, duration_cease, duration_peace, .after = year)
 
 #Factorising variables
 #intensity
@@ -770,9 +794,132 @@ ggplot(region_summary, aes(x = year, y = conflict_count, color = region)) +
     legend.position = "top"
   )
 
-###9. Conflict duration
+#9. Conflict duration
+#9.1. Differences between duration_cease and duration_peace
+merged_ucdp <- merged_ucdp %>%
+  mutate(diff_duration = duration_cease - duration_peace)
+
+# Reorder columns to place the new ones after 'year'
+merged_ucdp <- merged_ucdp %>%
+  relocate(diff_duration, .after = duration_peace)
+
+# Compute the mean and median of the differences
+mean_diff <- mean(merged_ucdp$diff_duration, na.rm = TRUE)
+median_diff <- median(merged_ucdp$diff_duration, na.rm = TRUE)
+
+# Output the results
+mean_diff #2.846
+median_diff #0
+
 #9.1. Distribution conflict duration
+#9.1.1. Distribution of duration_cease
+#Visualization - Histogram overlaid with kernel density curve and median
+ggplot(data = merged_ucdp, aes(x = duration_cease)) + 
+  geom_histogram(aes(y=..density..), #Histogram with density instead of count on y-axis
+                 binwidth= , colour="black", fill="white") +
+  geom_density(alpha=.2, fill="#FF6666") + #Overlay with transparent density plot
+  geom_vline(aes(xintercept=median(duration_cease, na.rm=T)), #Ignore NA values for median
+             color="red", linetype="dashed", size=1) +
+  labs(title = "Duration Distribution",
+       x = "Duration",
+       y = "Density of duration") +
+  theme_minimal()
+
+#9.1.2. Distribution of duration_peace
+#Visualization - Histogram overlaid with kernel density curve and median
+ggplot(data = merged_ucdp, aes(x = duration_peace)) + 
+  geom_histogram(aes(y=..density..), #Histogram with density instead of count on y-axis
+                 binwidth= , colour="black", fill="white") +
+  geom_density(alpha=.2, fill="#FF6666") + #Overlay with transparent density plot
+  geom_vline(aes(xintercept=median(duration_peace, na.rm=T)), #Ignore NA values for median
+             color="red", linetype="dashed", size=1) +
+  labs(title = "Duration Distribution",
+       x = "Duration",
+       y = "Density of duration") +
+  theme_minimal()
+
 #9.2. Trend analysis conflict duration (are conflicts getting shorter/longer)
+#9.2.1. Duration_cease over time
+# Prepare the data for visualization  
+duration_summary <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  group_by(year) %>%
+  summarise(mean_duration = mean(duration_cease, na.rm = TRUE),  # Calculate the mean duration
+            median_duration = median(duration_cease, na.rm = TRUE),  # Calculate the median duration
+            .groups = "drop")
+
+# Create the line chart
+ggplot(duration_summary, aes(x = year)) +
+  geom_line(aes(y = mean_duration), color = "blue", size = 1) +  # Add line for mean duration
+  geom_line(aes(y = median_duration), color = "red", size = 1) +  # Add line for median duration
+  labs(
+    title = "Trend in conflict duration over time",
+    x = "Year",
+    y = "Duration",
+    color = "Statistic"
+  ) +
+  scale_y_continuous(breaks = seq(0, 10, by = 1)) +  # Set breaks for y-axis
+  scale_color_manual(values = c("blue", "red")) +  # Set colors for lines
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "top"
+  )
+
+#9.2.2. Duration_peace over time
+# Prepare the data for visualization
+duration_summary_peace <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  group_by(year) %>%
+  summarise(mean_duration = mean(duration_peace, na.rm = TRUE),  # Calculate the mean duration
+            median_duration = median(duration_peace, na.rm = TRUE),  # Calculate the median duration
+            .groups = "drop")
+
+# Create the line chart
+ggplot(duration_summary_peace, aes(x = year)) +
+  geom_line(aes(y = mean_duration), color = "blue", size = 1) +  # Add line for mean duration
+  geom_line(aes(y = median_duration), color = "red", size = 1) +  # Add line for median duration
+  labs(
+    title = "Trend in peace duration over time",
+    x = "Year",
+    y = "Duration",
+    color = "Statistic"
+  ) +
+  scale_y_continuous(breaks = seq(0, 10, by = 1)) +  # Set breaks for y-axis
+  scale_color_manual(values = c("blue", "red")) +  # Set colors for lines
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "top"
+  )
+
+#9.3. Conflict duration by region
+#9.3.1. Duration_cease by region
+# Prepare the data for visualization
+duration_region <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  filter(!is.na(duration_cease)) %>%  # Filter out NA values
+  group_by(region) %>%
+  summarise(mean_duration = mean(duration_cease, na.rm = TRUE),  # Calculate the mean duration
+            median_duration = median(duration_cease, na.rm = TRUE),  # Calculate the median duration
+            .groups = "drop")
+
+# Create the bar chart
+ggplot(duration_region, aes(x = region, y = mean_duration)) +
+  geom_bar(stat = "identity", fill = "#FF6666") +  # Bar chart for mean duration
+  geom_point(aes(y = median_duration), color = "blue", size = 3) +  # Add points for median duration
+  labs(
+    title = "Mean and Median Conflict Duration by Region",
+    x = "Region",
+    y = "Duration",
+    color = "Statistic"
+  ) +
+  scale_y_continuous(breaks = seq(0, 10, by = 1)) +  # Set breaks for y-axis
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "top"
+  )
 
 ###10. Conflict parties
 #10.1.Distribution state vs. non-state
