@@ -193,6 +193,42 @@ merged_ucdp <- merged_ucdp %>%
 merged_ucdp <- merged_ucdp %>%
   relocate(start_year, end_year, duration_cease, duration_peace, .after = year)
 
+#Creation of a cumulative measure of duration
+merged_ucdp <- merged_ucdp %>%
+  group_by(dyad_id) %>%  # Group by dyad_id to calculate for each conflict-dyad
+  mutate(
+    start_year = min(year, na.rm = TRUE),  # Find the first year for each dyad_id
+    cumulative_duration = year - start_year + 1  # Calculate duration as the difference from the start year
+  ) %>%
+  ungroup()  # Ungroup to return the dataset to its original structure
+
+# Reorder columns to place the new ones after 'year'
+merged_ucdp <- merged_ucdp %>%
+  relocate(cumulative_duration, .after = year)
+
+# Creation of a variable indicating whether the observation is before or after 9/11#
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    nine_eleven = ifelse(year > 2001, "After 9/11", "Before 9/11")
+  )
+
+# Create a variable indicating whether the observation is during or after the Cold War#
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    cold_war = case_when(
+      year >= 1947 & year <= 1991 ~ "Cold War",
+      year > 1991 ~ "Post-Cold War",
+      TRUE ~ NA_character_ # Handles missing or out-of-range values
+    )
+  )
+
+# Ensure the new variables are factors for better usability
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    nine_eleven = factor(nine_eleven, levels = c("Before 9/11", "After 9/11")),
+    cold_war = factor(cold_war, levels = c("Cold War", "Post-Cold War"))
+  )
+
 #Factorising variables
 #intensity
 merged_ucdp$intensity <- factor(merged_ucdp$intensity,

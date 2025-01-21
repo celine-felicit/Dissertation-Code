@@ -4,6 +4,7 @@
 #PREPARATION#
 #Loading relevant packages
 library(dplyr)
+library(car)
 library(readxl)
 library(tidyr)
 library(purrr)
@@ -192,6 +193,42 @@ merged_ucdp <- merged_ucdp %>%
 merged_ucdp <- merged_ucdp %>%
   relocate(start_year, end_year, duration_cease, duration_peace, .after = year)
 
+#Creation of a cumulative measure of duration
+merged_ucdp <- merged_ucdp %>%
+  group_by(dyad_id) %>%  # Group by dyad_id to calculate for each conflict-dyad
+  mutate(
+    start_year = min(year, na.rm = TRUE),  # Find the first year for each dyad_id
+    cumulative_duration = year - start_year + 1  # Calculate duration as the difference from the start year
+  ) %>%
+  ungroup()  # Ungroup to return the dataset to its original structure
+
+# Reorder columns to place the new ones after 'year'
+merged_ucdp <- merged_ucdp %>%
+  relocate(cumulative_duration, .after = year)
+
+# Creation of a variable indicating whether the observation is before or after 9/11#
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    nine_eleven = ifelse(year > 2001, "After 9/11", "Before 9/11")
+  )
+
+#Creation of a variable indicating whether the observation is during or after the Cold War#
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    cold_war = case_when(
+      year >= 1947 & year <= 1991 ~ "Cold War",
+      year > 1991 ~ "Post-Cold War",
+      TRUE ~ NA_character_ # Handles missing or out-of-range values
+    )
+  )
+
+# Ensure the new variables are factors for better usability
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    nine_eleven = factor(nine_eleven, levels = c("Before 9/11", "After 9/11")),
+    cold_war = factor(cold_war, levels = c("Cold War", "Post-Cold War"))
+  )
+
 #Factorising variables
 #intensity
 merged_ucdp$intensity <- factor(merged_ucdp$intensity,
@@ -215,7 +252,7 @@ merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
                            levels = c(0, 1),
                            labels = c("No external support", "External support"))
 
-#Factorise region variable
+#region variable
 merged_ucdp$region <- factor(merged_ucdp$region,
                              levels = c(1, 2, 3, 4, 5),
                              labels = c("Europe", "Middle East", "Asia", "Africa", "Americas"))
@@ -227,6 +264,10 @@ library(gmodels)
 library(effects)
 library(sjPlot)
 library(lme4)
+library(plm)
+
+#suppress scientific notation
+options (scipen = 999)
 
 #As the observations are part of a broader cluster (conflict), random effects logistic regression is appropriate
   #calculates both within-cluster-variation and between-cluster-variation
@@ -240,87 +281,233 @@ library(lme4)
 
 #1. Troop support
 #1.1. random effects linear regression
-linregress_x <- lmer(ext_x ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_x)
+rlinregress_x <- lmer(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_x)
+  #if the t-value is above 2 or below -2 it is statistically significant
+  ##the average intercept (3.231), type (intrastate) (-3.691) and type (internationalised intrastate) (26.501) are statistically significant
+
+summary(is.na(merged_ucdp$cumulative_duration))
+
+#Checking for multicollinearity
+vif(rlinregress_x)
+  ##no multicollinearity
 
 #1.2. random effects logistic regression
-logregress_x <- glmer(ext_x ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_x)
+rlogregress_x <- glmer(ext_x ~  incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_x)
+  ##ext_coalition (coalition support) (**) is statistically significant
 
-exp(coef(logregress_x))
-  ###Error in exp(coef(logregress_x)) : non-numeric argument to mathematical function
+##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
+
+#Exponentiate results
+exp(fixef(rlogregress_x))
+
+#Check multicollinearity
+#Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model. 
+#It measures how much the variance of a regression coefficient increases due to collinearity with other predictors.
+  #VIF < 5: Low to moderate multicollinearity (acceptable).
+  #VIF = 5–10: Moderate multicollinearity (investigate further; might require adjustments).
+  #VIF > 10: High multicollinearity (likely problematic; consider corrective actions).
+vif(logregress_x)
+  ##no multicollinearity
+
+###Draft adding fixed effects models
+#1.3. Fixed effects linear regression
+flinregress_x <- plm(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
+summary(flinregress_x)
+  ##
+
+#1.4. Fixed effects logistic regression
+flogregress_x <- glm(ext_x ~  incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), data = merged_ucdp, family = "binomial" (link=logit))
+summary(flogregress_x)
+  ##
 
 #2. Foreign troop presence
 #2.1. random effects linear regression
-linregress_p <- lmer(ext_p ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_p)
+rlinregress_p <- lmer(ext_p ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_p)
+  ##intensity (war) (2.697) and ext_coalition (Coalition support) (3.114) are statistically significant
+
+#Check multicollinearity
+vif(rlinregress_p)
+  ##no multicollinearity
 
 #2.2 random effects logistic regression
-logregress_p <- glmer(ext_p ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_p)
+rlogregress_p <- glmer(ext_p ~  incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_p)
+  ##intensity (war) (**) is statistically significant
+
+#Exponentiate results
+exp(fixef(rlogregress_p))
+
+#Check multicollinearity
+vif(rlogregress_p)
+  ##no multicollinearity
 
 #3. Access to infrastructure/joint operations
 #3.1. random effects linear regression
-linregress_y <- lmer(ext_y ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_y)
+rlinregress_y <- lmer(ext_y ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_y)
+  ##cold_war (Post-Cold War) (3.073) and ext_coalition (Coalition support) (4.229) are statistically significant
+
+#Check multicollinearity
+vif(rlinregress_y)
+  ##no multicollinearity
 
 #3.2. random effects logistic regression
-logregress_y <- glmer(ext_y ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_y)
+rlogregress_y <- glmer(ext_y ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_y)
+  ##cumulative_duration (.), cold war (Post-Cold war) (***), ext_coalition (Coalition support) (***) are statistically significant
+
+#Exponentiate results
+exp(fixef(rlogregress_y))
+
+#Check multicollinearity
+vif(rlogregress_y)
+  ##no multicollinearity
   
 #4. weapons
 #4.1. random effects linear regression
-linregress_w <- lmer(ext_w ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_w)
+rlinregress_w <- lmer(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_w)
+  ##average Intercept (4.028), intensity (war) (3.996), nine_eleven (after 9/11) (2.625), and cold_war (Post-Cold war) (-5.280) are statistically significant
+
+#Check multicollinearity
+vif(rlinregress_w)
+  ##no multicollinearity
 
 #4.2. random effects logistic regression
-logregress_w <- glmer(ext_w ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_w)
+rlogregress_w <- glmer(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_w)
+  ##everything but incompatibility (territory and government) is statistically significant (***)
+
+##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
+
+#Exponentiate results
+exp(fixef(rlogregress_w))
+
+#Check multicollinearity
+vif(rlogregress_w)
+  ##no multicollinearity
 
 #5. materiel and statistics
 #5.1. random effects linear regression
-linregress_m <- lmer(ext_m ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_m)
+rlinregress_m <- lmer(ext_m ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_m)
+  ##average intercept (3.075), type (internationalised intrastate) (2.029), and intensity (war) (2.899) statistically significant
+
+#Check multicollinearity
+vif(rlinregress_m)
+  ##no multicollinearity
 
 #5.2. random effects logistic regression
-logregress_m <- glmer(ext_m ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_m)
+rlogregress_m <- glmer(ext_m ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_m)
+  ##type (internationalised intrastate) (*) and intensity (war) (***) are significant
+
+#Exponentiate results
+exp(fixef(rlogregress_m))
+
+#Check multicollinearity
+vif(rlogregress_m)
+  ##no multicollinearity
 
 #6. training and expertise
 #6.1. random effects linear regression
-linregress_t <- lmer(ext_t ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_t)
+rlinregress_t <- lmer(ext_t ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_t)
+  ##average intercept (3.222), type (internationalised intrastate) (2.251) and cold_war (Post-Cold War) (-3.517) are statistically significant
+
+#Check multicollinearity
+vif(rlinregress_t)
+  ##no multicollinearity
 
 #6.2. random effects logistic regression
-logregress_t <- glmer(ext_t ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_t)
+rlogregress_t <- glmer(ext_t ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_t)
+  ##type (intrastate) (.), type (internationalised intrastate) (*) and cold_war (Post-Cold War) (**) are statistically significant
+
+##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
+
+#Exponentiate results
+exp(fixef(rlogregress_t))
+
+#Check multicollinearity
+vif(rlogregress_t)
+  ##no multicollinearity
 
 #7. funding
 #7.1. random effects linear regression
-linregress_f <- lmer(ext_f ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_f)
+rlinregress_f <- lmer(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_f)
+  ##average intercept (2.212), intensity (war) (4.441), cumulative_duration (-2.612), nine_eleven (after 9/11) (2.072), cold_war (Post-Cold war) (-2.516), and ext_coalition (Coalition support) (-2.187) are statistically significant
+
+#Check multicollinearity
+vif(rlinregress_f)
+  ##no multicollinearity
 
 #7.2. random effects logistic regression
-logregress_f <- glmer(ext_f ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_f)
+rlogregress_f <- glmer(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_f)
+  ##type (internationalised intrastate) (.), intensity (war) (***), cumulative_duration (*) and cold_war (Post-Cold war) are significant
+
+##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
+
+#Exponentiate results
+exp(fixef(rlogregress_f))
+
+#Check multicollinearity
+vif(rlogregress_f)
+  ##no multicollinearity
 
 #8. intelligence
 #8.1. random effects linear regression
-linregress_i <- lmer(ext_i ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_i)
+rlinregress_i <- lmer(ext_i ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_i)
+  ##incompatibility (government) (-2.986), region (Americas) (2.936), nine_eleven (After 9/11) (7.519), cold_war (Post-Cold war) (2.022), and ext_coalition (Coalition support) (2.797) are statistically significant
+
+#Check multicollinearity
+vif(rlinregress_i)
+  ##no multicollinearity
 
 #8.2. random effects logistic regression
-logregress_i <- glmer(ext_i ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_i)
+rlogregress_i <- glmer(ext_i ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_i)
+  ##Intercept (*), incompatibility (government) (**), intensity (war) (.), region (Americas) (*), nine_eleven (after 9/11) (***), cold_war (Post-Cold war) (**), and ext_coalition (Coalition support) (*) are statistically significant
+
+#Exponentiate results
+exp(fixef(rlogregress_i))
+
+#Check multicollinearity
+vif(rlogregress_i)
+  ##no multicollinearity
 
 #9. access to territory
 #9.1. random effects linear regression
-linregress_l <- lmer(ext_l ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp)
-summary(linregress_l)
+rlinregress_l <- lmer(ext_l ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rlinregress_l)
+  ##average intercept (-2.033), type (intrastate) (3.118), type (internationalised intrastate) (3.316), region (Middle East) (2.214), region (Africa) (3.787), region (Americas) (2.063), nine_eleven (After 9/11) (-2.071), and ext_coalition (Coalition support) (2.165) are statistically significant
+
+#Check multicollinearity
+vif(rlinregress_l)
+  ##no multicollinearity
 
 #9.2. random effects logistic regression
-logregress_l <- glmer(ext_l ~ incompatibility + type + intensity + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(logregress_l)
+rlogregress_l <- glmer(ext_l ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_l)
+  ##incompatibility (government) (.), region (Middle East) (.), region (Africa) (***), nine_eleven (After 9/11) (.), and ext_coalition (Coalition support) (*) are statistically significant
+
+##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
+
+#Exponentiate results
+exp(fixef(rlogregress_l))
+
+#Check multicollinearity
+vif(rlogregress_l)
+  ##no multicollinearity
+
+##Visulaizing random effects logistic regression as a table
+tab_model(rlogregress_p, rlogregress_y, rlogregress_w, rlogregress_m, rlogregress_t, rlogregress_f, rlogregress_i, rlogregress_l, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Foreign troop presence", "Access to infrastructure/joint operations", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"))
 
 #Running a combined logistic regression
 #Preparation
@@ -330,7 +517,7 @@ library(lmtest) # For hypothesis testing with robust SEs
 library(brglm2) # For bias-reduced logistic regression
 
 # Fit the multinomial logistic regression model
-multinom_1 <- brmultinom(ext_category ~ incompatibility + type + intensity, data = merged_ucdp)
+multinom_1 <- brmultinom(ext_category ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp)
 summary(multinom_1)
 
 # Extract coefficients
@@ -338,7 +525,7 @@ coef(multinom_1)
 
 #Logistic regression on type of external support provided
 # Fit the multinomial logistic regression model
-multinom_2 <- multinom(ext_type ~ incompatibility + type + intensity, data = merged_ucdp)
+multinom_2 <- multinom(ext_type ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp)
 summary(multinom_2)
 
 # Calculate z-values and p-values for the coefficients
@@ -362,22 +549,11 @@ standardize(regress_1)
 #Obtaining confident intervals for the estimated coefficients
 confint(regress_1)
 
-#Checking for multicollinearity
-#Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model. 
-#It measures how much the variance of a regression coefficient increases due to collinearity with other predictors.
-vif(regress_1)
-  #VIF < 5: Low to moderate multicollinearity (acceptable).
-  #VIF = 5–10: Moderate multicollinearity (investigate further; might require adjustments).
-  #VIF > 10: High multicollinearity (likely problematic; consider corrective actions).
-
 ###DRAFT: Visualizing the results
 #As a plot
 plot_model(regress_1, title = "Correlation between the forms of external support provided and conflict characteristics")
   #If a given confidence interval crosses 0 it is not statistically significant
   #Negative association: below 0, positive association: above 0
-
-#OR as a table
-tab_model(regress_1, pred.labels = c("(Intercept)", "Incompatibility", "Type of conflict", "Conflict intensity"), dv.labels = "Provided external support")
 
 #Effect plots
 plot(allEffects(regress_1), ask=FALSE)
