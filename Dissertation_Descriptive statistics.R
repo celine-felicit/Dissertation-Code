@@ -9,6 +9,8 @@ library(tidyr)
 library(purrr)
 library(ggplot2)
 library(ggpattern)
+library(dagitty)
+library(ggdag)
 
 #Load datasets into R
 #1. UCDP Dyadic Dataset
@@ -1266,3 +1268,130 @@ print(chi_5.1)
 
 ###6. Conflict party and ext_category
 ###6.1. Conflict party and ext_type
+
+#DIRECTED ACYCLIC GRAPH#
+# Define the DAG structure (Variable names modified to avoid spaces)
+dag <- dagitty("
+  dag {
+    incompatibility -> type_of_conflict
+    incompatibility -> intensity
+    incompatibility -> cumulative_duration
+    type_of_conflict -> intensity 
+    type_of_conflict -> cumulative_duration
+    type_of_conflict -> provision_of_external_support
+    intensity -> supporters_GDP
+    intensity -> supporters_total_defence_spending
+    intensity <-> cumulative_duration
+    intensity <-> provision_of_external_support
+    intensity <-> type_of_support
+    region -> geographic_proximity
+    region -> incompatibility
+    cumulative_duration <-> provision_of_external_support
+    
+    nine_eleven -> shared_cultural_or_ideological_ties
+    Cold_war -> shared_cultural_or_ideological_ties
+    identity_of_recipient -> shared_cultural_or_ideological_ties
+    
+    colonial_ties -> shared_cultural_or_ideological_ties
+    democracy -> shared_cultural_or_ideological_ties
+    common_enemy <-> shared_cultural_or_ideological_ties
+    common_enemy -> provision_of_external_support
+    shared_cultural_or_ideological_ties -> provision_of_external_support
+    shared_cultural_or_ideological_ties -> type_of_support
+    
+    geographic_proximity -> trade_connection
+    geographic_proximity -> provision_of_external_support
+    geographic_proximity -> type_of_support
+    chance_of_spillover -> provision_of_external_support
+    chance_of_spillover -> type_of_support
+    multi_actor_dimension -> provision_of_external_support
+    multi_actor_dimension -> intensity
+    multi_actor_dimension -> type_of_conflict
+    multi_actor_dimension -> cumulative_duration
+    trade_connection -> provision_of_external_support
+    supporters_GDP -> supporters_total_defence_spending
+    supporters_total_defence_spending -> provision_of_external_support
+    
+    provision_of_external_support -> coalition_support
+    provision_of_external_support -> type_of_support
+    coalition_support -> type_of_support
+    type_of_support -> indirect_support
+    type_of_support -> direct_support
+    direct_support -> troop_presence
+    indirect_support -> access_to_infrastructure
+    indirect_support -> weapons
+    indirect_support -> materiel_and_logistics
+    indirect_support -> training_and_expertise
+    indirect_support -> intelligence
+    indirect_support -> access_to_territory
+  }
+")
+
+# Convert DAG to a tidy format
+tidy_dag <- tidy_dagitty(dag)
+
+# Extract unique node names
+node_names <- unique(tidy_dag$data$name)
+
+# Define x and y positions for clear layout using mutate()
+node_positions <- data.frame(
+  name = node_names  
+) %>%
+  mutate(
+    x = case_when(
+      name %in% c("incompatibility", "type_of_conflict", "intensity", "cumulative_duration", 
+                  "region", "Cold_war", "nine_eleven", "identity_of_recipient") ~ -6,
+      name %in% c("provision_of_external_support", "type_of_support", "direct_support", 
+                  "indirect_support", "troop_presence", "access_to_infrastructure", "weapons", 
+                  "materiel_and_logistics", "training_and_expertise", "intelligence", "access_to_territory") ~ 6,
+      TRUE ~ 0
+    ),
+    y = seq(from = 10, to = -10, length.out = length(node_names)) # Spread out nodes vertically
+  )
+
+# Check the structure of node_positions
+print(head(node_positions))
+
+# Merge positions into DAG data (ensure tidy_dag$data has 'name' column)
+tidy_dag$data <- tidy_dag$data %>%
+  left_join(node_positions, by = "name")
+
+# Rename the x.x, y.x columns to x and y
+tidy_dag$data <- tidy_dag$data %>%
+  rename(x = x.y, y = y.y)
+
+# Check the structure of the resulting merged data
+print(head(tidy_dag$data))
+
+# Ensure x and y columns are now present
+if (!all(c("x", "y") %in% colnames(tidy_dag$data))) {
+  stop("Error: x and y columns do not exist in tidy_dag$data after merging!")
+}
+
+# Extract edges and positions
+edges <- as.data.frame(edges(dag)) %>%
+  rename(from = v, to = w) %>%
+  left_join(tidy_dag$data %>% select(name, x, y), by = c("from" = "name"), suffix = c("_from", "")) %>%
+  left_join(tidy_dag$data %>% select(name, x, y), by = c("to" = "name"), suffix = c("", "_end")) %>%
+  rename(xend = x_end, yend = y_end)
+
+# Ensure edges have valid positions
+if (any(is.na(edges$x) | is.na(edges$y) | is.na(edges$xend) | is.na(edges$yend))) {
+  stop("Error: Some edges have missing x or y positions!")
+}
+
+# Plot the improved DAG
+ggplot() +
+  geom_segment(data = edges, aes(x = x, y = y, xend = xend, yend = yend), 
+               arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  geom_text(data = tidy_dag$data, aes(x = x, y = y, label = name), size = 4, hjust = 0.5, vjust = 0.5) +
+  theme_minimal() +
+  ggtitle("DAG on the Effect of Conflict Characteristics on External Support") +
+  theme(
+    plot.title = element_text(hjust = 0.5),  # Center the title
+    axis.title = element_blank(),            # Remove axis labels
+    axis.text = element_blank(),             # Remove axis text
+    panel.grid = element_blank()             # Remove grid
+  )
+  ###completely unreadable...
+  ## Any suggestions on how to fix this? I have attempted multiple times but just end in a circle of errors
