@@ -252,6 +252,11 @@ merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
                            levels = c(0, 1),
                            labels = c("No external support", "External support"))
 
+#ext_nonstate
+merged_ucdp$ext_nonstate <- factor(merged_ucdp$ext_nonstate,
+                                   levels = c(0, 1),
+                                   labels = c("state supporter", "non-state supporter"))
+
 #region variable
 merged_ucdp$region <- factor(merged_ucdp$region,
                              levels = c(1, 2, 3, 4, 5),

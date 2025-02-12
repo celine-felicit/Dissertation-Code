@@ -253,7 +253,12 @@ merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
                               levels = c(0, 1),
                               labels = c("No external support", "External support"))
 
-#Factorise region variable
+#ext_nonstate
+merged_ucdp$ext_nonstate <- factor(merged_ucdp$ext_nonstate,
+                                   levels = c(0, 1),
+                                   labels = c("state supporter", "non-state supporter"))
+
+#region
 merged_ucdp$region <- factor(merged_ucdp$region,
                              levels = c(1, 2, 3, 4, 5),
                              labels = c("Europe", "Middle East", "Asia", "Africa", "Americas"))
@@ -369,6 +374,7 @@ ggplot(combined_coalition, aes(x = year, y = conflict_count, linetype = ext_coal
     axis.text.x = element_text(angle = 90, hjust = 1),
     legend.position = "bottom"
   )
+  ###Why is NA not being portrayed?
 
 #3. Incompatibility
 #3.1. Distribution of incompatibility
@@ -455,8 +461,89 @@ ggplot(incompatibility_summary, aes(x = year, y = conflict_count, fill = incompa
            hjust = 1,  # Right-align text
            vjust = 1,  # Align text at the bottom
            color = "black")  # Optional, adjust color if needed
-###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
 
+#OR with patterns
+# Ensure `year` is numeric
+incompatibility_summary <- incompatibility_summary %>%
+  mutate(year = as.numeric(year)) %>%
+  arrange(year, incompatibility)
+
+# Remove any missing values
+incompatibility_summary <- na.omit(incompatibility_summary)
+incompatibility_summary <- incompatibility_summary %>% filter(!is.na(year))
+
+# Define colors and patterns
+pattern_mapping <- c(
+  "territory" = "stripe", 
+  "government" = "crosshatch", 
+  "territory and government" = "circle"
+)
+
+fill_colors <- c(
+  "territory" = "#8c510a",   # Orange for territory
+  "government" = "#01665e",   # Dark green for government
+  "territory and government" = "#80cdc1"  # Light blue for both
+)
+
+# Check year range
+year_range <- range(incompatibility_summary$year, na.rm = TRUE)
+
+# Adjust x-axis limits dynamically
+ggplot(incompatibility_summary, aes(x = year, y = conflict_count, group = incompatibility)) +
+  
+  # Use ribbon to mimic area plot with pattern
+  geom_ribbon_pattern(
+    aes(ymin = 0, ymax = conflict_count, fill = incompatibility, pattern = incompatibility),
+    alpha = 0.6, 
+    size = 0.8, 
+    color = "white",
+    pattern_density = 0.1,  
+    pattern_spacing = 0.02,  
+    pattern_fill = "gray50"
+  ) +
+  
+  # Add outline using geom_line()
+  geom_line(aes(color = incompatibility), size = 1.2) +
+  
+  # Customize labels
+  labs(
+    title = "State-based conflicts by type of incompatibility (1975–2017)",
+    x = "Year",
+    y = "Number of Conflicts",
+    fill = "Incompatibility",
+    pattern = "Pattern"
+  ) +
+  
+  # Apply color and pattern scales
+  scale_fill_manual(values = fill_colors) +
+  scale_pattern_manual(values = pattern_mapping) +
+  scale_color_manual(values = fill_colors) +  
+  
+  # Fix x-axis breaks and limits dynamically
+  scale_x_continuous(
+    breaks = breaks_seq,  # Use manually checked sequence
+    limits = c(year_range[1], year_range[2])
+  )
+  
+  # Adjust theme
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    plot.caption = element_text(hjust = 0),
+    plot.margin = margin(20, 20, 50, 20)
+  ) +
+  
+  # Add annotation for data source
+  annotate("text", x = year_range[2],  
+           y = -5,    
+           label = "Based on UCDP 18.1 data", 
+           size = 3, 
+           hjust = 1,  
+           vjust = 1,  
+           color = "black")  
+  ###This looks different to the ones without the patterns, why is that?
+  
 #4. Conflict type
 #4.1. Distribution of conflict type
 #Create a bar plot
@@ -541,7 +628,7 @@ ggplot(type_summary, aes(x = year, y = conflict_count, fill = type)) +
            hjust = 1,  # Right-align text
            vjust = 1,  # Align text at the bottom
            color = "black")  # Optional, adjust color if needed
-###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
+  ###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
 
 #5. External support offered
 #5.1. Distribution of external support offered
@@ -619,7 +706,7 @@ ggplot(merged_ucdp, aes(x = ext_category, fill = ext_category)) +
   )) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate x-axis labels for better readability
-###Would be good to seperate 'several forms of support' into the most prevalent combinations
+    ###Would be good to seperate 'several forms of support' into the most prevalent combinations
 
 #6.2. Evolution of forms of support
 # Grouped summary data for trend analysis
@@ -629,7 +716,7 @@ category_summary <- merged_ucdp %>%
   summarise(conflict_count = n(), .groups = "drop")
 
 # Line chart for evolution of support categories over time
-ggplot(category_summary, aes(x = year, y = count, color = ext_category, group = ext_category)) +
+ggplot(category_summary, aes(x = year, y = conflict_count, color = ext_category, group = ext_category)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -702,7 +789,7 @@ ggplot(category_summary, aes(x = year, y = conflict_count, fill = ext_category))
            hjust = 1,  # Right-align text
            vjust = 1,  # Align text at the bottom
            color = "black")  # Optional, adjust color if needed
-###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
+  ###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
 
 #7. Type of support
 #7.1. Distribution of support type
@@ -849,27 +936,13 @@ median_diff <- median(merged_ucdp$diff_duration, na.rm = TRUE)
 mean_diff #2.846
 median_diff #0
 
-#9.1. Distribution conflict duration
-#9.1.1. Distribution of duration_cease
+#9.1. Distribution of cumulative conflict duration
 #Visualization - Histogram overlaid with kernel density curve and median
-ggplot(data = merged_ucdp, aes(x = duration_cease)) + 
+ggplot(data = merged_ucdp, aes(x = cumulative_duration)) + 
   geom_histogram(aes(y=..density..), #Histogram with density instead of count on y-axis
                  binwidth= , colour="black", fill="white") +
   geom_density(alpha=.2, fill="#FF6666") + #Overlay with transparent density plot
-  geom_vline(aes(xintercept=median(duration_cease, na.rm=T)), #Ignore NA values for median
-             color="red", linetype="dashed", size=1) +
-  labs(title = "Duration Distribution",
-       x = "Duration",
-       y = "Density of duration") +
-  theme_minimal()
-
-#9.1.2. Distribution of duration_peace
-#Visualization - Histogram overlaid with kernel density curve and median
-ggplot(data = merged_ucdp, aes(x = duration_peace)) + 
-  geom_histogram(aes(y=..density..), #Histogram with density instead of count on y-axis
-                 binwidth= , colour="black", fill="white") +
-  geom_density(alpha=.2, fill="#FF6666") + #Overlay with transparent density plot
-  geom_vline(aes(xintercept=median(duration_peace, na.rm=T)), #Ignore NA values for median
+  geom_vline(aes(xintercept=median(cumulative_duration, na.rm=T)), #Ignore NA values for median
              color="red", linetype="dashed", size=1) +
   labs(title = "Duration Distribution",
        x = "Duration",
@@ -877,13 +950,12 @@ ggplot(data = merged_ucdp, aes(x = duration_peace)) +
   theme_minimal()
 
 #9.2. Trend analysis conflict duration (are conflicts getting shorter/longer)
-#9.2.1. Duration_cease over time
 # Prepare the data for visualization  
 duration_summary <- merged_ucdp %>%
   filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
   group_by(year) %>%
-  summarise(mean_duration = mean(duration_cease, na.rm = TRUE),  # Calculate the mean duration
-            median_duration = median(duration_cease, na.rm = TRUE),  # Calculate the median duration
+  summarise(mean_duration = mean(cumulative_duration, na.rm = TRUE),  # Calculate the mean duration
+            median_duration = median(cumulative_duration, na.rm = TRUE),  # Calculate the median duration
             .groups = "drop")
 
 # Create the line chart
@@ -904,42 +976,14 @@ ggplot(duration_summary, aes(x = year)) +
     legend.position = "top"
   )
 
-#9.2.2. Duration_peace over time
-# Prepare the data for visualization
-duration_summary_peace <- merged_ucdp %>%
-  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
-  group_by(year) %>%
-  summarise(mean_duration = mean(duration_peace, na.rm = TRUE),  # Calculate the mean duration
-            median_duration = median(duration_peace, na.rm = TRUE),  # Calculate the median duration
-            .groups = "drop")
-
-# Create the line chart
-ggplot(duration_summary_peace, aes(x = year)) +
-  geom_line(aes(y = mean_duration), color = "blue", size = 1) +  # Add line for mean duration
-  geom_line(aes(y = median_duration), color = "red", size = 1) +  # Add line for median duration
-  labs(
-    title = "Trend in peace duration over time",
-    x = "Year",
-    y = "Duration",
-    color = "Statistic"
-  ) +
-  scale_y_continuous(breaks = seq(0, 10, by = 1)) +  # Set breaks for y-axis
-  scale_color_manual(values = c("blue", "red")) +  # Set colors for lines
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1),
-    legend.position = "top"
-  )
-
 #9.3. Conflict duration by region
-#9.3.1. Duration_cease by region
 # Prepare the data for visualization
 duration_region <- merged_ucdp %>%
   filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
-  filter(!is.na(duration_cease)) %>%  # Filter out NA values
+  filter(!is.na(cumulative_duration)) %>%  # Filter out NA values
   group_by(region) %>%
-  summarise(mean_duration = mean(duration_cease, na.rm = TRUE),  # Calculate the mean duration
-            median_duration = median(duration_cease, na.rm = TRUE),  # Calculate the median duration
+  summarise(mean_duration = mean(cumulative_duration, na.rm = TRUE),  # Calculate the mean duration
+            median_duration = median(cumulative_duration, na.rm = TRUE),  # Calculate the median duration
             .groups = "drop")
 
 # Create the bar chart
@@ -959,10 +1003,50 @@ ggplot(duration_region, aes(x = region, y = mean_duration)) +
     legend.position = "top"
   )
 
-###10. Conflict parties
-#10.1.Distribution state vs. non-state
-#10.2. side_a/b_2nd (troop support): Always certain countries that provide troop support?
+#10. Identity of external supporters
+#10.1. Distribution of state and non-state external supporters
+#Create a bar plot
+ggplot(merged_ucdp, aes(x = ext_nonstate, fill = ext_nonstate)) +
+  geom_bar() +
+  labs(title = "Distribution of state and non-state supporters",
+       x = "Identity of external supporter",
+       y = "Count",
+       fill = "identity of external supporter") +
+  scale_fill_manual(
+    values = c(
+      "state supporter" = "#8c510a",
+      "non-state supporter" = "#01665e"
+    )
+  ) +
+  theme_minimal()
 
+#10.2. Trend analysis of state and non-state external supporters
+# Prepare the data for visualization
+supporter_summary <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  group_by(year, ext_nonstate) %>%
+  summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each type and year
+
+# Create the line chart
+ggplot(supporter_summary, aes(x = year, y = conflict_count, color = ext_nonstate)) +
+  geom_line(size = 1) +  # Add lines for each support type
+  labs(
+    title = "Evolution of state and non-state supporters over time",
+    x = "Year",
+    y = "Number of conflicts",
+    color = "Identity of external supporter"
+  ) +
+  scale_color_manual(
+    values = c(
+      "state supporter" = "#8c510a",
+      "non-state supporter" = "#01665e"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "top"
+  )
 
 #BIVARIATE ANALYSIS#
 #1. ext_coalition and ext_category 
