@@ -3,13 +3,13 @@
 
 #PREPARATION#
 #Loading relevant packages
-library(dplyr)
-library(car)
-library(readxl)
-library(tidyr)
-library(purrr)
-library(ggplot2)
-library(ggpattern)
+library(readxl) # For reading Excel files
+library(plyr)  # For mapvalues function
+library(dplyr) # For data manipulation
+library(tidyr) # For data tidying
+library(car)  # For VIF function
+library(ggplot2) # For data visualization
+library(ggpattern) # For patterned bar plots
 
 #Load datasets into R
 #1. UCDP Dyadic Dataset
@@ -43,7 +43,6 @@ nrow(distinct(merged_ucdp)) #Yes
 #name of the columns that are duplicates the code give all those that have 
 #.y at the end which means there is another column with the same name but 
 #with .x at the end
-
 merged_ucdp %>% 
   dplyr::select(ends_with(".y")) %>%
   names()
@@ -139,11 +138,59 @@ merged_ucdp <- merged_ucdp %>%
       ),
     )
   )
-#We now have 117 variables so seems to have worked
-  ###add further tests to see whether it worked
 
-  ###Think about how to operationalise this variable
-    #Which forms of support are you specifically interested in: funding, weapons, troop
+#Identify most common combinations of support: Create a new column with the most common combinations of support
+# Identify the support variables
+support_vars <- c("ext_l", "ext_i", "ext_f", "ext_t", "ext_m", "ext_w", "ext_y", "ext_p", "ext_x")
+
+# Define readable labels for support types
+support_labels <- c(
+  "ext_l" = "access to territory",
+  "ext_i" = "intelligence",
+  "ext_f" = "funding",
+  "ext_t" = "training",
+  "ext_m" = "materiel",
+  "ext_w" = "weapons",
+  "ext_y" = "infrastructure",
+  "ext_p" = "foreign troop presence",
+  "ext_x" = "troop support"
+)
+
+# Create the ext_combination column
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    ext_combination = apply(select(., all_of(support_vars)), 1, function(row) {
+      active_support <- names(row)[row == 1]  # Extract names of active supports
+      
+      # Convert to readable labels using mapvalues
+      active_support <- mapvalues(active_support, from = names(support_labels), to = support_labels, warn_missing = FALSE)
+      
+      # Assign categories based on count of support types
+      if (length(active_support) == 0) {
+        return("no support")
+      } else if (length(active_support) == 1) {
+        return(active_support)
+      } else if (length(active_support) == 2) {
+        return(paste(active_support, collapse = " and "))  # Two types
+      } else if (length(active_support) == 3) {
+        return(paste(active_support, collapse = ", "))  # Three types
+      } else {
+        return("several forms of support")  # More than 3
+      }
+    }),
+    
+    # Convert to factor with proper levels
+    ext_combination = factor(
+      ext_combination,
+      levels = c(
+        "no support", "unknown support", "other support",
+        support_labels,  # Single support types
+        paste(support_labels, collapse = " and "),  # Two support types
+        paste(support_labels, collapse = ", "),  # Three support types
+        "several forms of support"
+      )
+    )
+  )
 
 #Creation of a variable to differentiate between indirect and direct support
 merged_ucdp <- merged_ucdp %>%
@@ -264,12 +311,12 @@ merged_ucdp$region <- factor(merged_ucdp$region,
 
 #REGRESSION ANALYSIS#
 #Preparation
-library(arm)
-library(gmodels)
-library(effects)
-library(sjPlot)
-library(lme4)
-library(plm)
+library(arm) # For robust standard errors
+library(lme4) # For random effects models
+library(plm) # For fixed effects models
+library(gmodels) # For cross-tables
+library(effects) # For marginal effects
+library(sjPlot) # For plotting marginal effects
 
 #suppress scientific notation
 options (scipen = 999)
@@ -282,7 +329,7 @@ options (scipen = 999)
 # the random effects logistic regression model will look like this: model_randomintercepts <- glmer(y ~ x + (1 | CLUSTER), data = data, family = "binomial")
 
 #Form of support provided (DV) ~ Reason for conflict/incompatibility (IV), Form of conflict (IV) and conflict intensity (IV), support as a coalition (IV)
-#Running robust effects logistic and linear regression for all forms of support seperately
+#Running random effects logistic and linear regression for all forms of support separately
 
 #1. Troop support
 #1.1. random effects linear regression
@@ -319,12 +366,37 @@ vif(logregress_x)
 #1.3. Fixed effects linear regression
 flinregress_x <- plm(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_x)
-  ###intercept, incompatibility and region are not portrayed in output, why?
+    #the intercept is always absorbed in fixed effects model, so it never appears in the output
+    ##incompatibility and region qre Likely dropped due to multicollinearity
+      ##If incompatibility and region are time-invariant (i.e., they do not change within each dyad_id over time), they are automatically removed from the regression -> highly likely
+      ##The fixed effects transformation subtracts the mean of each variable within each dyad_id, meaning any variable that does not vary within each dyad is dropped.
+      ##BUT wouldn't that apply to type, 9/11 and Cold War as well? 
+
+#Check whether incompatibility and region are time-invariant
+merged_ucdp %>%
+  group_by(dyad_id) %>%
+  summarise(var_incompatibility = n_distinct(incompatibility),
+            var_region = n_distinct(region)) %>%
+  summarise(across(everything(), ~ sum(. == 1)))  # Count how many dyads have only one unique value = 472 for both
+    ##Due to this result, random effects may be the better approach, as no vraibales will be excluded due to time-invariance
+
+#Otherwise:
+#Run a Hybrid Model using Mundlak's approach, which includes both within and between transformations:
+merged_ucdp <- merged_ucdp %>%
+  group_by(dyad_id) %>%
+  mutate(across(c(incompatibility, region), mean, .names = "mean_{.col}"))  # Compute dyad-level mean
+
+flinregress_x_mundlak <- plm(ext_x ~ incompatibility + mean_incompatibility + region + mean_region + 
+                             type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition, 
+                           data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
+  ###need to fix NAs
+summary(flinregress_x_mundlak)
+
 
 #1.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_x <- glmer(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
 summary(flogregress_x)
-  ##Coalition support is statistically significant
+  ##Coalition support (**) is statistically significant
 
 #2. Foreign troop presence
 #2.1. random effects linear regression
@@ -499,7 +571,7 @@ vif(rlinregress_f)
 #7.2. random effects logistic regression
 rlogregress_f <- glmer(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_f)
-  ##type (internationalised intrastate) (.), intensity (war) (***), cumulative_duration (*) and cold_war (Post-Cold war) are significant
+  ##type (internationalised intrastate) (.), intensity (war) (***), cumulative_duration (*) and cold_war (Post-Cold war) (*) are significant
 
 ##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
 
@@ -517,7 +589,7 @@ summary(flinregress_f)
 #7.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_f <- glmer(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
 summary(flogregress_f)
-  ##type (internationalised intrastate) (.), intensity (war) (***), cumulative_duration (*) and cold_war (Post-Cold war) are significant
+  ##type (internationalised intrastate) (.), intensity (war) (***), cumulative_duration (*) and cold_war (Post-Cold war) (*) are significant
 
 #8. intelligence
 #8.1. random effects linear regression
@@ -583,8 +655,21 @@ flogregress_l <- glmer(ext_l ~ incompatibility + type + intensity + region + cum
 summary(flogregress_l)
   ##incompatibility (government) (.), region (Middle East) (.), region (Africa) (***), nine_eleven (After 9/11) (.), and ext_coalition (Coalition support) (*) are statistically significant
 
-##Visulaizing random effects logistic regression as a table
+#Visualizing random effects logistic regression as a table
 tab_model(rlogregress_p, rlogregress_y, rlogregress_w, rlogregress_m, rlogregress_t, rlogregress_f, rlogregress_i, rlogregress_l, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Foreign troop presence", "Access to infrastructure/joint operations", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"))
+  ###Quite a big table, how can I visualize this in a better way?
+
+#Visualizing random effects logistic regression only for the most common forms of support (> 45 counts in descriptive analysis): training, materiel, weapons, infrastructure
+tab_model(rlogregress_m, rlogregress_w, rlogregress_y, rlogregress_t, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Materiel and statistics", "Weapons", "Access to infrastructure/joint operations", "Training and expertise"))
+
+#Visualizing random effects logistic regression for the most common forms of support for governments: training and troop support
+tab_model(rlogregress_t, rlogregress_p, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Training and expertise", "Foreign troop presence"))
+
+#Visualizing random effects logistic regression for the most common forms of support for rebels: materiel, weapons, and intelligence
+tab_model(rlogregress_m, rlogregress_w, rlogregress_i, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Materiel and statistics", "Weapons", "Intelligence"))
+
+#Visualizing fixed effects logistic regression as a table
+tab_model(flogregress_p, flogregress_y, flogregress_w, flogregress_m, flogregress_t, flogregress_f, flogregress_i, flogregress_l, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Foreign troop presence", "Access to infrastructure/joint operations", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"))
 
 #Running a combined logistic regression
 #Preparation
