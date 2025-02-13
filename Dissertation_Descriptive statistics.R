@@ -3,14 +3,15 @@
 
 #PREPARATION#
 #Loading relevant packages
-library(dplyr)
-library(readxl)
-library(tidyr)
-library(purrr)
-library(ggplot2)
-library(ggpattern)
-library(dagitty)
-library(ggdag)
+library(readxl) # For reading Excel files
+library(plyr)  # For mapvalues function
+library(dplyr) # For data manipulation
+library(tidyr) # For data tidying
+library(car)  # For VIF function
+library(ggplot2) # For data visualization
+library(ggpattern) # For patterned bar plots
+library(dagitty) # For DAGs
+library(ggdag) # For DAG plots
 
 #Load datasets into R
 #1. UCDP Dyadic Dataset
@@ -140,11 +141,62 @@ merged_ucdp <- merged_ucdp %>%
       ),
     )
   )
-#We now have 117 variables so seems to have worked
-###add further tests to see whether it worked
 
-###Think about how to operationalise this variable
-#Which forms of support are you specifically interested in: funding, weapons, troop
+#Identify most common combinations of support: Create a new column with the most common combinations of support
+# Identify the support variables
+support_vars <- c("ext_l", "ext_i", "ext_f", "ext_t", "ext_m", "ext_w", "ext_y", "ext_p", "ext_x")
+
+# Define readable labels for support types
+support_labels <- c(
+  "ext_l" = "access to territory",
+  "ext_i" = "intelligence",
+  "ext_f" = "funding",
+  "ext_t" = "training",
+  "ext_m" = "materiel",
+  "ext_w" = "weapons",
+  "ext_y" = "infrastructure",
+  "ext_p" = "foreign troop presence",
+  "ext_x" = "troop support"
+)
+
+# Create the ext_combination column
+merged_ucdp <- merged_ucdp %>%
+  mutate(
+    ext_combination = apply(select(., all_of(support_vars)), 1, function(row) {
+      active_support <- names(row)[row == 1]  # Extract names of active supports
+      
+      # Convert to readable labels using mapvalues
+      active_support <- mapvalues(active_support, from = names(support_labels), to = support_labels, warn_missing = FALSE)
+      
+      # Assign categories based on count of support types
+      if (length(active_support) == 0) {
+        return("no support")
+      } else if (length(active_support) == 1) {
+        return(active_support)
+      } else if (length(active_support) == 2) {
+        return(paste(active_support, collapse = " and "))  # Two types
+      } else if (length(active_support) == 3) {
+        return(paste(active_support, collapse = ", "))  # Three types
+      } else {
+        return("several forms of support")  # More than 3
+      }
+    }),
+    
+    # Convert to factor with proper levels
+    ext_combination = factor(
+      ext_combination,
+      levels = c(
+        "no support", "unknown support", "other support",
+        support_labels,  # Single support types
+        paste(support_labels, collapse = " and "),  # Two support types
+        paste(support_labels, collapse = ", "),  # Three support types
+        "several forms of support"
+      )
+    )
+  )
+
+# Ensure that ext_combination is correctly set as a factor
+class(merged_ucdp$ext_combination) #factor
 
 #Creation of a variable to differentiate between indirect and direct support
 merged_ucdp <- merged_ucdp %>%
@@ -167,8 +219,6 @@ merged_ucdp <- merged_ucdp %>%
       levels = c("no support", "indirect", "direct", "direct and indirect", "unknown") # Set the order
     )
   )
-##118 variables now so seems to have worked
-###add further checks
 
 #Creation of a duration variable#
 # Ensure the dataset is sorted by dyad_id and year
@@ -296,7 +346,8 @@ ggplot(intensity_summary, aes(x = year, y = conflict_count, fill = intensity)) +
   scale_fill_manual(values = c("grey", "black")) +
   scale_x_continuous(breaks = seq(min(intensity_summary$year), max(intensity_summary$year), by = 5)) + #Label years every 5 years
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) #Rotate x-axis labels for better readability
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), #Rotate x-axis labels for better readability
+        legend.position = "bottom") 
 
 #2. Descriptive statistics for ext_coalition
 ext_coalition_stats <- merged_ucdp |>
@@ -326,19 +377,26 @@ coalition_summary <- merged_ucdp %>%
   group_by(year, ext_coalition) %>%
   summarise(conflict_count = n(), .groups = "drop")
 
-# Create the line chart
-ggplot(coalition_summary, aes(x = year, y = conflict_count, color = ext_coalition, group = ext_coalition)) +
+#Create the line chart
+ggplot(coalition_summary, aes(x = year, y = conflict_count, color = ext_coalition, linetype = ext_coalition)) +
   geom_line(size = 1) +
   labs(
-    title = "Evolution of support types over time",
+    title = "Evolution of external support: bilateral vs coalition",
     x = "Year",
     y = "Number of conflicts",
-    color = "Support type"
+    color = "External support",
+    linetype = "External support"
   ) +
   scale_color_manual(
     values = c(
-      "Bilateral Support" = "#8c510a",
+      "Bilateral Support" = "#8c510a",   
       "Coalition Support" = "#01665e"
+    )
+  ) +
+  scale_linetype_manual(
+    values = c(
+      "Bilateral Support" = "solid",
+      "Coalition Support" = "dashed"
     )
   ) +
   theme_minimal() +
@@ -346,35 +404,6 @@ ggplot(coalition_summary, aes(x = year, y = conflict_count, color = ext_coalitio
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"
   )
-
-#OR
-
-# Combine datasets for coalition and total conflicts
-combined_coalition <- bind_rows(coalition_summary, total_summary)
-
-# Create the grouped line chart
-ggplot(combined_coalition, aes(x = year, y = conflict_count, linetype = ext_coalition)) +
-  geom_line(size = 1) +  # Add lines for each support type
-  geom_line(data = total_summary, aes(x = year, y = conflict_count, linetype = "Total"), color = "black", size = 1) +  # Add total line
-  labs(
-    title = "Coalition support, 1975–2017",
-    x = "Year",
-    y = "Number of conflict-dyads",
-    linetype = "Support type"
-  ) +
-  scale_linetype_manual(
-    values = c(
-      "Bilateral Support" = "dotted",   
-      "Coalition Support" = "dashed",
-      "Total armed conflicts" = "solid"
-    )
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1),
-    legend.position = "bottom"
-  )
-  ###Why is NA not being portrayed?
 
 #3. Incompatibility
 #3.1. Distribution of incompatibility
@@ -654,18 +683,25 @@ support_summary <- merged_ucdp %>%
   summarise(conflict_count = n(), .groups = "drop")
 
 # Create the line chart
-ggplot(support_summary, aes(x = year, y = conflict_count, color = ext_sup, group = ext_sup)) +
+ggplot(support_summary, aes(x = year, y = conflict_count, color = ext_sup, linetype = ext_sup)) +
   geom_line(size = 1) +
   labs(
     title = "Evolution of external support over time",
     x = "Year",
     y = "Number of conflicts",
-    color = "External support"
+    color = "External support",
+    linetype = "External support"
   ) +
   scale_color_manual(
     values = c(
       "No external support" = "#8c510a",
       "External support" = "#01665e"
+    )
+  ) +
+  scale_linetype_manual(
+    values = c(
+      "No external support" = "solid",
+      "External support" = "dashed"
     )
   ) +
   theme_minimal() +
@@ -706,8 +742,7 @@ ggplot(merged_ucdp, aes(x = ext_category, fill = ext_category)) +
   )) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate x-axis labels for better readability
-    ###Would be good to seperate 'several forms of support' into the most prevalent combinations
-
+      
 #6.2. Evolution of forms of support
 # Grouped summary data for trend analysis
 category_summary <- merged_ucdp %>%
@@ -790,6 +825,75 @@ ggplot(category_summary, aes(x = year, y = conflict_count, fill = ext_category))
            vjust = 1,  # Align text at the bottom
            color = "black")  # Optional, adjust color if needed
   ###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
+
+#6.3. Prevalent combinations of support
+# Calculate the average number of forms of external support provided
+mean(merged_ucdp$ext_sum, na.rm = TRUE) #3.289
+median(merged_ucdp$ext_sum, na.rm = TRUE) #4
+
+# Create a summary dataset for the most common combinations of support
+support_combinations <- merged_ucdp %>%
+  group_by(ext_combination) %>%
+  summarise(conflict_count = n(), .groups = "drop_last") %>%  # Fix `.groups` placement
+  arrange(desc(conflict_count))  # Sort by descending count
+
+# Print top combinations
+print(head(support_combinations, 10))  # Display the 10 most common combinations
+  ##several forms of support (1126), no support (425), NA (185), training+materiel+weapons (82), training (48)
+
+# Get proportion of each category
+support_combinations <- support_combinations %>%
+  mutate(percentage = (conflict_count / sum(conflict_count)) * 100)
+
+#Bar chart - Plot the top 10 most frequent support combinations in a colour-blind friendly palette
+ggplot(head(support_combinations, 10), aes(x = reorder(ext_combination, conflict_count), y = conflict_count, fill = ext_combination)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Top 10 most frequent combinations of external support",
+    x = "Combination of support",
+    y = "Count",
+    fill = "Combination of support"
+  ) +
+  scale_fill_viridis_d(option = "magma") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate x-axis labels for better readability
+
+#6.4. Evolution of prevalent combinations of support
+# Prepare the data for visualization
+combination_summary <- merged_ucdp %>%
+  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
+  group_by(year, ext_combination) %>%
+  summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each combination and year
+
+# Create the grouped line chart for the 10 most frequent support combinations
+# Identify the 10 most frequent support combinations
+top_10_combinations <- combination_summary %>%
+  group_by(ext_combination) %>%
+  summarise(total_count = sum(conflict_count)) %>%
+  arrange(desc(total_count)) %>%
+  slice_head(n = 10) %>%
+  pull(ext_combination)
+
+# Filter dataset to include only the top 10 combinations
+top_combination_summary <- combination_summary %>%
+  filter(ext_combination %in% top_10_combinations)
+
+# Plot grouped line chart
+ggplot(top_combination_summary, aes(x = year, y = conflict_count, linetype = ext_combination)) +
+  geom_line(size = 1) +  # Line for each support type
+  labs(
+    title = "Evolution of the 10 Most Common External Support Combinations",
+    x = "Year",
+    y = "Number of Conflict-Dyads",
+    linetype = "Support Combination"
+  ) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted", "dotdash", "twodash",
+                                   "longdash", "solid", "dotted", "dashed", "twodash")) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "bottom"
+  )
 
 #7. Type of support
 #7.1. Distribution of support type
@@ -896,13 +1000,14 @@ region_summary <- merged_ucdp %>%
   summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each region and year
 
 # Create the grouped line chart
-ggplot(region_summary, aes(x = year, y = conflict_count, color = region)) +
+ggplot(region_summary, aes(x = year, y = conflict_count, color = region, linetype = region)) +
   geom_line(size = 1) +  # Add lines for each region
   labs(
     title = "Evolution of conflicts by region over time",
     x = "Year",
     y = "Number of conflicts",
-    color = "Region"
+    color = "Region",
+    linetype = "Region"
   ) +
   scale_color_manual(
     values = c(
@@ -913,11 +1018,58 @@ ggplot(region_summary, aes(x = year, y = conflict_count, color = region)) +
       "Americas" = "#a6d854"
     )
   ) +
+  scale_linetype_manual(
+    values = c(
+      "Europe" = "solid",
+      "Middle East" = "dashed",
+      "Asia" = "dotted",
+      "Africa" = "dotdash",
+      "Americas" = "longdash"
+    )
+  ) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
-    legend.position = "top"
+    legend.position = "bottom"
   )
+
+#Stacked area chart
+ggplot(region_summary, aes(x = year, y = conflict_count, fill = region)) +
+  geom_area(alpha = 0.6, size = 1, color = "white") +  # Stacked area with transparent fill
+  labs(
+    title = "State-based conflicts by region (1975–2017)",
+    x = "Year",
+    y = "Number of conflicts",
+    fill = "Region"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Europe" = "#8c510a",
+      "Middle East" = "#01665e",
+      "Asia" = "#dfc27d",
+      "Africa" = "#80cdc1",
+      "Americas" = "#a6d854"
+    )
+  ) +
+  scale_x_continuous(
+    breaks = seq(1975, 2017, by = 5),  # Breaks for every 5 years
+    limits = c(1975, 2017)             # Explicit limits for the x-axis
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    plot.caption = element_text(hjust = 0),
+    plot.margin = margin(20, 20, 50, 20)
+  ) +
+  annotate("text", x = 2017,  # Set x to the last year
+           y = -5,    # Push the label below the plot area
+           label = "Based on UCDP 18.1 data", 
+           size = 3, 
+           hjust = 1,  # Right-align text
+           vjust = 1,  # Align text at the bottom
+           color = "black")  # Optional, adjust color if needed
+  ###Would like to add patterns
 
 #9. Conflict duration
 #9.1. Differences between duration_cease and duration_peace
@@ -959,21 +1111,20 @@ duration_summary <- merged_ucdp %>%
             .groups = "drop")
 
 # Create the line chart
-ggplot(duration_summary, aes(x = year)) +
-  geom_line(aes(y = mean_duration), color = "blue", size = 1) +  # Add line for mean duration
-  geom_line(aes(y = median_duration), color = "red", size = 1) +  # Add line for median duration
+ggplot(duration_summary, aes(x = year, y = mean_duration, linetype = "Mean")) +
+  geom_line(size = 1) +  # Add line for mean duration
+  geom_line(aes(x = year, y = median_duration, linetype = "Median"), size = 1) +  # Add line for median duration
   labs(
-    title = "Trend in conflict duration over time",
+    title = "Mean and Median Conflict Duration over Time",
     x = "Year",
     y = "Duration",
-    color = "Statistic"
+    linetype = "Statistic"
   ) +
-  scale_y_continuous(breaks = seq(0, 10, by = 1)) +  # Set breaks for y-axis
-  scale_color_manual(values = c("blue", "red")) +  # Set colors for lines
+  scale_linetype_manual(values = c("Mean" = "dashed", "Median" = "dotted")) +  # Set linetypes
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
-    legend.position = "top"
+    legend.position = "bottom"
   )
 
 #9.3. Conflict duration by region
@@ -1028,13 +1179,14 @@ supporter_summary <- merged_ucdp %>%
   summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each type and year
 
 # Create the line chart
-ggplot(supporter_summary, aes(x = year, y = conflict_count, color = ext_nonstate)) +
+ggplot(supporter_summary, aes(x = year, y = conflict_count, color = ext_nonstate, linetype = ext_nonstate)) +
   geom_line(size = 1) +  # Add lines for each support type
   labs(
-    title = "Evolution of state and non-state supporters over time",
+    title = "Evolution of state and non-state external supporters over time",
     x = "Year",
     y = "Number of conflicts",
-    color = "Identity of external supporter"
+    color = "Identity of external supporter",
+    linetype = "Identity of external supporter"
   ) +
   scale_color_manual(
     values = c(
@@ -1042,11 +1194,18 @@ ggplot(supporter_summary, aes(x = year, y = conflict_count, color = ext_nonstate
       "non-state supporter" = "#01665e"
     )
   ) +
+  scale_linetype_manual(
+    values = c(
+      "state supporter" = "solid",
+      "non-state supporter" = "dashed"
+    )
+  ) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
-    legend.position = "top"
+    legend.position = "bottom"
   )
+  ###Why is NA not being portrayed?
 
 #BIVARIATE ANALYSIS#
 #1. ext_coalition and ext_category 
