@@ -1,5 +1,4 @@
-##DISSERTATION##
-#Regression#
+##DISSERTATION - Regression##
 
 #PREPARATION#
 #Loading relevant packages
@@ -213,32 +212,11 @@ merged_ucdp <- merged_ucdp %>%
       levels = c("no support", "indirect", "direct", "direct and indirect", "unknown") # Set the order
     )
   )
-  ##118 variables now so seems to have worked
-    ###add further checks
 
 #Creation of a duration variable#
 # Ensure the dataset is sorted by dyad_id and year
 merged_ucdp <- merged_ucdp %>% arrange(dyad_id, year)
 
-# Calculate the new variables
-merged_ucdp <- merged_ucdp %>%
-  group_by(dyad_id) %>%
-  mutate(
-    # Calculate the first and last observed years for the dyad
-    start_year = min(year, na.rm = TRUE),  # First year in the dataset for the dyad
-    end_year = max(year, na.rm = TRUE),    # Last year in the dataset for the dyad
-    
-    # Calculate the duration including missing years
-    duration_cease = end_year - start_year + 1,
-    
-    # Calculate the duration excluding missing years
-    duration_peace = n()  # Count the actual number of rows (years) for the dyad
-  ) %>%
-  ungroup()
-
-# Reorder columns to place the new ones after 'year'
-merged_ucdp <- merged_ucdp %>%
-  relocate(start_year, end_year, duration_cease, duration_peace, .after = year)
 
 #Creation of a cumulative measure of duration
 merged_ucdp <- merged_ucdp %>%
@@ -249,7 +227,7 @@ merged_ucdp <- merged_ucdp %>%
   ) %>%
   ungroup()  # Ungroup to return the dataset to its original structure
 
-# Reorder columns to place the new ones after 'year'
+# Reorder columns to place the new one after 'year'
 merged_ucdp <- merged_ucdp %>%
   relocate(cumulative_duration, .after = year)
 
@@ -313,7 +291,8 @@ merged_ucdp$region <- factor(merged_ucdp$region,
 #Preparation
 library(arm) # For robust standard errors
 library(lme4) # For random effects models
-library(plm) # For fixed effects models
+library(fixest) # For fixed effects models
+library(texreg) # For regression tables
 library(gmodels) # For cross-tables
 library(effects) # For marginal effects
 library(sjPlot) # For plotting marginal effects
@@ -363,11 +342,22 @@ exp(fixef(rlogregress_x))
 vif(logregress_x)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_x))
+  #straight line: assumption met for duration
+
+#Test the model for outliers
+#Cook's distance is a measure of the influence of each observation on the regression coefficients.
+#It is used to identify influential data points that may have a large impact on the regression coefficients.
+#Values greater than 1 are considered influential.
+cooks.distance(rlogregress_x)
+  ##no influential data points
+
 #1.3. Fixed effects linear regression
 flinregress_x <- plm(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_x)
     #the intercept is always absorbed in fixed effects model, so it never appears in the output
-    ##incompatibility and region qre Likely dropped due to multicollinearity
+    ##incompatibility and region are likely dropped due to multicollinearity
       ##If incompatibility and region are time-invariant (i.e., they do not change within each dyad_id over time), they are automatically removed from the regression -> highly likely
       ##The fixed effects transformation subtracts the mean of each variable within each dyad_id, meaning any variable that does not vary within each dyad is dropped.
       ##BUT wouldn't that apply to type, 9/11 and Cold War as well? 
@@ -380,23 +370,26 @@ merged_ucdp %>%
   summarise(across(everything(), ~ sum(. == 1)))  # Count how many dyads have only one unique value = 472 for both
     ##Due to this result, random effects may be the better approach, as no vraibales will be excluded due to time-invariance
 
-#Otherwise:
-#Run a Hybrid Model using Mundlak's approach, which includes both within and between transformations:
-merged_ucdp <- merged_ucdp %>%
-  group_by(dyad_id) %>%
-  mutate(across(c(incompatibility, region), mean, .names = "mean_{.col}"))  # Compute dyad-level mean
-
-flinregress_x_mundlak <- plm(ext_x ~ incompatibility + mean_incompatibility + region + mean_region + 
-                             type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition, 
-                           data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
-  ###need to fix NAs
-summary(flinregress_x_mundlak)
-
-
 #1.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_x <- glmer(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_x)
-  ##Coalition support (**) is statistically significant
+flogregress_x <- glm(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_x, omit.coef = c("factor\\(dyad_id\\).*"))
+  ###all are statistically significant. Can this be correct?
+  ##AIC = ; BIC = 
+
+#Alternative:
+flogregress_xi <- feglm(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_xi)
+  ##doesn't portray output for any variables
+  ##only worked with 467 observations (in contrast to 1449 in the originally fitted model) after removing 785 due to NAs and 982 because of only 0 (or only 1) outcomes
+  ##BIC is different to the originally fitted model
+
+#Check multicollinearity
+vif(flogregress_x)
+  ###Doesn't work
+
+#Check linearity
+plot(allEffects(flogregress_x))
+  ###Doesn't work
 
 #2. Foreign troop presence
 #2.1. random effects linear regression
@@ -420,15 +413,24 @@ exp(fixef(rlogregress_p))
 vif(rlogregress_p)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_p))
+  #straight line: assumption met for duration
+
 #2.3. Fixed effects linear regression
 flinregress_p <- plm(ext_p ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_p)
   ###intercept, incompatibility and region are not portrayed in output, why?
 
 #2.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_p <- glmer(ext_p ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_p)
-  ##intensity (war) (**) is statistically significant
+flogregress_p <- glm(ext_p ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_p, omit.coef = c("factor\\(dyad_id\\).*"))
+
+#Check multicollinearity
+vif(flogregress_p)
+
+#Check linearity
+plot(allEffects(flogregress_p))
 
 #3. Access to infrastructure/joint operations
 #3.1. random effects linear regression
@@ -452,15 +454,24 @@ exp(fixef(rlogregress_y))
 vif(rlogregress_y)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_y))
+  #negative linear relationship
+
 #3.3. Fixed effects linear regression
 flinregress_y <- plm(ext_y ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_y)
 
 #3.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_y <- glmer(ext_y ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_y)
-  ##cumulative_duration (.), cold war (Post-Cold war) (***), ext_coalition (Coalition support) (***) are statistically significant
-  
+flogregress_y <- glm(ext_y ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_y, omit.coef = c("factor\\(dyad_id\\).*"))
+
+#Check multicollinearity
+vif(flogregress_y)
+
+#Check linearity
+plot(allEffects(flogregress_y))
+
 #4. weapons
 #4.1. random effects linear regression
 rlinregress_w <- lmer(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
@@ -485,14 +496,23 @@ exp(fixef(rlogregress_w))
 vif(rlogregress_w)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_w))
+  #negative linear relationship for duration
+
 #4.3. Fixed effects linear regression
 flinregress_w <- plm(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_w)
 
 #4.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_w <- glmer(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_w)
-  ##all but incompatibility (territory and government) are statistically significant (***)
+flogregress_w <- glm(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_w, omit.coef = c("factor\\(dyad_id\\).*"))
+
+#Check multicollinearity
+vif(flogregress_w)
+
+#Check linearity
+plot(allEffects(flogregress_w))
 
 #5. materiel and statistics
 #5.1. random effects linear regression
@@ -516,14 +536,23 @@ exp(fixef(rlogregress_m))
 vif(rlogregress_m)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_m))
+  #negative linear relationship for duration
+
 #5.3. Fixed effects linear regression
 flinregress_m <- plm(ext_m ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_m)
 
 #5.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_m <- glmer(ext_m ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_m)
-  ##type (internationalised intrastate) (*) and intensity (war) (***) are significant
+flogregress_m <- glm(ext_m ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_m, omit.coef = c("factor\\(dyad_id\\).*"))
+
+#Check multicollinearity
+vif(flogregress_m)
+
+#Check linearity
+plot(allEffects(flogregress_m))
 
 #6. training and expertise
 #6.1. random effects linear regression
@@ -549,14 +578,23 @@ exp(fixef(rlogregress_t))
 vif(rlogregress_t)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_t))
+  #straight line: assumption met for duration
+
 #6.3. Fixed effects linear regression
 flinregress_t <- plm(ext_t ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_t)
 
 #6.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_t <- glmer(ext_t ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_t)
-  ##type (intrastate) (.), type (internationalised intrastate) (*) and cold_war (Post-Cold War) (**) are statistically significant
+flogregress_t <- glm(ext_t ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_t, omit.coef = c("factor\\(dyad_id\\).*"))
+
+#Check multicollinearity
+vif(flogregress_t)
+
+#Check linearity
+plot(allEffects(flogregress_t))
 
 #7. funding
 #7.1. random effects linear regression
@@ -582,14 +620,23 @@ exp(fixef(rlogregress_f))
 vif(rlogregress_f)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_f))
+  #negative linear relationship for duration
+
 #7.3. Fixed effects linear regression
 flinregress_f <- plm(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_f)
 
 #7.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_f <- glmer(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_f)
-  ##type (internationalised intrastate) (.), intensity (war) (***), cumulative_duration (*) and cold_war (Post-Cold war) (*) are significant
+flogregress_f <- glm(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_f, omit.coef = c("factor\\(dyad_id\\).*"))
+
+#Check multicollinearity
+vif(flogregress_f)
+
+#check linearity
+plot(allEffects(flogregress_f))
 
 #8. intelligence
 #8.1. random effects linear regression
@@ -613,14 +660,23 @@ exp(fixef(rlogregress_i))
 vif(rlogregress_i)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_i))
+  #positive linear relationship for duration
+
 #8.3. Fixed effects linear regression
 flinregress_i <- plm(ext_i ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_i)
 
 #8.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_i <- glmer(ext_i ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_i)
-  ##Intercept (*), incompatibility (government) (**), intensity (war) (.), region (Americas) (*), nine_eleven (after 9/11) (***), cold_war (Post-Cold war) (**), and ext_coalition (Coalition support) (*) are statistically significant
+flogregress_i <- glm(ext_i ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_i, omit.coef = c("factor\\(dyad_id\\).*"))
+
+#Check multicollinearity
+vif(flogregress_i)
+
+#check linearity
+plot(allEffects(flogregress_i))
 
 #9. access to territory
 #9.1. random effects linear regression
@@ -646,14 +702,27 @@ exp(fixef(rlogregress_l))
 vif(rlogregress_l)
   ##no multicollinearity
 
+#Checking linearity assumption
+plot(allEffects(rlogregress_l))
+  #positive linear relationship for duration
+
 #9.3. Fixed effects linear regression
 flinregress_l <- plm(ext_l ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
 summary(flinregress_l)
 
 #9.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_l <- glmer(ext_l ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = binomial(link = "logit"))
-summary(flogregress_l)
-  ##incompatibility (government) (.), region (Middle East) (.), region (Africa) (***), nine_eleven (After 9/11) (.), and ext_coalition (Coalition support) (*) are statistically significant
+flogregress_l <- glm(ext_l ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
+screenreg(flogregress_l, omit.coef = c("factor\\(dyad_id\\).*"))
+
+#Check multicollinearity
+vif(flogregress_l)
+
+#check linearity
+plot(allEffects(flogregress_l))
+
+#Check model for outliers
+plot(flogregress_l, which = 4, id.n = 3)
+  ###check how to interpret this code
 
 #Visualizing random effects logistic regression as a table
 tab_model(rlogregress_p, rlogregress_y, rlogregress_w, rlogregress_m, rlogregress_t, rlogregress_f, rlogregress_i, rlogregress_l, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Foreign troop presence", "Access to infrastructure/joint operations", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"))
@@ -670,38 +739,6 @@ tab_model(rlogregress_m, rlogregress_w, rlogregress_i, pred.labels = c("(Interce
 
 #Visualizing fixed effects logistic regression as a table
 tab_model(flogregress_p, flogregress_y, flogregress_w, flogregress_m, flogregress_t, flogregress_f, flogregress_i, flogregress_l, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Foreign troop presence", "Access to infrastructure/joint operations", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"))
-
-#Running a combined logistic regression
-#Preparation
-library(nnet) # For multinomial logistic regression
-library(sandwich) # For robust standard errors
-library(lmtest) # For hypothesis testing with robust SEs
-library(brglm2) # For bias-reduced logistic regression
-
-# Fit the multinomial logistic regression model
-multinom_1 <- brmultinom(ext_category ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp)
-summary(multinom_1)
-
-# Extract coefficients
-coef(multinom_1)
-
-#Logistic regression on type of external support provided
-# Fit the multinomial logistic regression model
-multinom_2 <- multinom(ext_type ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp)
-summary(multinom_2)
-
-# Calculate z-values and p-values for the coefficients
-z_values_2 <- summary(multinom_2)$coefficients / summary(multinom_2)$standard.errors
-p_values_2 <- (1 - pnorm(abs(z_values_2), 0, 1)) * 2  # Two-tailed test
-
-z_values_2
-p_values_2
-
-# Predict probabilities for each observation
-predicted_probs_2 <- predict(multinom_2, type = "probs")
-
-# Predict the category for each observation
-predicted_categories_2 <- predict(multinom_2)
 
 ###DRAFT: CONTINUATION OF REGRESSION INTERPRETATION##
 #Rescaling the input variables to tell which predictors have a stronger effect

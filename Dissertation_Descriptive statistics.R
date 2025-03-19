@@ -10,8 +10,7 @@ library(tidyr) # For data tidying
 library(car)  # For VIF function
 library(ggplot2) # For data visualization
 library(ggpattern) # For patterned bar plots
-library(dagitty) # For DAGs
-library(ggdag) # For DAG plots
+library(gt) # For creating tables
 
 #Load datasets into R
 #1. UCDP Dyadic Dataset
@@ -98,7 +97,33 @@ for (col_name in common_columns) {
 glimpse(merged_ucdp)
 
 #Checking for missing values
-sum(is.na(merged_ucdp)) #5325
+sum(is.na(merged_ucdp)) #5321
+
+#Dependent variables - Forms of external support
+sum(is.na(merged_ucdp$ext_sum)) #0
+#Troops
+sum(is.na(merged_ucdp$ext_x))
+#Troop presence
+sum(is.na(merged_ucdp$ext_p))
+#Access to infrastructure
+sum(is.na(merged_ucdp$ext_y))
+#Weapons
+sum(is.na(merged_ucdp$ext_w))
+#Materiel and statistics
+sum(is.na(merged_ucdp$ext_m))
+#Training and expertise
+sum(is.na(merged_ucdp$ext_t))
+#Funding
+sum(is.na(merged_ucdp$ext_f))
+#Intelligence
+sum(is.na(merged_ucdp$ext_i))
+#Access to territory
+sum(is.na(merged_ucdp$ext_l))
+#Other support
+sum(is.na(merged_ucdp$ext_o))
+#Unknown support
+sum(is.na(merged_ucdp$ext_u))
+  ##all 0
 
 #COMBINATION OF FORMS OF SUPPORT#
 #Combining the separate forms of support variables into one
@@ -143,53 +168,119 @@ merged_ucdp <- merged_ucdp %>%
   )
 
 #Identify most common combinations of support: Create a new column with the most common combinations of support
-# Identify the support variables
-support_vars <- c("ext_l", "ext_i", "ext_f", "ext_t", "ext_m", "ext_w", "ext_y", "ext_p", "ext_x")
-
-# Define readable labels for support types
-support_labels <- c(
-  "ext_l" = "access to territory",
-  "ext_i" = "intelligence",
-  "ext_f" = "funding",
-  "ext_t" = "training",
-  "ext_m" = "materiel",
-  "ext_w" = "weapons",
-  "ext_y" = "infrastructure",
-  "ext_p" = "foreign troop presence",
-  "ext_x" = "troop support"
-)
-
-# Create the ext_combination column
 merged_ucdp <- merged_ucdp %>%
   mutate(
-    ext_combination = apply(select(., all_of(support_vars)), 1, function(row) {
-      active_support <- names(row)[row == 1]  # Extract names of active supports
+    ext_combination = case_when(
+      ext_sum == 0 ~ "no support",                                    # No support provided
+      ext_sum > 2 ~ "several forms of support",                       # More than two types of support provided
       
-      # Convert to readable labels using mapvalues
-      active_support <- mapvalues(active_support, from = names(support_labels), to = support_labels, warn_missing = FALSE)
+      # Explicitly include unknown and other support combinations
+      ext_u == 1 & ext_o == 1 ~ "unknown and other support",
+      ext_u == 1 & ext_l == 1 ~ "unknown support and access to territory",
+      ext_u == 1 & ext_i == 1 ~ "unknown support and intelligence",
+      ext_u == 1 & ext_f == 1 ~ "unknown support and funding",
+      ext_u == 1 & ext_t == 1 ~ "unknown support and training",
+      ext_u == 1 & ext_m == 1 ~ "unknown support and materiel",
+      ext_u == 1 & ext_w == 1 ~ "unknown support and weapons",
+      ext_u == 1 & ext_y == 1 ~ "unknown support and infrastructure",
+      ext_u == 1 & ext_p == 1 ~ "unknown support and foreign troop presence",
+      ext_u == 1 & ext_x == 1 ~ "unknown support and troop support",
       
-      # Assign categories based on count of support types
-      if (length(active_support) == 0) {
-        return("no support")
-      } else if (length(active_support) == 1) {
-        return(active_support)
-      } else if (length(active_support) == 2) {
-        return(paste(active_support, collapse = " and "))  # Two types
-      } else if (length(active_support) == 3) {
-        return(paste(active_support, collapse = ", "))  # Three types
-      } else {
-        return("several forms of support")  # More than 3
-      }
-    }),
-    
-    # Convert to factor with proper levels
+      ext_o == 1 & ext_l == 1 ~ "other support and access to territory",
+      ext_o == 1 & ext_i == 1 ~ "other support and intelligence",
+      ext_o == 1 & ext_f == 1 ~ "other support and funding",
+      ext_o == 1 & ext_t == 1 ~ "other support and training",
+      ext_o == 1 & ext_m == 1 ~ "other support and materiel",
+      ext_o == 1 & ext_w == 1 ~ "other support and weapons",
+      ext_o == 1 & ext_y == 1 ~ "other support and infrastructure",
+      ext_o == 1 & ext_p == 1 ~ "other support and foreign troop presence",
+      ext_o == 1 & ext_x == 1 ~ "other support and troop support",
+      
+      # Two types of support - explicit labeling
+      ext_l == 1 & ext_i == 1 ~ "access to territory and intelligence",
+      ext_l == 1 & ext_f == 1 ~ "access to territory and funding",
+      ext_l == 1 & ext_t == 1 ~ "access to territory and training",
+      ext_l == 1 & ext_m == 1 ~ "access to territory and materiel",
+      ext_l == 1 & ext_w == 1 ~ "access to territory and weapons",
+      ext_l == 1 & ext_y == 1 ~ "access to territory and infrastructure",
+      ext_l == 1 & ext_p == 1 ~ "access to territory and foreign troop presence",
+      ext_l == 1 & ext_x == 1 ~ "access to territory and troop support",
+      
+      ext_i == 1 & ext_f == 1 ~ "intelligence and funding",
+      ext_i == 1 & ext_t == 1 ~ "intelligence and training",
+      ext_i == 1 & ext_m == 1 ~ "intelligence and materiel",
+      ext_i == 1 & ext_w == 1 ~ "intelligence and weapons",
+      ext_i == 1 & ext_y == 1 ~ "intelligence and infrastructure",
+      ext_i == 1 & ext_p == 1 ~ "intelligence and foreign troop presence",
+      ext_i == 1 & ext_x == 1 ~ "intelligence and troop support",
+      
+      ext_f == 1 & ext_t == 1 ~ "funding and training",
+      ext_f == 1 & ext_m == 1 ~ "funding and materiel",
+      ext_f == 1 & ext_w == 1 ~ "funding and weapons",
+      ext_f == 1 & ext_y == 1 ~ "funding and infrastructure",
+      ext_f == 1 & ext_p == 1 ~ "funding and foreign troop presence",
+      ext_f == 1 & ext_x == 1 ~ "funding and troop support",
+      
+      ext_t == 1 & ext_m == 1 ~ "training and materiel",
+      ext_t == 1 & ext_w == 1 ~ "training and weapons",
+      ext_t == 1 & ext_y == 1 ~ "training and infrastructure",
+      ext_t == 1 & ext_p == 1 ~ "training and foreign troop presence",
+      ext_t == 1 & ext_x == 1 ~ "training and troop support",
+      
+      ext_m == 1 & ext_w == 1 ~ "materiel and weapons",
+      ext_m == 1 & ext_y == 1 ~ "materiel and infrastructure",
+      ext_m == 1 & ext_p == 1 ~ "materiel and foreign troop presence",
+      ext_m == 1 & ext_x == 1 ~ "materiel and troop support",
+      
+      ext_w == 1 & ext_y == 1 ~ "weapons and infrastructure",
+      ext_w == 1 & ext_p == 1 ~ "weapons and foreign troop presence",
+      ext_w == 1 & ext_x == 1 ~ "weapons and troop support",
+      
+      ext_y == 1 & ext_p == 1 ~ "infrastructure and foreign troop presence",
+      ext_y == 1 & ext_x == 1 ~ "infrastructure and troop support",
+      
+      ext_p == 1 & ext_x == 1 ~ "foreign troop presence and troop support",
+      
+      # Single forms of support
+      ext_u == 1 ~ "unknown support",
+      ext_o == 1 ~ "other support",
+      ext_l == 1 ~ "access to territory",
+      ext_i == 1 ~ "intelligence",
+      ext_f == 1 ~ "funding",
+      ext_t == 1 ~ "training",
+      ext_m == 1 ~ "materiel",
+      ext_w == 1 ~ "weapons",
+      ext_y == 1 ~ "infrastructure",
+      ext_p == 1 ~ "foreign troop presence",
+      ext_x == 1 ~ "troop support",
+      
+      TRUE ~ "no support"  # Default case to ensure all cases are covered
+    )
+  ) %>%
+  # Convert to factor with proper levels
+  mutate(
     ext_combination = factor(
       ext_combination,
       levels = c(
-        "no support", "unknown support", "other support",
-        support_labels,  # Single support types
-        paste(support_labels, collapse = " and "),  # Two support types
-        paste(support_labels, collapse = ", "),  # Three support types
+        "no support",
+        "unknown support",
+        "other support",
+        "access to territory", "intelligence", "funding", "training",
+        "materiel", "weapons", "infrastructure", "foreign troop presence", "troop support",
+        "unknown and other support",
+        "unknown support and access to territory", "unknown support and intelligence", 
+        "unknown support and funding", "unknown support and training", 
+        "unknown support and materiel", "unknown support and weapons", 
+        "unknown support and infrastructure", "unknown support and foreign troop presence", 
+        "unknown support and troop support",
+        "other support and access to territory", "other support and intelligence", 
+        "other support and funding", "other support and training", 
+        "other support and materiel", "other support and weapons", 
+        "other support and infrastructure", "other support and foreign troop presence", 
+        "other support and troop support",
+        "access to territory and intelligence", "funding and weapons", 
+        "intelligence and training", "materiel and weapons", 
+        "training and infrastructure", "foreign troop presence and troop support",
         "several forms of support"
       )
     )
@@ -197,6 +288,12 @@ merged_ucdp <- merged_ucdp %>%
 
 # Ensure that ext_combination is correctly set as a factor
 class(merged_ucdp$ext_combination) #factor
+
+#check that there's no NAs
+sum(is.na(merged_ucdp$ext_combination))
+
+# Verify the output
+table(merged_ucdp$ext_combination)
 
 #Creation of a variable to differentiate between indirect and direct support
 merged_ucdp <- merged_ucdp %>%
@@ -223,26 +320,6 @@ merged_ucdp <- merged_ucdp %>%
 #Creation of a duration variable#
 # Ensure the dataset is sorted by dyad_id and year
 merged_ucdp <- merged_ucdp %>% arrange(dyad_id, year)
-
-# Calculate the new variables
-merged_ucdp <- merged_ucdp %>%
-  group_by(dyad_id) %>%
-  mutate(
-    # Calculate the first and last observed years for the dyad
-    start_year = min(year, na.rm = TRUE),  # First year in the dataset for the dyad
-    end_year = max(year, na.rm = TRUE),    # Last year in the dataset for the dyad
-    
-    # Calculate the duration including missing years
-    duration_cease = end_year - start_year + 1,
-    
-    # Calculate the duration excluding missing years
-    duration_peace = n()  # Count the actual number of rows (years) for the dyad
-  ) %>%
-  ungroup()
-
-# Reorder columns to place the new ones after 'year'
-merged_ucdp <- merged_ucdp %>%
-  relocate(start_year, end_year, duration_cease, duration_peace, .after = year)
 
 #Creation of a cumulative measure of duration
 merged_ucdp <- merged_ucdp %>%
@@ -280,15 +357,28 @@ merged_ucdp <- merged_ucdp %>%
     cold_war = factor(cold_war, levels = c("Cold War", "Post-Cold War"))
   )
 
+#Check NAs for independent variables - conflict characteristics
+sum(is.na(merged_ucdp$intensity)) #0
+sum(is.na(merged_ucdp$type)) #0
+sum(is.na(merged_ucdp$incompatibility)) #0
+sum(is.na(merged_ucdp$region)) #0
+
+sum(is.na(merged_ucdp$ext_coalition)) #783
+sum(is.na(merged_ucdp$ext_sup)) #0
+sum(is.na(merged_ucdp$ext_nonstate)) #411
+
 #Factorising variables
 #intensity
 merged_ucdp$intensity <- factor(merged_ucdp$intensity,
                                 levels = c(1, 2),
                                 labels = c("Minor armed conflict", "War"))
+
 #ext_coalition
 merged_ucdp$ext_coalition <- factor(merged_ucdp$ext_coalition,
                                     levels = c(0, 1),
-                                    labels = c("Bilateral Support", "Coalition Support"))
+                                    labels = c("Bilateral Support", "Coalition Support"),
+                                    exclude = NULL)
+
 #incompatibility
 merged_ucdp$incompatibility <- factor(merged_ucdp$incompatibility,
                                       levels = c(1, 2, 3),
@@ -306,7 +396,8 @@ merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
 #ext_nonstate
 merged_ucdp$ext_nonstate <- factor(merged_ucdp$ext_nonstate,
                                    levels = c(0, 1),
-                                   labels = c("state supporter", "non-state supporter"))
+                                   labels = c("state supporter", "non-state supporter"),
+                                   exclude = NULL)
 
 #region
 merged_ucdp$region <- factor(merged_ucdp$region,
@@ -318,6 +409,11 @@ merged_ucdp$region <- factor(merged_ucdp$region,
 total_summary <- merged_ucdp %>%
   group_by(year) %>%
   summarise(conflict_count = n(), ext_type = "Total", .groups = "drop")  # Add "Total" as a type
+
+#Number of NAs
+sum(is.na(merged_ucdp)) #5813
+#Number of dyads
+nrow(merged_ucdp %>% distinct(dyad_id)) #472
 
 #1. Conflict intensity
 #1.1.Distribution of conflict intensity
@@ -354,6 +450,7 @@ ext_coalition_stats <- merged_ucdp |>
   group_by(ext_coalition) |>
   summarise(count = n()) |>
   mutate(percentage = (count / sum(count)) * 100)
+  ##35.05% missing values
 
 #2.1. Distribution of ext_coalition
 #Create a bar plot
@@ -379,7 +476,7 @@ coalition_summary <- merged_ucdp %>%
 
 #Create the line chart
 ggplot(coalition_summary, aes(x = year, y = conflict_count, color = ext_coalition, linetype = ext_coalition)) +
-  geom_line(size = 1) +
+  geom_line(linewidth = 1) +
   labs(
     title = "Evolution of external support: bilateral vs coalition",
     x = "Year",
@@ -404,6 +501,7 @@ ggplot(coalition_summary, aes(x = year, y = conflict_count, color = ext_coalitio
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"
   )
+  ###Why is NA not being portrayed???
 
 #3. Incompatibility
 #3.1. Distribution of incompatibility
@@ -550,7 +648,7 @@ ggplot(incompatibility_summary, aes(x = year, y = conflict_count, group = incomp
   
   # Fix x-axis breaks and limits dynamically
   scale_x_continuous(
-    breaks = breaks_seq,  # Use manually checked sequence
+    breaks = 5,  # Use manually checked sequence
     limits = c(year_range[1], year_range[2])
   )
   
@@ -879,14 +977,16 @@ top_combination_summary <- combination_summary %>%
   filter(ext_combination %in% top_10_combinations)
 
 # Plot grouped line chart
-ggplot(top_combination_summary, aes(x = year, y = conflict_count, linetype = ext_combination)) +
+ggplot(top_combination_summary, aes(x = year, y = conflict_count, color = ext_combination, linetype = ext_combination)) +
   geom_line(size = 1) +  # Line for each support type
   labs(
     title = "Evolution of the 10 Most Common External Support Combinations",
     x = "Year",
     y = "Number of Conflict-Dyads",
+    color = "Support Combination",
     linetype = "Support Combination"
   ) +
+  scale_color_viridis_d(option = "magma") + # Colour-blind friendly palette
   scale_linetype_manual(values = c("solid", "dashed", "dotted", "dotdash", "twodash",
                                    "longdash", "solid", "dotted", "dashed", "twodash")) +
   theme_minimal() +
@@ -894,6 +994,7 @@ ggplot(top_combination_summary, aes(x = year, y = conflict_count, linetype = ext
     axis.text.x = element_text(angle = 90, hjust = 1),
     legend.position = "bottom"
   )
+
 
 #7. Type of support
 #7.1. Distribution of support type
@@ -971,6 +1072,7 @@ ggplot(combined_type, aes(x = year, y = conflict_count, linetype = ext_type)) +
     axis.text.x = element_text(angle = 90, hjust = 1),
     legend.position = "bottom"
   )
+  ###NA is not being portrayed, so how do I get rid of it in the legend?
 
 #8. Region
 #8.1. Distribution of conflicts by region
@@ -1072,22 +1174,6 @@ ggplot(region_summary, aes(x = year, y = conflict_count, fill = region)) +
   ###Would like to add patterns
 
 #9. Conflict duration
-#9.1. Differences between duration_cease and duration_peace
-merged_ucdp <- merged_ucdp %>%
-  mutate(diff_duration = duration_cease - duration_peace)
-
-# Reorder columns to place the new ones after 'year'
-merged_ucdp <- merged_ucdp %>%
-  relocate(diff_duration, .after = duration_peace)
-
-# Compute the mean and median of the differences
-mean_diff <- mean(merged_ucdp$diff_duration, na.rm = TRUE)
-median_diff <- median(merged_ucdp$diff_duration, na.rm = TRUE)
-
-# Output the results
-mean_diff #2.846
-median_diff #0
-
 #9.1. Distribution of cumulative conflict duration
 #Visualization - Histogram overlaid with kernel density curve and median
 ggplot(data = merged_ucdp, aes(x = cumulative_duration)) + 
@@ -1138,15 +1224,20 @@ duration_region <- merged_ucdp %>%
             .groups = "drop")
 
 # Create the bar chart
-ggplot(duration_region, aes(x = region, y = mean_duration)) +
-  geom_bar(stat = "identity", fill = "#FF6666") +  # Bar chart for mean duration
-  geom_point(aes(y = median_duration), color = "blue", size = 3) +  # Add points for median duration
+ggplot(duration_region, aes(x = region)) +
+  geom_bar(aes(y = mean_duration, fill = "Mean Duration"), 
+           stat = "identity", show.legend = TRUE) +  # Bar chart for mean duration
+  geom_point(aes(y = median_duration, color = "Median Duration"), 
+             size = 3, show.legend = TRUE) +  # Points for median duration
   labs(
     title = "Mean and Median Conflict Duration by Region",
     x = "Region",
     y = "Duration",
-    color = "Statistic"
+    fill = "Statistic",  # Legend title for bar (mean)
+    color = "Statistic"  # Legend title for points (median)
   ) +
+  scale_fill_manual(values = c("Mean Duration" = "#FF6666")) +  # Custom color for bars
+  scale_color_manual(values = c("Median Duration" = "blue")) +  # Custom color for points
   scale_y_continuous(breaks = seq(0, 10, by = 1)) +  # Set breaks for y-axis
   theme_minimal() +
   theme(
@@ -1512,129 +1603,75 @@ print(chi_5.1)
 ###6. Conflict party and ext_category
 ###6.1. Conflict party and ext_type
 
-#DIRECTED ACYCLIC GRAPH#
-# Define the DAG structure (Variable names modified to avoid spaces)
-dag <- dagitty("
-  dag {
-    incompatibility -> type_of_conflict
-    incompatibility -> intensity
-    incompatibility -> cumulative_duration
-    type_of_conflict -> intensity 
-    type_of_conflict -> cumulative_duration
-    type_of_conflict -> provision_of_external_support
-    intensity -> supporters_GDP
-    intensity -> supporters_total_defence_spending
-    intensity <-> cumulative_duration
-    intensity <-> provision_of_external_support
-    intensity <-> type_of_support
-    region -> geographic_proximity
-    region -> incompatibility
-    cumulative_duration <-> provision_of_external_support
+#Variable table
+# Create a dataframe with variable details
+variable_table <- data.frame(
+  Category = c(
+    "Dependent Variables", rep("", 15),
+    "Independent Variables", rep("", 5),
+    "Control Variables", rep("", 3)
+  ),
+  Variable = c(
+    "", "ext_sup", "ext_x", "ext_p", "ext_y", "ext_w", "ext_m", "ext_t", "ext_f", "ext_i", "ext_l", "ext_o", "ext_u",
+    "ext_category", "ext_combination", "ext_type",
+    "", "type", "intensity", "incompatibility", "cumulative_duration", "region",
+    "", "cold_war", "nine_eleven", "ext_coalition"
+  ),
+  Description = c(
+    "", 
+    "External support provided (0 = No, 1 = Yes)",
+    "Troop support (1 = Yes)", "Foreign troop presence (1 = Yes)", 
+    "Access to infrastructure/joint operations (1 = Yes)", "Weapons support (1 = Yes)", 
+    "Materiel and logistics support (1 = Yes)", "Training and expertise support (1 = Yes)", 
+    "Funding support (1 = Yes)", "Intelligence support (1 = Yes)", 
+    "Access to territory (1 = Yes)", "Other support (1 = Yes)", "Unknown support (1 = Yes)",
+    "Categorized external support (e.g., no support, direct, indirect, troop support, etc.)",
+    "Most common combinations of external support (up to three explicitly listed)",
+    "Categorization of external support as direct, indirect, or mixed",
     
-    nine_eleven -> shared_cultural_or_ideological_ties
-    Cold_war -> shared_cultural_or_ideological_ties
-    identity_of_recipient -> shared_cultural_or_ideological_ties
+    "", 
+    "Type of conflict (1 = Extrasystemic, 2 = Interstate, 3 = Intrastate, 4 = Internationalized Intrastate)",
+    "Conflict intensity (1 = Minor conflict, 2 = War)", 
+    "Conflict incompatibility (1 = Territory, 2 = Government, 3 = Both)",
+    "Cumulative years of conflict (Years since first observed conflict year)",
+    "Region of conflict (1 = Europe, 2 = Middle East, 3 = Asia, 4 = Africa, 5 = Americas)",
     
-    colonial_ties -> shared_cultural_or_ideological_ties
-    democracy -> shared_cultural_or_ideological_ties
-    common_enemy <-> shared_cultural_or_ideological_ties
-    common_enemy -> provision_of_external_support
-    shared_cultural_or_ideological_ties -> provision_of_external_support
-    shared_cultural_or_ideological_ties -> type_of_support
-    
-    geographic_proximity -> trade_connection
-    geographic_proximity -> provision_of_external_support
-    geographic_proximity -> type_of_support
-    chance_of_spillover -> provision_of_external_support
-    chance_of_spillover -> type_of_support
-    multi_actor_dimension -> provision_of_external_support
-    multi_actor_dimension -> intensity
-    multi_actor_dimension -> type_of_conflict
-    multi_actor_dimension -> cumulative_duration
-    trade_connection -> provision_of_external_support
-    supporters_GDP -> supporters_total_defence_spending
-    supporters_total_defence_spending -> provision_of_external_support
-    
-    provision_of_external_support -> coalition_support
-    provision_of_external_support -> type_of_support
-    coalition_support -> type_of_support
-    type_of_support -> indirect_support
-    type_of_support -> direct_support
-    direct_support -> troop_presence
-    indirect_support -> access_to_infrastructure
-    indirect_support -> weapons
-    indirect_support -> materiel_and_logistics
-    indirect_support -> training_and_expertise
-    indirect_support -> intelligence
-    indirect_support -> access_to_territory
-  }
-")
+    "", 
+    "Cold War status (0 = Cold War, 1 = Post-Cold War)",
+    "Period relative to 9/11 (0 = Before 9/11, 1 = After 9/11)",
+    "Coalition support (0 = Bilateral support, 1 = Coalition support)"
+  ),
+  Measurement_Scale = c(
+    "", 
+    rep("Nominal", 12), "Ordinal", "Nominal", "Nominal",
+    "", 
+    "Nominal", "Nominal", "Nominal", "Ratio", "Nominal",
+    "", 
+    "Nominal", "Nominal", "Nominal"
+  ),
+  stringsAsFactors = FALSE
+)
 
-# Convert DAG to a tidy format
-tidy_dag <- tidy_dagitty(dag)
-
-# Extract unique node names
-node_names <- unique(tidy_dag$data$name)
-
-# Define x and y positions for clear layout using mutate()
-node_positions <- data.frame(
-  name = node_names  
-) %>%
-  mutate(
-    x = case_when(
-      name %in% c("incompatibility", "type_of_conflict", "intensity", "cumulative_duration", 
-                  "region", "Cold_war", "nine_eleven", "identity_of_recipient") ~ -6,
-      name %in% c("provision_of_external_support", "type_of_support", "direct_support", 
-                  "indirect_support", "troop_presence", "access_to_infrastructure", "weapons", 
-                  "materiel_and_logistics", "training_and_expertise", "intelligence", "access_to_territory") ~ 6,
-      TRUE ~ 0
-    ),
-    y = seq(from = 10, to = -10, length.out = length(node_names)) # Spread out nodes vertically
+# Create a formatted table using gt
+variable_table %>%
+  gt() %>%
+  tab_header(title = "Variable Table: Conflict Characteristics and External Support") %>%
+  cols_label(
+    Category = "Category",
+    Variable = "Variable Name",
+    Description = "Description",
+    Measurement_Scale = "Measurement Scale"
+  ) %>%
+  tab_options(table.font.size = "small") %>%
+  tab_style(
+    style = cell_text(weight = "bold", size = px(14)),
+    locations = cells_column_labels()
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "lightgray"),
+    locations = cells_body(rows = Variable == "")
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold", align = "left", size = px(13)),
+    locations = cells_body(rows = Variable == "")
   )
-
-# Check the structure of node_positions
-print(head(node_positions))
-
-# Merge positions into DAG data (ensure tidy_dag$data has 'name' column)
-tidy_dag$data <- tidy_dag$data %>%
-  left_join(node_positions, by = "name")
-
-# Rename the x.x, y.x columns to x and y
-tidy_dag$data <- tidy_dag$data %>%
-  rename(x = x.y, y = y.y)
-
-# Check the structure of the resulting merged data
-print(head(tidy_dag$data))
-
-# Ensure x and y columns are now present
-if (!all(c("x", "y") %in% colnames(tidy_dag$data))) {
-  stop("Error: x and y columns do not exist in tidy_dag$data after merging!")
-}
-
-# Extract edges and positions
-edges <- as.data.frame(edges(dag)) %>%
-  rename(from = v, to = w) %>%
-  left_join(tidy_dag$data %>% select(name, x, y), by = c("from" = "name"), suffix = c("_from", "")) %>%
-  left_join(tidy_dag$data %>% select(name, x, y), by = c("to" = "name"), suffix = c("", "_end")) %>%
-  rename(xend = x_end, yend = y_end)
-
-# Ensure edges have valid positions
-if (any(is.na(edges$x) | is.na(edges$y) | is.na(edges$xend) | is.na(edges$yend))) {
-  stop("Error: Some edges have missing x or y positions!")
-}
-
-# Plot the improved DAG
-ggplot() +
-  geom_segment(data = edges, aes(x = x, y = y, xend = xend, yend = yend), 
-               arrow = arrow(length = unit(0.2, "cm")), color = "black") +
-  geom_text(data = tidy_dag$data, aes(x = x, y = y, label = name), size = 4, hjust = 0.5, vjust = 0.5) +
-  theme_minimal() +
-  ggtitle("DAG on the Effect of Conflict Characteristics on External Support") +
-  theme(
-    plot.title = element_text(hjust = 0.5),  # Center the title
-    axis.title = element_blank(),            # Remove axis labels
-    axis.text = element_blank(),             # Remove axis text
-    panel.grid = element_blank()             # Remove grid
-  )
-  ###completely unreadable...
-  ## Any suggestions on how to fix this? I have attempted multiple times but just end in a circle of errors
