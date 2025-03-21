@@ -272,6 +272,11 @@ merged_ucdp$incompatibility <- factor(merged_ucdp$incompatibility,
 merged_ucdp$type <- factor(merged_ucdp$type,
                                        levels = c(1, 2, 3, 4),
                                        labels = c("extrasystemic", "interstate", "intrastate", "internationalised intrastate"))
+
+#Relevel type so that intrastate becomes the reference group in the regression analysis
+merged_ucdp$type <- factor(merged_ucdp$type,
+                           levels = c("intrastate", "extrasystemic", "interstate", "internationalised intrastate"))
+
 #ext_sup
 merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
                            levels = c(0, 1),
@@ -291,7 +296,8 @@ merged_ucdp$region <- factor(merged_ucdp$region,
 #Preparation
 library(arm) # For robust standard errors
 library(lme4) # For random effects models
-library(fixest) # For fixed effects models
+library(plm) # For linear fixed effects models
+library(fixest) # For logistic fixed effects models
 library(texreg) # For regression tables
 library(gmodels) # For cross-tables
 library(effects) # For marginal effects
@@ -374,21 +380,33 @@ merged_ucdp %>%
 flogregress_x <- glm(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
 screenreg(flogregress_x, omit.coef = c("factor\\(dyad_id\\).*"))
   ###all are statistically significant. Can this be correct?
-  ##AIC = ; BIC = 
 
 #Alternative:
 flogregress_xi <- feglm(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_xi)
-  ##doesn't portray output for any variables
   ##only worked with 467 observations (in contrast to 1449 in the originally fitted model) after removing 785 due to NAs and 982 because of only 0 (or only 1) outcomes
   ##BIC is different to the originally fitted model
+    ##BIC: 364.7; adj. pseudo R-squared: 0.81
+  ##type (internationalised intrastate) (***), nine_eleven (after) (***), cold_war (after) (***), and ext_coalition (Coalition support) (***) are statistically significant
+
+#Continue with the alternative as this seems to work
+
+coef(flogregress_xi) #provides coefficients
+confint (flogregress_xi) #provides confidence intervals
+  #if it doesn't cross zero, that implies statistical significance
+
+#Check for NAs to see where 785 observations that were dropped due to NAs might be coming from
+colSums(is.na(merged_ucdp))
+  ##783 NAs for ext_coalition
+  ##Where are the two other missing observations coming from? (785 observations removed because of NA values (RHS: 785). -> address in limitations
 
 #Check multicollinearity
-vif(flogregress_x)
-  ###Doesn't work
+vif(flogregress_xi)
+  ##No intercept: vifs may not be sensible.
+  ##no multicollinearity
 
 #Check linearity
-plot(allEffects(flogregress_x))
+plot(allEffects(flogregress_xi))
   ###Doesn't work
 
 #2. Foreign troop presence
@@ -423,11 +441,15 @@ summary(flinregress_p)
   ###intercept, incompatibility and region are not portrayed in output, why?
 
 #2.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_p <- glm(ext_p ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
-screenreg(flogregress_p, omit.coef = c("factor\\(dyad_id\\).*"))
+flogregress_p <- feglm(ext_p ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_p)
+  ##only uses 165 observations after removing 785 due to NAs and 1284 because of only 0 or 1 outcomes
+  ##BIC: 225.4; adj. pseudo R-squared: 0.008911
+  ##nine_eleven (after) (***), and cold_war (after) (***) are statistically significant
 
 #Check multicollinearity
 vif(flogregress_p)
+  ##no multicollinearity
 
 #Check linearity
 plot(allEffects(flogregress_p))
@@ -463,11 +485,15 @@ flinregress_y <- plm(ext_y ~ incompatibility + type + intensity + region + cumul
 summary(flinregress_y)
 
 #3.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_y <- glm(ext_y ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
-screenreg(flogregress_y, omit.coef = c("factor\\(dyad_id\\).*"))
+flogregress_y <- feglm(ext_y ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_y)
+  ##only uses 612 observations after removing 785 due to NAs and 837 because of only 0 or 1 outcomes
+  ##BIC: 1074.7; Adj. Pseudo R-squared: 0.044885
+  ##no variables are statistically significant
 
 #Check multicollinearity
 vif(flogregress_y)
+  ##no multicollinearity
 
 #Check linearity
 plot(allEffects(flogregress_y))
@@ -505,11 +531,15 @@ flinregress_w <- plm(ext_w ~ incompatibility + type + intensity + region + cumul
 summary(flinregress_w)
 
 #4.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_w <- glm(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
-screenreg(flogregress_w, omit.coef = c("factor\\(dyad_id\\).*"))
+flogregress_w <- feglm(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_w)
+  ##uses 557 observations after removing 785 due to NAs and 892 because of only 0 or 1 outcomes
+  ##BIC: 949.6; Adj. Pseudo R-squared: 0.157779
+  ##intensity(war) (*), cumulative_duration (*), nine_eleven (after) (*), and cold_war (after) (.) are statistically significant
 
 #Check multicollinearity
 vif(flogregress_w)
+  ##no multicollinearity
 
 #Check linearity
 plot(allEffects(flogregress_w))
@@ -545,11 +575,15 @@ flinregress_m <- plm(ext_m ~ incompatibility + type + intensity + region + cumul
 summary(flinregress_m)
 
 #5.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_m <- glm(ext_m ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
-screenreg(flogregress_m, omit.coef = c("factor\\(dyad_id\\).*"))
+flogregress_m <- feglm(ext_m ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_m)
+  ##uses 603 observations after removing 785 due to NAs and 846 because of only 0 or 1 outcomes
+  ##BIC: 1051.2; Adj. Pseudo R-squared: 0.071311
+  ##intensity (war) (.) is statistically significant
 
 #Check multicollinearity
 vif(flogregress_m)
+  ##no multicollinearity
 
 #Check linearity
 plot(allEffects(flogregress_m))
@@ -587,11 +621,15 @@ flinregress_t <- plm(ext_t ~ incompatibility + type + intensity + region + cumul
 summary(flinregress_t)
 
 #6.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_t <- glm(ext_t ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
-screenreg(flogregress_t, omit.coef = c("factor\\(dyad_id\\).*"))
+flogregress_t <- feglm(ext_t ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_t)
+  ##uses 515 observations after removing 785 due to NAs and 934 because of only 0 or 1 outcomes
+  ##BIC: 885.2; Adj. Pseudo R-squared: 0.030282
+  ##type (internationalised intrastate) (.), and cold_war (Post-Cold war) (.) are statistically significant
 
 #Check multicollinearity
 vif(flogregress_t)
+  ##no multicollinearity
 
 #Check linearity
 plot(allEffects(flogregress_t))
@@ -629,11 +667,15 @@ flinregress_f <- plm(ext_f ~ incompatibility + type + intensity + region + cumul
 summary(flinregress_f)
 
 #7.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_f <- glm(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
-screenreg(flogregress_f, omit.coef = c("factor\\(dyad_id\\).*"))
+flogregress_f <- feglm(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_f)
+  ##uses 683 observations after removing 785 due to NAs and 766 because of only 0 or 1 outcomes
+  ##BIC: 1128.9; Adj. Pseudo R-squared: 0.179317
+  ##intensity (war) (*), and cumulative_duration (*) are statistically significant
 
 #Check multicollinearity
 vif(flogregress_f)
+  ##no multicollinearity
 
 #check linearity
 plot(allEffects(flogregress_f))
@@ -669,11 +711,15 @@ flinregress_i <- plm(ext_i ~ incompatibility + type + intensity + region + cumul
 summary(flinregress_i)
 
 #8.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_i <- glm(ext_i ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
-screenreg(flogregress_i, omit.coef = c("factor\\(dyad_id\\).*"))
+flogregress_i <- feglm(ext_i ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_i)
+  ##uses 513 observations after removing 785 due to NAs and 936 because of only 0 or 1 outcomes
+  ##BIC: 795.6; Adj. Pseudo R-squared: 0.208345
+  ##intensity (war) (.), cumulative_duration (.), and cold_war (Post-Cold war) (*) are statistically significant
 
 #Check multicollinearity
 vif(flogregress_i)
+  ##no multicollinearity
 
 #check linearity
 plot(allEffects(flogregress_i))
@@ -711,11 +757,15 @@ flinregress_l <- plm(ext_l ~ incompatibility + type + intensity + region + cumul
 summary(flinregress_l)
 
 #9.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_l <- glm(ext_l ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + factor(dyad_id), family = binomial, data = merged_ucdp)
-screenreg(flogregress_l, omit.coef = c("factor\\(dyad_id\\).*"))
+flogregress_l <- feglm(ext_l ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_l)
+  ##uses 681 observations after removing 785 due to NAs and 768 because of only 0 or 1 outcomes
+  ##BIC: 1113.8; Adj. Pseudo R-squared: 0.169719
+  ##nine_eleven (after) (.) is statistically significant
 
 #Check multicollinearity
 vif(flogregress_l)
+  ##no multicollinearity
 
 #check linearity
 plot(allEffects(flogregress_l))
