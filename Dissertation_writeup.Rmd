@@ -27,11 +27,11 @@ word_count <- str_count(paste(rmd_text, collapse = " "), "\\S+")
 print(word_count)
 ```
 
-# Declaration and Copyright statement
-## Dissertation Declaration
+## Declaration and Copyright statement
+### Dissertation Declaration
 This work is all the author’s original work unless referenced clearly to the contrary. No portion of the work referred to in the dissertation has been submitted in support of an application for another degree or qualification of this or any other university or other institute of learning.
 
-## Dissertation Intellectual Property Statement
+### Dissertation Intellectual Property Statement
 The author of this dissertation (including any appendices and/or schedules to this dissertation) owns certain copyright or related rights in it (the “Copyright”) and she has given The University of Manchester certain rights to use such Copyright, including for administrative purposes. 
 
 i.	Copies of this dissertation, either in full or in extracts and whether in hard or electronic copy, may be made only in accordance with the Copyright, Designs and Patents Act 1988 (as amended) and regulations issued under it or, where appropriate, in accordance with licensing agreements which the University has entered into. This page must form part of any such copies made.
@@ -40,7 +40,7 @@ ii.	The ownership of certain Copyright, patents, designs, trademarks and other i
 
 iii.	Further information on the conditions under which disclosure, publication and commercialisation of this dissertation, the Copyright and any Intellectual Property and/or Reproductions described in it may take place is available in the University IP Policy, in any relevant Dissertation restriction declarations deposited in the University Library, and The University Library’s regulations. 
 
-# Abstract
+## Abstract
 
 All analyses were conducted in R (R Core Team, 2024), with the analytic code and input data made publicly available on GitHub to ensure transparency and facilitate replication. 
 ```{r Preparation, include=FALSE}
@@ -400,11 +400,6 @@ merged_ucdp$type <- factor(merged_ucdp$type,
 #Relevel type so that intrastate becomes the reference group in the regression analysis
 merged_ucdp$type <- factor(merged_ucdp$type,
                            levels = c("intrastate", "extrasystemic", "interstate", "internationalised intrastate"))
-                           
-#ext_sup
-merged_ucdp$ext_sup <- factor(merged_ucdp$ext_sup,
-                              levels = c(0, 1),
-                              labels = c("No external support", "External support"))
 
 #ext_nonstate
 merged_ucdp$ext_nonstate <- factor(merged_ucdp$ext_nonstate,
@@ -424,77 +419,77 @@ rm(ucdp_dyadic, ucdp_esd)
 rm(common_columns, col_name, col, col_x, col_y)
 ```
 
-# Introduction
+## Introduction
 Despite a reduction in conflicts and deaths, the past decade remains the most violent on record (Engström, Pettersson, and Öberg, 2024). Discussions around armed conflicts and external support have once again become extremely relevant to the political context and international relations, with the USA withdrawing large means of their military and financial support to Ukraine and many other geopolitical tensions and conflicts ongoing. Not only do these developments raise questions around the responsibility to and the sustainability of support but further around the future of military alliances and combined defence efforts such as NATO. Today, although conflicts are largely fought by developing nations, they rely heavily on advanced military equipment produced by industrial countries, further reinforcing military over social investments (Sivard, 1996). The prevalence and complexity of external support in armed conflicts have grown significantly over the past decades. From 1975 to 2017, 80% of intrastate conflicts involved at least one instance of external support, with state actors being the predominant supporters (Meier et al., 2023). Recent years have seen systemic shifts in external support, characterised by the rise of multilateral coalitions and collaborative interventions. Nearly one-third of all support instances now involve such coalitions, emphasising burden-sharing and legitimacy (Meier et al., 2023). This raises questions around the responsibility and accountability of external supporters, especially when military actions turn into war crimes. 
 
 While extremely timely, Criminology has historically neglected armed conflict (Hagan, 2015; Jamieson, 2003; Ruggiero, 2015; Walklate and McGarry, 2015), let alone external support. But even in research on external support, the content of interventions remains underexplored, despite its impact on conflict trajectories. Differentiating between support types - military training, material aid, or safe havens - can highlight distinct effects on outcomes (Roberts, 2019).
 
 This research adopts an interdisciplinary approach, integrating Criminology, Peace and Conflict Studies, and Economics to examine whether conflict characteristics affect the provision of external support and identify trends and conditions under which external support is provided. By distinguishing between support types, it aims to provide a more robust understanding of the role of external supporters and their motives, essential for further discussions around liability and responsibility. In doing so, it bridges critical gaps in Criminology, contributing to a more comprehensive understanding of the interplay between external interventions and conflict dynamics.
 
-# Literature Review
-The landscape of armed conflict has shifted in recent decades, with a rise in internationalised intrastate conflicts where external states support non-state actors opposing governments (Engström, Pettersson, and Öberg, 2024). Armed conflict herein is defined as 'a contested incompatibility that concerns government and/or territory where the use of armed force between two parties, of which at least one is the government of a state, results in at least 25 battle-related deaths in a calendar year' (Themner, 2017). The primary parties in such conflicts include governments, which control the state capital, and opposition organisations, which are formally organised groups using armed force to influence the outcome of the incompatibility.
+## Literature Review
+The landscape of armed conflict has shifted in recent decades, with a rise in internationalised intrastate conflicts where external states support non-state actors opposing governments (Engström, Pettersson, and Öberg, 2024). Armed conflict herein is defined as 'a contested incompatibility that concerns government and/or territory where the use of armed force between two parties, of which at least one is the government of a state, results in at least 25 battle-related deaths in a calendar year' (Themner, 2017, p.2). The primary parties in such conflicts include governments, which control the state capital, and opposition organisations, which are formally organised groups using armed force to influence the outcome of the incompatibility.
 
 Although developing nations fight most of today's conflicts, they are often fought with weapons from industrialised countries, reflecting 20th-century technological advancements (Sivard, 1996). As geopolitical tensions rise, the role of external support in these conflicts has become a central topic of discussion (Ayiar et al., 2023; Federle et al., 2024). External support, defined as militarily relevant assistance provided by outside parties to active conflicts, is distinct from peacetime activities like arms trade or security reforms (Meier et al., 2023; Meier, 2022). This support aims to enhance the recipient’s military capabilities and is provided with the clear intent of facilitating military victory over the opposing side. It includes materiel, knowledge, or services directly aiding warfare but excludes unintentional support (e.g., due to state weakness) and indirect measures like sanctions. Additionally, diplomatic efforts, humanitarian aid, and mediation offers do not qualify as external support since they do not directly contribute to the military outcome. The external nature of support is determined by whether the provider is not a primary warring party in the conflict, even if present in the same territory.
 
 Foreign military operations, though a small portion of defence spending, are pivotal in defining international relations and interventions (Marín, 2021). Understanding why and how states intervene and the consequences of different types of support is vital to analysing external involvement. The interplay between conflict characteristics and external support is complex, with interventions - whether direct military actions or indirect aid - often prolonging hostilities and complicating peace efforts. This research seeks to explore these themes, examining how conflict characteristics shape external interventions.
 
-## Armed conflicts in the social sciences
+### Armed conflicts in the social sciences
 Armed conflict remains a pervasive yet underexplored subject in the social sciences, despite its profound historical and societal impact. Following the so-called ‘century of peace’ (1815–1914), war violence has persisted across continents, yet sociological inquiry has failed to match its prevalence or significance. States, through their ‘legitimate monopoly of violence’ (Weber, 1919 in McGarry and Walklate, 2019), justify violence via bureaucratic rationality, framing war as a noble endeavour to solidify authority and autonomy (Malešević, 2010a in McGarry and Walklate, 2019). Internationally, economic imperatives often guide responses to war, reducing it to a developmental obstacle, while historically, war was driven by imperial capitalist expansion (Ruggiero, 2023; Bonger, 1916 in McGarry and Walklate, 2019). Ethical frameworks further complicate the discourse, distinguishing ‘unjust’ wars, violating global peace, from ‘just’ wars perceived as punishment (Sutherland, 1942 in McGarry and Walklate, 2019), highlighting the contested morality surrounding armed conflict.
 
-### ‘Just war’ theory
-‘Just war’ theory provides a framework for evaluating the morality of armed conflict, focusing on principles across its stages. Jus ad bellum considers pre-war criteria, including just cause, proportionality, and likelihood of success, ensuring war is waged to establish peace and fairness (Ruggiero, 2023). Jus in bello governs conduct during war, mandating proportionate and necessary actions while sparing civilians. However, euphemisms like ‘peace operations’ often obscure objectives, and actors exploit conflict for economic gain (Freedman, 2014; Ruggiero, 2023). Collateral damage is reframed as an ‘externality,’ minimising harm to non-combatants (Ruggiero, 2023). Jus post bellum emphasizes accountability and rebuilding but is hindered by cycles of violence and instability (Galtung, 2005 in Ruggiero, 2023). Critics argue that powerful states manipulate just war theory, undermining its ethical foundation through unilateralism and disregard for international norms (Ruggiero, 2023).
-
-## Criminological theories on armed conflicts
+### Criminological theories on armed conflicts
 Criminology has historically neglected armed conflict, despite its relevance to violence, victimisation, and state power (Hagan, 2015; Jamieson, 2003; Ruggiero, 2015; Walklate and McGarry, 2015). Critical criminologists view war as a form of state crime legitimised by dominant powers who shape international norms to justify past and future conflicts (Kramer and Michalowski, 2005; Bonanate, 2011 in Ruggiero, 2023). War is intertwined with the political economy and often rooted in capitalism, which fuels conflicts through profit-driven globalisation (Bonger, 1916 in McGarry and Walklate, 2018; Klein, 2011). This global economic system blurs lines between legitimate and harmful actions, exacerbating violence (Ruggiero, 2005).
 
 Despite millions of ‘legitimate’ killings in war, criminology has been reluctant to challenge the legitimacy of such violence or address its broader systemic causes (Ruggiero, 2005). Wartime atrocities are reframed as patriotic acts, aligning with state narratives through techniques of neutralisation (Sykes and Matza, 1957; Ruggiero, 2005). Examining external conflict support raises critical questions about complicity, liability for war crimes, and whether such support escalates violence or fosters peace. These dynamics underscore the importance of rethinking state authority, as legality and illegality are often strategically maneuvered in the pursuit of power (Heyman, 1999 in Ruggiero, 2005). As war weakens social bonds, fosters disorganisation, and perpetuates cycles of violence, criminologists have a unique opportunity to address its multifaceted impacts and advocate for systemic reforms, including peaceful conflict resolution and global resource redistribution (Jamieson, 1998; Ruggiero, 2005).
 
-## The economic cost of conflict and mass violence
-### The effects of armed conflicts on the conflict parties
+#### Hot and cold wars: The evolution of armed conflict
+Criminological genocide studies distinguish between 'hot' and 'cold' acts of mass violence (Rafter, 2016), reflecting the emotional dynamics that drive mass violence. "Hot" genocides are characterised by forward panic (Collins in Rafter, 2016), a highly aroused emotional state where prolonged tension and fear suddenly erupt into explosive violence. This emotional rush carries perpetrators into a cycle of aggression, elation, and hysteria, often leading to actions they would not commit in calmer moments. Mass violence tends to escalate when strong emotional momentum is achieved. However, not all genocides are driven by intense emotions — some unfold in a more calculated, bureaucratic manner, devoid of immediate emotional frenzy. In reality, genocides are not purely 'hot' or 'cold' but may fluctuate between these emotional states over time. This study attempts to apply this concept to the provision of external support in armed conflicts, exploring whether external support is correlated with conflict characteristics and might thereby be determined to be a calculated, rational choice. Such analysis can shed light on the emotional and strategic dynamics of external support, offering insights into the motives and strategies of intervention.
+
+### The economic cost of conflict and mass violence
+#### The effects of armed conflicts on the conflict parties
 War and armed conflict profoundly impact parties involved, with ordinary civilians disproportionately suffering due to fatalities, displacement, and long-term public health crises from destroyed infrastructure (Hoeffler and Reynal-Querol, 2003). War-torn countries face reduced growth, higher poverty rates, and weakened institutions, with recovery dependent on robust policy reforms (Hoeffler and Reynal-Querol, 2003). High-intensity violence during conflicts lowers economic growth, life expectancy, and educational attainment, with these effects often persisting long-term (Le, Bui, and Uddin, 2022). Increased military spending further distorts government budgets, diverting resources from critical public goods like healthcare and education (Hoeffler and Reynal-Querol, 2003).
 
 However, economic impacts vary by context. Domestic wars typically reduce growth, while wars fought abroad can stimulate mild economic expansion through increased military spending and investments in related sectors (Federle et al., 2024; Chupilkin and Kóczán, 2022). War economies sometimes exhibit resilience, particularly in developed states where increased labour and capital utilisation mitigate conflict's effects (Rasler and Thompson, 1985). Nonetheless, countries experiencing war on their territory often face catastrophic economic fallout, with non-initiators and losers suffering the largest GDP declines (Chupilkin and Kóczán, 2022). The enduring economic and social costs of war underscore its profoundly criminogenic nature.
 
-### The effects of armed conflicts on other countries
+#### The effects of armed conflicts on other countries
 Wars and armed conflicts generate significant spillover effects, with severity influenced by geographic proximity and economic ties to the conflict zone. Neighbouring countries often face adverse economic consequences, while distant nations experience milder effects due to limited trade links and geographic distance (Federle et al., 2024). Weak trade integration can shield distant countries from severe supply shocks, and increased military spending may even stimulate economic activity in specific sectors (Federle et al., 2024). However, regions with stronger economic ties to the conflict zone experience amplified negative impacts, including disrupted stability and heightened uncertainty (Fang et al., 2020; Le, Bui, and Uddin, 2022). While inflation and output remain stable in distant countries, the ripple effects of war challenge interconnected global economies, highlighting the complex dynamics between conflict and economic stability (Federle et al., 2024).
 
-## External support to armed conflicts
+### External support to armed conflicts
 Research on external support in armed conflicts highlights its significant impact on conflict dynamics and outcomes. External actors, including state and non-state supporters, play pivotal roles by shaping conflict processes through diverse forms of assistance, such as military training and direct intervention (Gleditsch, 2007; Salehyan, 2010; Toukan, 2019).
 
 The type and target of external support often align with intervening parties' strategic interests. Governments typically receive training and troop assistance, while rebel groups rely on material aid, including light weaponry and technical expertise (Meier et al., 2023; Berlin and Malone, 2023). Rebel sponsorship is more common when governments also receive support, reflecting the interconnected nature of interventions (Salehyan et al., 2011). Nonetheless, support dynamics vary by conflict intensity, geographic proximity, and the relative strength of involved parties. Rebel groups seen as either too strong or too weak are less likely to attract aid due to their perceived ability to succeed or fail independently (Salehyan, Gleditsch, and Cunningham, 2011). The Cold War intensified conflicts through superpower support, but its end shifted patterns, reducing insurgencies and prolongation, while rebel groups lost aid, leading many conflicts to peter out or end in settlements (Testerman, 2015; Kalyvas and Balcells, 2010 in Roberts, 2019).
 
 Over recent decades, the number of actors providing external support has grown, despite only a slight rise in total conflicts (Meier et al., 2023). This proliferation adds veto players, complicating bargaining and potentially prolonging conflicts (Cunningham, 2010). By 2017, 77% of active conflict-dyads featured state support for governments alone, driven in part by the post-9/11 counterterrorism focus, which stigmatised support for non-state actors (Meier et al., 2023). Multilateral counter-extremism efforts, often led by UN Security Council members, have reinforced this trend (Meier et al., 2023).
 
-Direct military interventions have become the most common form of external support, with intervening states increasingly opting to deploy their own troops rather than solely providing equipment and training (Meier et al., 2023). This shift reflects a broader trend toward intensive engagement strategies, particularly among external states with significant stakes in conflict outcomes. While foreign troops are deployed in less than 20% of conflicts, they are often associated with heavy force models, including strategic bombing and civilian protection (Sullivan and Karreth, 2019). Training and expertise remain the most frequent forms of support , while material aid dominates assistance to rebel groups (Meier et al., 2023; Berlin and Malone, 2023). States that sponsor armed groups tend to back multiple organisations, with an average of 10.36 groups supported per state (Berlin and Malone, 2023).
+*Direct military interventions have become the most common form of external support*, with intervening states increasingly opting to deploy their own troops rather than solely providing equipment and training (Meier et al., 2023). This shift reflects a broader trend toward intensive engagement strategies, particularly among external states with significant stakes in conflict outcomes. While foreign troops are deployed in less than 20% of conflicts, they are often associated with heavy force models, including strategic bombing and civilian protection (Sullivan and Karreth, 2019). *Training and expertise remain the most frequent forms of support*, while material aid dominates assistance to rebel groups (Meier et al., 2023; Berlin and Malone, 2023). States that sponsor armed groups tend to back multiple organisations, with an average of 10.36 groups supported per state (Berlin and Malone, 2023).
 
 The internationalisation of intrastate conflicts highlights notable trends. While troop support has declined, the total number of external interventions continues to grow, reflecting persistent interest in shaping conflict trajectories through both direct and indirect means (Engström, Pettersson, and Öberg, 2024; Chang and Sellak, 2022). These evolving dynamics underscore external support's dual role as both an escalatory factor and a mechanism for resolution, offering critical insights for modern conflict management.
 
-### Why external supporters get involved
+#### Why external supporters get involved
 External supporters engage in civil conflicts for diverse and strategic reasons, including geopolitical, economic, and ideological motives, as well as specific foreign policy objectives (Findlay and Teo, 2006; Meier et al., 2023). Economic interests often drive involvement, with external powers seeking to protect trade benefits or access resources by backing domestic victors (Regan, 1998; Kathman, 2011). In some instances, involvement appears benevolent, such as facilitating peace talks (Bhattarai, 2016). However, third-party intervention is rarely altruistic; states often aim to weaken adversaries, prevent conflict spillover, or maintain influence in post-colonial regions (Cunningham, 2010; Gregory, 2000).
 
 Shared ethnic or ideological ties between sponsors and armed groups are among the strongest predictors of external support (Salehyan, Gleditsch, and Cunningham, 2011; Sozer, 2016). These connections signal shared goals and reduce the risk that resources will be misused (Berlin and Malone, 2023; Salehyan, 2010). Common cultural or ideological ground facilitates communication and enhances trust, improving cooperation (San Akca, 2016; Bacon, 2018). Democratic states often support each other in combating rebels, reflecting shared values and interests in stability (Goldman and Abulof, 2016). However, relying on such ties can oversimplify sponsorship decisions, especially in contexts with multiple potential recipients or competing priorities (Berlin and Malone, 2023).
 
 Strategically, sponsoring militant groups enables states to destabilise rivals or gain leverage without direct conflict. Delegating violence minimises costs while exploiting the instability inflicted on adversaries (Schultz, 2010; Bapat, 2011). However, this approach carries risks, including retaliation, escalation, and the possibility that armed groups will pursue independent agendas (Schultz, 2010; Maoz and San Akca, 2012). Ultimately, external support is a calculated foreign policy tool used to influence conflict outcomes while advancing sponsors’ strategic goals.
 
-### The effects of external support on conflicts
+#### The effects of external support on conflicts
 External support profoundly influences armed conflict, shaping its onset (Cunningham, 2016; Regan and Meachum, 2014), duration (Aydin and Regan, 2011; Anderson, 2019), outcomes (Sawyer, Cunningham and Reed, 2017), and recurrence (Karlén, 2017). Many contemporary conflicts are recurrences of previous ones, particularly territorial disputes, which are prone to persistence due to entrenched incompatibilities (Quinn, Mason, and Gurses, 2007). In such cases, external support is often limited, as most states favour preserving territorial status quos.
 
 Interventions, whether direct (troops) or indirect (weapons, logistics, training), frequently prolong conflicts by altering the cost-benefit calculations of belligerents (Fearon, in Testerman, 2015; Lacina, 2006). Although external aid can alter power dynamics, it frequently intensifies conflicts, complicates negotiations, and reduces the likelihood of peaceful resolutions (Olson Lounsbery, 2016). It also internationalises conflicts, introducing new veto players and complicating bargaining dynamics (Zartman, 1992 in Saideman, 2002; Salehyan, Gleditsch, and Cunningham, 2011). When foreign states support rebel groups, they not only supply material resources but also confer political legitimacy, further complicating resolution efforts and prolonging violence (Petrova, 2019).
 
 External support’s impact extends to post-conflict dynamics. Rebel groups with sustained backing are more likely to remobilise, anticipating future assistance, thereby increasing conflict recurrence (Karlén, 2017). Although external support can improve the odds of military victory (Balch-Lindsay et al., 2008), it often exacerbates humanitarian crises, with rebels exploiting moral hazards to attract further intervention (Rauchhaus, 2009). Thus, while external support can alter power dynamics and sustain resistance, it frequently intensifies violence, complicates negotiations, and reduces the chances of a peaceful resolution, underscoring its complex and paradoxical role in armed conflicts.
 
-### Limitations of past research
+#### Limitations of past research
 The study of external support in armed conflicts has provided critical insights but is hindered by several limitations. Much research focuses predominantly on support for non-state armed groups, particularly rebel organisations, sidelining other actors and minor armed engagements (Walter, 2004; Quinn, Mason, and Gurses, 2007). Additionally, studies often emphasise the initial decision to delegate support (Salehyan, 2010; San-Akca, 2016), neglecting how support dynamics evolve throughout a conflict’s lifecycle and the strategic factors influencing its continuation or cessation (Karlén, 2019; Tokdemir et al., 2021).
 
 The content of interventions remains underexplored, despite its impact on conflict trajectories. Differentiating between support types - military training, material aid, or safe havens - can highlight distinct effects on outcomes (Roberts, 2019). Furthermore, the multi-actor dimension of support is frequently overlooked, despite evidence that sponsors selectively support specific groups within fragmented conflicts (Berlin and Malone, 2023).
 
 A focus on rebel groups introduces methodological challenges and selection bias, limiting generalisability to other armed organisations (Abrahms, Ward, and Kennedy, 2018; Phillips, 2019). This neglect obscures patterns of external support across diverse settings, undermining frameworks linking organisational attributes to state sponsorship. Moreover, qualitative approaches dominate the literature, often at the expense of quantitative or mixed-method analyses better suited to capturing temporal and contextual variations in support dynamics (Petrova, 2019). 
 
-# Methodology
-## Research Hypotheses
+## Methodology
+### Research Hypotheses
 The study aims to test several hypotheses regarding the relationship between conflict characteristics and external support. These hypotheses are grouped based on the type of relationship they examine, focusing on whether conflict characteristics influence the provision of external support, the form of support provided, and the impact of support coalitions on the type of assistance.
 
-#### Hypothesis Group 1: Conflict Characteristics affect whether external support is provided to a conflict party.
+##### Hypothesis Group 1: Conflict Characteristics affect whether external support is provided to a conflict party.
 a)	Conflict intensity affects whether external support is provided.
 b)	Conflict incompatibility affects whether external support is provided
 c)	The cumulative duration of conflict affects whether external support is provided.
@@ -503,7 +498,7 @@ e)	The region where the state conflict party is located affects whether external
 f)	Whether a conflict is taking place before or after 9/11 affects whether external support is provided.
 g)	Whether a conflict is taking place during or after the Cold War affects whether external support is provided.
 
-#### Hypothesis Group 2: Conflict characteristics influence what kind of external support is provided.
+##### Hypothesis Group 2: Conflict characteristics influence what kind of external support is provided.
 a)	Conflict intensity affects what kind of external support is provided.
 b)	Conflict incompatibility affects what kind of external support is provided.
 c)	The cumulative duration of conflict affects what kind of external support is provided.
@@ -512,9 +507,9 @@ e)	The region where the state conflict party is located affects what kind of ext
 f)	Whether a conflict is taking place before or after 9/11 affects what kind of external support is provided.
 g)	Whether a conflict is taking place during or after the Cold War affects what kind of external support is provided.
 
-#### Hypothesis 3: Whether support is provided in a coalition or as bilateral support affects what kind of external support is provided.
+##### Hypothesis 3: Whether support is provided in a coalition or as bilateral support affects what kind of external support is provided.
 
-## Research Design
+### Research Design
 [Figure 1: *INSERT DAG*]
   ###How to compute the DAG with LATEX code in R?
 
@@ -522,7 +517,7 @@ Based on the outlined Literature, Figure 1 portrays the underlying assumptions a
 
 ! Something is not a collider/confounder/mediator by nature, we decide to treat it as such
 
-### Data and operationalisation
+#### Data and operationalisation
 ```{r Info on dataset, include=FALSE}
 #Number of dyads
 nrow(merged_ucdp %>% distinct(dyad_id)) #472
@@ -554,7 +549,7 @@ This study draws on two key datasets from the Uppsala Conflict Data Program (UCD
 
 The two datasets were merged using the common identifiers `dyad_id` and `year` with the `inner_join` function. Prior to merging, the datasets were checked for uniqueness to ensure the absence of duplicate rows. The merging process ensured the removal of duplicates and redundant variables, retaining only the necessary columns for analysis. The underlying unit of analysis remains the dyad-year. The final dataset includes 2234 observations of 123 variables on 472 dyads in 212 conflicts from 1975-2017. The comprehensive information on both conflict characteristics and characteristics of external support allows the study to address research questions about the relationship between the two and the types of support provided by external actors.
 
-Despite their comprehensive nature, these datasets have several limitations. As the availability of data on external support provision constraints the analysis to the years from 1975 to 2017, it does not account for recent geopolitical developments. However, the datasets still provide a large sample size that would be difficult to replicate through primary data collection and the data allow for comparative analysis across different conflicts, regions, and time periods, offering a broad perspective on patterns of external support and conflict dynamics. Further, the observation period includes significant portions of the Cold War and post-Cold War eras, as well as the years leading up to and following 9/11, which have generated a new wave of external support. 
+Despite their comprehensive nature, these datasets have several limitations. As the availability of data on external support provision constraints the analysis to the years from 1975 to 2017, it does not account for recent geopolitical developments. However, the datasets still provide a large sample size that would be difficult to replicate through primary data collection and the data allow for comparative analysis across different conflicts, regions, and time periods, offering a broad perspective on patterns of external support and conflict dynamics. Further, the observation period includes significant portions of the Cold War and post-Cold War eras, as well as the years leading up to and following 9/11, which have generated a new wave of external support [*insert reference from Literature*]. 
 
 Its state-based armed conflict definition includes only incompatibilities concerning government and territory, potentially overlooking underlying causes. Additionally, conflicts that fail to meet the annual threshold of 25 battle-related deaths are missing, and cases where information on key variables such as incompatibility, actors, or intensity is uncertain are excluded. The datasets lack precise geographic data, instead assigning location based on the government side in a dyad rather than where the conflict occurs. This raises concerns about whether the 'region' variable used in the analysis accurately reflects the location of fighting. 
 
@@ -562,7 +557,7 @@ The ESD further narrows the scope by only recording first-degree supporters - ex
 
 The study incorporates dependent, independent, and control variables (Table 1), categorised based on their measurement scales. All nominal independent variables were factorised to improve analytical clarity. The dependent variables measuring external support were expanded to differentiate between types of support (ext_category, ext_type) and their most frequent combinations (ext_combination). Conflict characteristics were kept as per their original categorisation, while cumulative duration was derived using a time-based formula. 
 
-```{r Variable table, echo=FALSE}
+```{r Table 1: Variable table, echo=FALSE}
 # Create a dataframe with variable details
 variable_table <- data.frame(
   Category = c(
@@ -635,26 +630,34 @@ variable_table %>%
     locations = cells_body(rows = Variable == "")
   )
 ```
-  - include proportion of variables? e.g. percentage of each category?
-- A coalition is defined as three or more states that coordinate their provision of external support to achieve a common goal.
+  - *include proportion of variables? e.g. percentage of each category?*
 
-Missing data analysis identified few cases of missing values for the variables used in the analysis and rows where key variables contained missing values, were therefore excluded, as they were not deemed to have a significant impact on the overall analysis. 
-
-While the underlying data and computed variables cover most independent factors included in the theoretical framework outlined above (Figure 1), several important control variables are missing, as their computation is beyond the scope of this dissertation. These include geographic proximity, which influences cross-border spillover effects and logistical feasibility of support [**INSERT REFERENCE**], and major power status, as powerful states are more likely to intervene due to strategic interests [**INSERT REFERENCE**]. Other omitted factors include military capability differences, historical adversarial relationships, trade dependencies, former colonial ties, and the ideological alignment between external supporters and violent non-governmental organisations (NGOs). The exclusion of these variables limits the study’s ability to fully capture why certain conflicts receive external support while others do not.
+Missing data analysis identified few cases of missing values for the variables used in the analysis. However, while the underlying data and computed variables cover most independent factors included in the theoretical framework outlined above (Figure 1), several important control variables are missing, as their computation is beyond the scope of this dissertation. These include geographic proximity, which influences cross-border spillover effects and logistical feasibility of support [**INSERT REFERENCE**], and major power status, as powerful states are more likely to intervene due to strategic interests [**INSERT REFERENCE**]. Other omitted factors include military capability differences, historical adversarial relationships, trade dependencies, former colonial ties, and the ideological alignment between external supporters and violent non-governmental organisations (NGOs). The exclusion of these variables limits the study’s ability to fully capture why certain conflicts receive external support while others do not.
 
 ### Data analysis
 Descriptive statistical methods were employed to summarise and analyse the data. This included the calculation of total conflict counts per year, as well as the summarisation of conflict intensity and the mean and median conflict durations by region. These statistics were visualised through various graphical methods, such as stacked bar charts for conflict intensity levels and line plots for the evolution of external support types, thereby providing a clear depiction of temporal trends in conflict characteristics and support dynamics.
   
-Regression analysis aimed to investigate the factors influencing the provision of various forms of external support in armed conflict, utilising random and fixed effects models for logistic regression. The choice of regression models was guided by theoretical considerations and empirical data characteristics. The use of random effects logistic regression was particularly relevant because the observations within conflict dyads are not independent, necessitating a model that accounts for both within- and between-dyad variation. Despite the potential for the inclusion of within-between hybrid models (Fairbrother, 2014; Mundlak, 1978), time constraints precluded this approach, and the simpler random and fixed effects models were deemed sufficient. Therefore, each form of external support was analysed through four models: random effects linear, random effects logistic, fixed effects linear, and fixed effects logistic regression. The decision to include both random and fixed effects models was driven by the need to account for both within-country and between-country variations. In all models, the primary independent variables included conflict incompatibility, type of conflict, conflict intensity, region, cumulative conflict duration, and historical events such as the end of the Cold War and the aftermath of 9/11. For each model, the random intercept for dyad_id was included to account for the hierarchical structure of the data, as observations were grouped by conflict dyads. 
+Regression analysis, utilising random and fixed effects models, aimed to investigate the factors influencing the provision of various forms of external support in armed conflict. 
+For each separate form of support, fixed and random effects logistic regression models were fitted to the data to test the research hypotheses that conflict characteristics, as well as coalition support influence the provision of external support H2, H3). Fixed effects models control for individual, herein conflict dyad, getting rid of any variation between individual dyads (Huntington-Klein, 2023). Random effect models make the assumption that the slopes originate from a known random distribution, such as a normal distribution. This enhances the estimation of the individual effects individually, increases the precision of estimates (lowering the standard errors), and employs a weighted average of within and between variance rather than simply within variation (Huntington-Klein, 2023). The choice of regression models was guided by theoretical considerations and empirical data characteristics. The decision to include both random and fixed effects models was driven by the need to account for both within-dyad and between-dyad variations. Despite the potential for the inclusion of within-between hybrid models (Fairbrother, 2014; Mundlak, 1978), time constraints precluded this approach, and the simpler random and fixed effects models were deemed sufficient. As the dependent variables are binary, binomial logistic regression models were deemed appropriate. However, as linear probability models can be fitted in cases where the dependent variable is binary, each form of external support was first analysed through four models: random effects linear, random effects logistic, fixed effects linear, and fixed effects logistic regression. In all models, the primary independent variables included conflict incompatibility, type of conflict, conflict intensity, region, cumulative conflict duration, and historical events such as the end of the Cold War and the aftermath of 9/11. After a first analysis, the logistic regression models were deemed more suitable for several forms of external support due to significant differences in statistical significance across the models, particularly in the case of binary dependent variables (Table 2; *INSERT REFERENCE Appendix significance linear random effects*). As such, logistic regression was preferred for interpreting the effects, with all final models being fitted via maximum likelihood method of the following equations:
 
-After a first analysis, the logistic regression models were deemed more suitable for several forms of external support due to significant differences in statistical significance across the models, particularly in the case of binary dependent variables. As such, logistic regression was preferred for interpreting the effects, with model results exponentiated for easier interpretation of the odds ratios. Despite discussions on redefining statistical significance (Benjamin et al., 2018), this report rejects the null hypothesis that the population's estimated co-efficient is zero when p <.05. The results from both random and fixed effects logistic regression models were displayed in tables for each form of external support.
+Fixed Effects Logistic Regression:
+log (provision of support/no provision of support) = α + ß1⋅incompatibility + ß2⋅type + ß3⋅intensity + ß4⋅region + ß5⋅duration + ß6⋅nine_eleven + ß7⋅cold_war + ß8⋅coalition_support + γdyad_id
 
-[*insert logistic regression formula for both fixed and random effects*]
+where where p is the probability of the dependent variable, α is the intercept, β is the coefficient for each independent variable, and γdyad_idγdyad_id represents the fixed effect for each dyad.
 
-Multicollinearity was monitored throughout the analysis using variance inflation factors (VIF). To ensure robustness, the assumptions of regression models - additivity and linearity, independence of errors, and normality of residuals - were checked. Given that the models were logistic regressions, homoscedasticity and normality of errors were not required assumptions.
+Random Effects Logistic Regression:
+log (provision of support/no provision of support) = α + ß1⋅incompatibility + ß2⋅type + ß3⋅intensity + ß4⋅region + ß5⋅duration + ß6⋅nine_eleven + ß7⋅cold_war + ß8⋅coalition_support + udyad_id
 
+where where p is the probability of the dependent variable, α is the intercept, β is the coefficient for each independent variable, and udyad_id∼N(0,σ2)udyad_id∼N(0,σ2) represents the random effect for each dyad.
 
-# Findings
+  ### *How do I include the equations in the text?*
+  ### *correct introduction of random and fixed effects in the equation?*
+  
+An overall comparison was made between the effects of conflict characteristics on the provision of external support within and between conflicts, with the statistically significant characteristics in the models for the provision of troop support and intelligence being compared in detail. These models were chosen for detailed comparison based on the high correlation between conflict characteristics and the provision of the corresponding support in either the fixed effects or random effects models. They further allow for a more detailed comparison of the correlation with various conflict characteristics between the provision of direct or indirect support. Despite discussions on redefining statistical significance (Benjamin et al., 2018), this report rejects the null hypothesis that the population's estimated coefficient is zero when p <.05.
+  ### *Correct to speak of coefficient here or would this need to be log odds ration as we're using logistic models?*
+Multicollinearity was monitored throughout the analysis using variance inflation factors (VIF) and all models were tested against standard regression assumptions to ensure validity and reliability. However, as most predictors were categorical, the linearity assumption did not apply to them and homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. For fixed effects models the Adjusted Pseudo R-Squared was used to assess model fit. The Bayesian Information Criterion (BIC) and Akaike Information Criterion (AIC) were used to evaluate the random effects models' goodness-of-fit; with lower values denoting a better fit (Gellman and Hill, 2007).
+
+## Findings
 ```{r Preparations for visualisations, echo=FALSE}
 # Summarize total conflict counts per year for visualisations
 total_summary <- merged_ucdp %>%
@@ -664,6 +667,7 @@ total_summary <- merged_ucdp %>%
 
 ### Independent variables: Conflict characteristics
 Although the total number of conflicts has decreased and minor armed conflicts make up the majority of armed conflicts, recent years have seen a rise in wars (Figure 2)
+
 ```{r intensity (Figure 2), echo=FALSE}
 #Create a summary dataset by year and intensity_level
 intensity_summary <- merged_ucdp %>%
@@ -684,7 +688,9 @@ ggplot(intensity_summary, aes(x = year, y = conflict_count, fill = intensity)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1), #Rotate x-axis labels for better readability
         legend.position = "bottom") 
 ```
+
 While most conflicts are fought in Asia and Africa, the number of conflicts fought in the Middle East is growing (Appendix 1). Especially conflicts in Asia and the Americas seem to be going on for a long time (Figure 3).
+
 ```{r cumulative duration (Figure 3), echo=FALSE}
 #Conflict duration by region
 # Prepare the data for visualisation
@@ -718,10 +724,12 @@ ggplot(duration_region, aes(x = region)) +
     legend.position = "top"
   )
 ```
-Intrastate conflicts are the most common type of conflict, followed by internationalised intrastate conflicts, whose number has been growing since the early 2000s (Appendix 2). While there is fluctuation between the incomptibility types ' territory' and government', most conflicts in 2017 were about territory (Appendix 3). Hardly any are about territory and government.
+
+Intrastate conflicts are the most common type of conflict, followed by internationalised intrastate conflicts, whose number has been growing since the early 2000s (Appendix 2). While there is fluctuation between the incomptibility types 'territory' and 'government', most conflicts in 2017 were about territory (Appendix 3). Hardly any are about territory and government.
 
 ### Dependent variables: Provision of external support
 The provision of external support has risen, with indirect support being the most common (Figure 4) and supporters providing three forms of support on average (Median: 4).
+
 ```{r (In-)direct support (Figure 4), echo=FALSE}
 # Evolution of support type
 # Prepare the data for visualisation
@@ -757,7 +765,9 @@ ggplot(combined_type, aes(x = year, y = conflict_count, linetype = ext_type)) +
   )
   ###NA is not being portrayed, so how do I get rid of it in the legend?
 ```
-### add findings once variable is fixed
+
+[*add findings once variable is fixed*]
+
 ```{r Frequent support combinations (Figure 5), echo=FALSE}
 # Prepare the data for visualization
 combination_summary <- merged_ucdp %>%
@@ -801,8 +811,8 @@ ggplot(top_combination_summary, aes(x = year, y = conflict_count, color = ext_co
     ###If 3 is the average of provided support should this variable be rescaled to not only indicate combinations of two in detail but also combinations of three?
 ```
 
-##Regression Analysis
-```{r Regression Analysis, include=FALSE}
+### Regression Analysis
+```{r Preparation Regression Analysis, include=FALSE}
 #Preparation
 library(arm) # For robust standard errors
 library(lme4) # For random effects models
@@ -811,6 +821,7 @@ library(texreg) # For regression tables
 library(gmodels) # For cross-tables
 library(effects) # For marginal effects
 library(sjPlot) # For plotting marginal effects
+library (gt) # For tables
 
 #suppress scientific notation
 options (scipen = 999)
@@ -824,47 +835,75 @@ options (scipen = 999)
 
 #Form of support provided (DV) ~ Reason for conflict/incompatibility (IV), Form of conflict (IV) and conflict intensity (IV), support as a coalition (IV)
 #Running random effects logistic and linear regression for all forms of support separately
+```
 
-#1. Troop support
-##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
-#1.2. random effects logistic regression
-rlogregress_x <- glmer(ext_x ~  incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(rlogregress_x)
-  ##ext_coalition (coalition support) (**) is statistically significant
-  ##AIC = 86.7; BIC = 165.8
-    ###When is a value considered as low?
+```{r Regression External support, include=FALSE}
+#0.2. random effects logistic regression
+rlogregress_0 <- glmer(ext_sup ~  incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_0)
+  ### nothing is significant
 
 #Exponentiate results
-exp(fixef(rlogregress_x))
+exp(fixef(rlogregress_0)) #to exponentiate only the fixed effects coefficients.
 
 #Check multicollinearity
-#Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model. 
+#Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model.
 #It measures how much the variance of a regression coefficient increases due to collinearity with other predictors.
   #VIF < 5: Low to moderate multicollinearity (acceptable).
   #VIF = 5–10: Moderate multicollinearity (investigate further; might require adjustments).
   #VIF > 10: High multicollinearity (likely problematic; consider corrective actions).
-vif(rlogregress_x)
+vif(rlogregress_0)
   ##no multicollinearity
 
 #Checking linearity for binomial logistic regression
   #The linearity assumption for logistic regression requires that the log odds of the dependent variable are a linear combination of the independent variables.
   #This assumption can be checked by plotting the predicted probabilities against the independent variables.
   #The plot should show a linear relationship between the independent variables and the log odds of the dependent variable.
-plot(allEffects(rlogregress_x))
+plot(allEffects(rlogregress_0))
   #straight line: assumption met for duration
 
-#Test the model for outliers
-#Cook's distance is a measure of the influence of each observation on the regression coefficients.
-#It is used to identify influential data points that may have a large impact on the regression coefficients.
-#Values greater than 1 are considered influential.
-cooks.distance(rlogregress_x)
-  ##no influential data points
+#0.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
+flogregress_0 <- feglm(ext_sup ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_0)
+  ## type (internationalised intrastate) (***), intensity (War) (***), and cold_war (after) (***) are statistically significant
+  ## BIC: 63.1; Adj. Pseudo R-squared: 0.226927
+
+#Check multicollinearity
+vif(flogregress_0)
+  ##Warning: No intercept: vifs may not be sensible
+  ##no multicollinearity but not sure it's working?
+    ###*Is there another way to check for multicollinearity in fixed effects models?*
+
+#Checking linearity
+#plot(allEffects(flogregress_0))
+  ### doesn't work. Is there another way to check this?
+      
+```
+
+```{r Regression Troop support, include=FALSE}
+#1. Troop support
+#1.2. random effects logistic regression
+rlogregress_x <- glmer(ext_x ~  incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_x)
+  ##AIC = 86.1; BIC = 165.3
+
+#Exponentiate results
+exp(fixef(rlogregress_x)) #to exponentiate only the fixed effects coefficients.
+
+#Check multicollinearity
+vif(rlogregress_x)
+  ##no multicollinearity
+
+#Checking linearity for binomial logistic regression
+plot(allEffects(rlogregress_x))
+  #straight line: assumption met for duration
 
 #1.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_x <- feglm(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_x)
   ##only worked with 467 observations after removing 785 due to NAs and 982 because of only 0 (or only 1) outcomes
   ##BIC: 364.7; Adj. Pseudo R-squared: 0.81
+    ###check how to interpret adjusted pseudo R-squared 
   
   ###Output does not show the coefficient values or statistical significance for single variables (might have something to do with the seetings of te chunk) but running the same code in a normal RScript shows the following results:
   ##type (internationalised intrastate) (***), nine_eleven (after) (***), cold_war (after) (***), and ext_coalition (Coalition support) (***) are statistically significant
@@ -885,11 +924,9 @@ vif(flogregress_x)
 colSums(is.na(merged_ucdp))
   ##783 NAs for ext_coalition
   ##Where are the two other missing observations coming from? (785 observations removed because of NA values (RHS: 785). -> address in limitations
+```
 
-#Check linearity
-plot(allEffects(flogregress_x))
-  ###Doesn't work
-
+```{r Regression Foreign troop presence, include=FALSE}
 #2. Foreign troop presence
 #2.2 random effects logistic regression
 rlogregress_p <- glmer(ext_p ~  incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
@@ -917,7 +954,9 @@ summary(flogregress_p)
 #Check multicollinearity
 vif(flogregress_p)
   ##no multicollinearity
+```
 
+```{r Regression Access to infrastructure/joint operations, include=FALSE}
 #3. Access to infrastructure/joint operations
 #3.2. random effects logistic regression
 rlogregress_y <- glmer(ext_y ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
@@ -945,14 +984,13 @@ summary(flogregress_y)
 #Check multicollinearity
 vif(flogregress_y)
   ##no multicollinearity
-  
+```
+
+```{r Regression Weapons, include=FALSE}  
 #4. weapons
 #4.2. random effects logistic regression
 rlogregress_w <- glmer(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_w)
-  ##everything but incompatibility (territory and government) is statistically significant (***)
-
-##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
 
 #Exponentiate results
 exp(fixef(rlogregress_w))
@@ -963,7 +1001,7 @@ vif(rlogregress_w)
 
 #Check linearity
 plot(allEffects(rlogregress_w))
-  #negative linear relationship for duration
+  #straight line for duration
 
 #4.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_w <- feglm(ext_w ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
@@ -975,12 +1013,13 @@ summary(flogregress_w)
 #Check multicollinearity
 vif(flogregress_w)
   ##no multicollinearity
+```
 
+```{r Regression Materiel and statistics, include=FALSE}  
 #5. materiel and statistics
 #5.2. random effects logistic regression
 rlogregress_m <- glmer(ext_m ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_m)
-  ##type (internationalised intrastate) (*) and intensity (war) (***) are significant
 
 #Exponentiate results
 exp(fixef(rlogregress_m))
@@ -1003,14 +1042,14 @@ summary(flogregress_m)
 #Check multicollinearity
 vif(flogregress_m)
   ##no multicollinearity
+```
 
+```{r Regression Training and expertise, include=FALSE}  
 #6. training and expertise
 #6.2. random effects logistic regression
 rlogregress_t <- glmer(ext_t ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_t)
   ##type (intrastate) (.), type (internationalised intrastate) (*) and cold_war (Post-Cold War) (**) are statistically significant
-
-##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
 
 #Exponentiate results
 exp(fixef(rlogregress_t))
@@ -1033,14 +1072,13 @@ summary(flogregress_t)
 #Check multicollinearity
 vif(flogregress_t)
   ##no multicollinearity
+```
 
+```{r Regression Funding, include=FALSE}  
 #7. funding
 #7.2. random effects logistic regression
 rlogregress_f <- glmer(ext_f ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_f)
-  ##type (internationalised intrastate) (.), intensity (war) (***), cumulative_duration (*) and cold_war (Post-Cold war) (*) are significant
-
-##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
 
 #Exponentiate results
 exp(fixef(rlogregress_f))
@@ -1063,12 +1101,13 @@ summary(flogregress_f)
 #Check multicollinearity
 vif(flogregress_f)
   ##no multicollinearity
+```
 
+```{r Regression Intelligence, include=FALSE}  
 #8. intelligence
 #8.2. random effects logistic regression
 rlogregress_i <- glmer(ext_i ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_i)
-  ##Intercept (*), incompatibility (government) (**), intensity (war) (.), region (Americas) (*), nine_eleven (after 9/11) (***), cold_war (Post-Cold war) (**), and ext_coalition (Coalition support) (*) are statistically significant
 
 #Exponentiate results
 exp(fixef(rlogregress_i))
@@ -1091,15 +1130,14 @@ summary(flogregress_i)
 #Check multicollinearity
 vif(flogregress_i)
   ##no multicollinearity
+```
 
+```{r Regression Access to territory, include=FALSE}  
 #9. access to territory
 #9.2. random effects logistic regression
 rlogregress_l <- glmer(ext_l ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_l)
-  ##incompatibility (government) (.), region (Middle East) (.), region (Africa) (***), nine_eleven (After 9/11) (.), and ext_coalition (Coalition support) (*) are statistically significant
-
-##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
-
+  
 #Exponentiate results
 exp(fixef(rlogregress_l))
 
@@ -1122,80 +1160,156 @@ summary(flogregress_l)
 vif(flogregress_l)
   ##no multicollinearity
 ```
-All models were tested against standard regression assumptions to ensure validity and reliability. The data, sourced from the UCDP, was deemed appropriate for addressing the research questions, as it comprehensively captures armed conflict characteristics and external support. Although, empirical datasets rarely meet all theoretical criteria perfectly (Gellman and Hill, 2007). Multicollinearity was examined using variance inflation factors (VIFs), with all values below 5, indicating no significant collinearity issues (O'Brien, 2007). As most predictors were categorical, the linearity assumption did not apply to them. It was tested using the `allEffects()` function for the only continuous predictor, cumulative duration, which showed a linear relationship with the log odds of the dependent variable in all random effect models. The independence of errors assumption was not met due to multiple observations per conflict and dyad, although robust standard errors were used to account for potential dependencies. Homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. The binary nature of the dependent variable confirmed the appropriateness of logistic regression. Overall, the assumptions were satisfactorily met for valid inference. 
 
-To Do:
-- Assess model's goodness of fit: The models' goodness-of-fit was assessed using the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC), with lower values indicating better fit (Gellman and Hill, 2007). The models' AIC and BIC values were compared to assess their relative fit, with the model with the lowest values considered the best fit (Gellman and Hill, 2007).
+The random effects model for the provision of external support (Table 2) shows no statistically significant results. However, the fixed effects model reveals that the correlation between internationalised intrastate conflicts, wars, and the post-Cold War period and the provision of external support are statistically significant. 
 
-- Checking for outliers
-  
-```{r Visualising Regression Analysis, include=FALSE}
-#Visualising only the statistical significance for the random effects logistic regression
-tab_model(rlogregress_p, rlogregress_y, rlogregress_w, rlogregress_m, 
-          rlogregress_t, rlogregress_f, rlogregress_i, rlogregress_l, 
-          pred.labels = c("(Intercept)", "Incompatibility (government)", 
-                           "Incompatibility (territory and government)", 
-                           "Type (intrastate)", "Type (internationalised intratstate)", 
-                           "Intensity (war)", "Region (Middle East)", "Region (Asia)", 
-                           "Region (Africa)", "Region (Americas)", "Duration", "9/11", 
-                           "Cold War", "Coalition support"),
-          dv.labels = c("Foreign troop presence", "Access to infrastructure/joint operations", 
-                        "Weapons", "Materiel and statistics", "Training and expertise", 
-                        "Funding", "Intelligence", "Access to territory"),
-          show.estimates = FALSE, # Remove estimates (odds ratios)
-          show.ci = FALSE,        # Remove confidence intervals
-          show.p = TRUE)          # Show p-values only
-  ###Receive error message: FIX!!
+```{r Table 2: Overall provision of external support, echo=FALSE}
+#Visualising random effects logistic regression for overall provision of external support
+tab_model(rlogregress_0, rlogregress_w, rlogregress_i, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (interstate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", " After 9/11", "Post-Cold War", "Coalition support"), dv.labels = c("Troop support", "Weapons", "Intelligence"))
 
-#Visualising random effects logistic regression only for the most common forms of support (> 45 counts in descriptive analysis): training, materiel, weapons, infrastructure
-tab_model(rlogregress_m, rlogregress_w, rlogregress_y, rlogregress_t, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Materiel and statistics", "Weapons", "Access to infrastructure/joint operations", "Training and expertise"))
-
-#Visualising random effects logistic regression for the most common forms of support for governments: training and troop support
-tab_model(rlogregress_t, rlogregress_p, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Training and expertise", "Foreign troop presence"))
-
-#Visualising random effects logistic regression for the most common forms of support for rebels: materiel, weapons, and intelligence
-tab_model(rlogregress_m, rlogregress_w, rlogregress_i, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Materiel and statistics", "Weapons", "Intelligence"))
+#Visualising fixed effects logistic regression for overall provision of external support
+tab_model(flogregress_0, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (interstate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", " After 9/11", "Post-Cold War", "Coalition support"), dv.labels = c("Troop support", "Weapons", "Intelligence"))
 ```
-- Random effects logistic regression
-  - Between different conflicts, the provision of weapons and intelligence seems to be heavily connected to conflict characteristics
-  - Intensity (5), Cold war (5), coalition support (5), and type of conflict (4) seem to have the biggest effect on the provision of external support
+
+The results of the regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of external support, with notable differences between the random and fixed effects models. 
+
+```{r Table 3: Random effects logistic regression - statistical significance, echo=FALSE}
+# Create the data frame manually
+rlog_table <- data.frame(
+  Independent_Variable = c("Intercept", "Incompatibility", "Type of conflict", "Intensity", "Region", "Duration", "9/11", "Cold War", "Coalition Support", "N", "AIC", "BIC"),
+  Troop_Support = c("*", NA, ". (Interstate)", NA, NA, NA, NA, NA, "*** (Coalition)", 1449, 86.1, 165.3),
+  Troop_Presence = c(NA, NA, "* (Internationalised intrastate)", "* (War)", NA, NA, NA, NA, NA, 1449, 292.9, 372.1),
+  Access_to_Infrastructure = c("*", NA, "** (Internationalised intrastate)", NA, NA, "*", NA, "*** (After)", "*** (Coalition)", 1449, 1255.9, 1335.1),
+  Weapons = c("**", NA, ". (Internationalised intrastate)", "*** (War)", NA, NA, "* (After)", "*** (After)", NA, 1449, 1098.4, 1177.6),
+  Materiel_and_Statistics = c("**", NA, "** (Internationalised intrastate)", "*** (War)", NA, NA, NA, ". (After)", NA, 1449, 1204.3, 1283.5),
+  Training_and_Expertise = c("**", NA, "* (Interstate); ** (Internationalised intrastate)", NA, NA, NA, ". (After)", "*** (After)", NA, 1449, 1063.0, 1142.1),
+  Funding = c(NA, NA, "* (Internationalised intrastate)", "*** (War)", NA, ".", NA, "* (After)", NA, 1449, 1313.1, 1392.3),
+  Intelligence = c("***", "** (Government)", NA, "* (War)", "* (Americas)", NA, "*** (After)", "** (After)", ". (Coalition)", 1449, 923.7, 1002.9),
+  Access_to_Territory = c("***", NA, NA, NA, "* (Middle East); * (Asia); *** (Africa); * (Americas)", NA, ". (After)", NA, "* (Coalition)", 1449, 1267.7, 1346.8)
+)
+
+# Generate a gt table
+gtrlog_tbl <- rlog_table %>%
+  gt() %>%
+  tab_header(
+    title = "Statistical significance in the random effects logistic regression models"
+  ) %>%
+  cols_label(
+    Independent_Variable = "Independent Variable",
+    Troop_Support = "Troop Support",
+    Troop_Presence = "Troop Presence",
+    Access_to_Infrastructure = "Access to Infrastructure",
+    Weapons = "Weapons",
+    Materiel_and_Statistics = "Materiel and Statistics",
+    Training_and_Expertise = "Training and Expertise",
+    Funding = "Funding",
+    Intelligence = "Intelligence",
+    Access_to_Territory = "Access to Territory"
+  ) %>%
+  fmt_missing(columns = everything(), missing_text = "")
+
+# Print the table
+gtrlog_tbl
+```
+
+In the random effects logistic regression (Table 3), the type of conflict — particularly internationalised intrastate conflicts — emerges as strongly correlated to the provision of external support, showing significance in seven of the nine models. Other influential factors include conflict intensity and the Cold War period, which are strongly correlated with multiple forms of support. Intelligence provision appears to be the most sensitive to conflict characteristics, with seven out of nine independent variables reaching statistical significance. Medium-level correlations are observed for access to infrastructure, weapons, materiel and logistics, training and expertise, funding, and access to territory, while troop support and troop presence exhibit the weakest correlations.
+
+  ###*add more Findings so that all variables are covered?*
+  
+```{r Table 4: Fixed effects logistic regression - statistical significance, echo=FALSE}
+# Create the data frame manually
+flog_table <- data.frame(
+  Independent_Variable = c("Intercept", "Incompatibility", "Type of conflict", "Intensity", "Region", "Duration", "9/11", "Cold War", "Coalition Support", "N", "BIC", "Adjusted Pseudo R-squared"),
+  Troop_Support = c(NA, NA, "*** (Internationalised intrastate)", NA, NA, NA, "*** (After)", "*** (After)", "*** (Coalition)", 467, 364.7, 0.810892),
+  Troop_Presence = c(NA, NA, NA, NA, NA, NA, "*** (After)", "*** (After)", NA, 165, 225.4, 0.008911),
+  Access_to_Infrastructure = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, 612, 1074.7, 0.044885),
+  Weapons = c(NA, NA, NA, "* (War)", NA, "*", "* (After)", ". (After)", NA, 557, 949.6, 0.157779),
+  Materiel_and_Statistics = c(NA, NA, NA, ". (War)", NA, NA, NA, NA, NA, 603, 1051.2, 0.071311),
+  Training_and_Expertise = c(NA, NA, ". (Internationalised intrastate)", NA, NA, NA, NA, ". (After)", NA, 515, 885.2, 0.030282),
+  Funding = c(NA, NA, NA, "* (War)", NA, "*", NA, NA, NA, 683, 1128.9, 0.179317),
+  Intelligence = c(NA, NA, NA, ". (War)", NA, ".", NA, "* (After)", NA, 513, 795.6, 0.208345),
+  Access_to_Territory = c(NA, NA, NA, NA, NA, NA, ". (After)", NA, NA, 681, 1113.8, 0.169719)
+)
+
+# Generate a gt table
+gtflog_tbl <- flog_table %>%
+  gt() %>%
+  tab_header(
+    title = "Statistical significance in the fixed effects logistic regression models"
+  ) %>%
+  cols_label(
+    Independent_Variable = "Independent Variable",
+    Troop_Support = "Troop Support",
+    Troop_Presence = "Troop Presence",
+    Access_to_Infrastructure = "Access to Infrastructure",
+    Weapons = "Weapons",
+    Materiel_and_Statistics = "Materiel and Statistics",
+    Training_and_Expertise = "Training and Expertise",
+    Funding = "Funding",
+    Intelligence = "Intelligence",
+    Access_to_Territory = "Access to Territory"
+  ) %>%
+  fmt_missing(columns = everything(), missing_text = "")
+
+# Print the table
+gtflog_tbl
+```
+
+Within conflicts, as captured by the fixed effects models (Table 4), the provision of external support is mostly correlated with the post-Cold War and post-9/11 periods, as well as conflict intensity. Troop support is particularly notable, with all significant correlations reaching high levels of statistical significance. While random effects suggest that indirect support is more strongly tied to conflict characteristics, fixed effects highlight the temporal dimension, with direct support — troop presence and troop support — being significantly correlated to the era in which the conflict occurs. Conflict intensity and duration are correlated with the provision of indirect external support within a conflict but not with the provision of direct support.
+
+  ###*add more Findings so that all variables are covered?*
+
+Model-specific results further illustrate these patterns: troop support is most strongly linked to coalition involvement and conflict type across both models, whereas intelligence provision and weapons supply show broader but less consistent correlations with conflict characteristics. In the random effects model (Table 5), interstate conflicts are associated with higher odds of receiving troop support (log odds = 5.905) compared to intrastate conflicts, holding all other conflict characteristics constant. The average log odds of troop support provision for coalition support are 9.650 larger than the average log odds of bilateral support, controlling for all other conflict characteristics included in the model. In contrast, the fixed effects model (Table 6) finds that internationalised intrastate conflicts are correlated to provision of troop support, with a log odds difference of 64.637 compared to intrastate conflicts, holding all other factors constant. The strong correlation between Coalition support and the provision of troop support remains in the fixed effects model, but its effect is much larger (log odds = 42.236) than in the random effects model. However, the fixed effects model also suggests that conflicts occurring after 9/11 and after the Cold War are negatively correlated with the provision of troop support, with reductions in the average log odds of 3.443 and 13.187 compared to the average log odds before 9/11 and during the Cold War, respectively — correlations that are non-significant in the random effects model.  
+
+For intelligence support, both models find that the average log odds for wars are smaller than that for minor armed conflicts to receive this form of aid (log odds = -0.808 in random effects; -1.123 in fixed effects), holding all other factors constant. Both models further indicate that conflicts occurring after the Cold War are correlated with the provision of intelligence, although the effect is stronger in the fixed effects model (log odds = 2.130) than in the random effects model (log odds = 1.592). The random effects model identifies regional differences, with conflicts in the Americas having a log odds of intelligence provision that is 4.121 larger than the log odds of conflicts in Europe, controlling for incompatibility, type, intensity, region, duration, 9/11, Cold War, and coalition support. It further indicates that conflicts about government have a log odds of being provided intelligence that is 1.831 smaller than the log odds of conflicts about territory, controlling for type, intensity, region, duration, 9/11, Cold War, and coalition support. While the random effects model suggests that intelligence provision is correlated to 9/11 (log odds = 2.410) and coalition support (log odds = 1.076), holding all other variables constant, these effects do not emerge as statistically significant in the fixed effects model. Notably, only the fixed effects model finds that the log odds of receiving intelligence support increases with the duration of the conflict (log odds = 0.111 per year).
+
+```{r Table 5: random effects logistic regression results, echo=FALSE}
+#Visualising random effects logistic regression for those forms of support that are correlated to the most conflict characteristics: troop support, intelligence and weapons
+tab_model(rlogregress_x, rlogregress_w, rlogregress_i, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (interstate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", " After 9/11", "Post-Cold War", "Coalition support"), dv.labels = c("Troop support", "Weapons", "Intelligence"))
+```
+ ### *? How do I cut the large numbers?*
+
+```{r Table 6: fixed effects logistic regression results, echo=FALSE}
+#Visualising fixed effects logistic regression for those forms of support that are correlated to the most conflict characteristics: troop support, intelligence and weapons
+tab_model(flogregress_x, flogregress_w, flogregress_i, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (interstate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", " After 9/11", "Post-Cold War", "Coalition support"), dv.labels = c("Troop support", "Weapons", "Intelligence"))
+```
+ ### *? How do I exclude the fixed effect from the table?*
+
+All models were tested against standard regression assumptions to ensure validity and reliability. The data, sourced from the UCDP, was deemed appropriate for addressing the research questions, as it comprehensively captures armed conflict characteristics and external support. Although, empirical datasets rarely meet all theoretical criteria perfectly (Gellman and Hill, 2007). Multicollinearity was examined using variance inflation factors (VIFs), with all values below 5, indicating no significant collinearity issues (O'Brien, 2007). As most predictors were categorical, the linearity assumption did not apply to them. Linearity was tested using the `allEffects()` function for the only continuous predictor, cumulative duration, which showed a linear relationship with the log odds of the dependent variable in all random effect models. [*add how assumption was tested in fixed effects*] The independence of errors assumption was not met due to multiple observations per conflict and dyad. Homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. The binary nature of the dependent variable confirmed the appropriateness of logistic regression. 
+
+Model fit assessment reveals differences both across different forms of external support and between the fixed effects and random effects models. Among the fixed effects models (Table 4), troop support has the highest adjusted pseudo R-squared (0.811), indicating a strong explanatory power, while troop presence has the lowest (0.009), suggesting that conflict characteristics do little to explain variations in the provision of troop presence within conflicts. Intelligence (0.208), funding (0.179), access to territory (0.170), and weapons (0.158) also show relatively better model fit compared to the other forms of support, whereas access to infrastructure (0.045), training and expertise (0.030), and materiel and statistics (0.071) exhibit weaker fits . BIC values further indicate that troop support (364.7) has the best trade-off between model fit and complexity among the fixed effects models, while other models — especially those related to access to infrastructure (1074.7) and funding (1128.9) — show higher BIC values, indicating weaker model performance. For the random effects models (Table 3), AIC and BIC provide insights into model performance across different forms of support. Troop support again exhibits the lowest AIC (86.1) and BIC (165.3), suggesting the best model fit among the random effects models. In contrast, access to infrastructure has a particularly high AIC (1255.9) and BIC (1335.1), indicating weaker explanatory power. Intelligence (AIC = 923.7, BIC = 1002.9) and funding (AIC = 1313.1, BIC = 1392.3) show moderate model fit, aligning with their relatively strong performance in the fixed effects models. When comparing the fixed and random effects models, the fixed effects model for troop support has an exceptionally high adjusted pseudo R-squared (0.811), reinforcing its strong explanatory power. However, the random effects model for troop support has a much lower BIC (165.3) compared to the fixed effects BIC (364.7), suggesting that the random effects approach may be more efficient in accounting for between-conflict variations. For other forms of support, the fixed effects models generally exhibit stronger explanatory power (higher pseudo R-squared values) but tend to have higher BIC values, reflecting greater model complexity. The random effects models, in contrast, often have lower AIC and BIC values, indicating better model fit in terms of parsimony, particularly for troop support and intelligence.
 
 ! Possible issue of reverse causality regarding duration?: Interventions, whether direct (troops) or indirect (weapons, logistics, training), frequently prolong conflicts by altering the cost-benefit calculations of belligerents (Fearon, in Testerman, 2015; Lacina, 2006). 
 
-# Discussion
-- Explaining limitations: "One possible explanation for these findings is..." / "A limitation of this study is..."
-- Introducing implications: "This research highlights the need for..." / "These findings suggest potential interventions..."
-- frame discussion within Crim
+## Discussion
+The findings of this study align with existing literature on conflict dynamics and external interventions. Over time, the number of wars has slightly increased, indicating a shift towards more intense conflicts, while conflict duration has also grown, suggesting that many conflicts persist rather than being resolved. These trends are consistent with research highlighting the protracted nature of modern armed conflicts [*INSERT REFERENCE*]. In terms of regional patterns, the results support previous findings that, although developing nations experience most contemporary conflicts, these wars are often fought with weapons from industrialised countries, reflecting 20th-century technological advancements (Sivard, 1996). The nature of external support has also evolved. While troop support has declined, the total number of external interventions continues to rise [*Insert reference graphic*], demonstrating a persistent strategic interest in shaping conflict trajectories through both direct and indirect means (Engström, Pettersson, and Öberg, 2024; Chang and Sellak, 2022). Between 1975 and 2017, 80% of intrastate conflicts involved at least one instance of external support, with state actors serving as the predominant supporters (Meier et al., 2023). Recent years have also seen a shift toward multilateral coalitions and collaborative interventions, with nearly one-third of all support instances involving such coalitions, reflecting a greater emphasis on burden-sharing and legitimacy (Meier et al., 2023). Regarding the types of support provided, training and expertise remain the most frequently used forms, while material aid, particularly light weaponry and technical expertise, dominates assistance to rebel groups (*Insert reference graphic*; Meier et al., 2023; Berlin and Malone, 2023). Governments, in contrast, typically receive training and troop assistance. These trends align with theoretical expectations that the forms of support most commonly provided depend on the primary recipients in each conflict, whether governments or rebel groups.
 
-## Descriptive stats/visualisations
-The findings of this study align with existing literature on conflict dynamics and external interventions. Over time, the number of wars has slightly increased, indicating a shift towards more intense conflicts, while conflict duration has also grown, suggesting that many conflicts persist rather than being resolved. These trends are consistent with research highlighting the protracted nature of modern armed conflicts. In terms of regional patterns, the results support previous findings that, although developing nations experience most contemporary conflicts, these wars are often fought with weapons from industrialized countries, reflecting 20th-century technological advancements (Sivard, 1996). The nature of external support has also evolved. While troop support has declined, the total number of external interventions continues to rise, demonstrating a persistent strategic interest in shaping conflict trajectories through both direct and indirect means (Engström, Pettersson, and Öberg, 2024; Chang and Sellak, 2022). Between 1975 and 2017, 80% of intrastate conflicts involved at least one instance of external support, with state actors serving as the predominant supporters (Meier et al., 2023). Recent years have also seen a shift toward multilateral coalitions and collaborative interventions, with nearly one-third of all support instances involving such coalitions, reflecting a greater emphasis on burden-sharing and legitimacy (Meier et al., 2023). Regarding the types of support provided, training and expertise remain the most frequently used forms, while material aid, particularly light weaponry and technical expertise, dominates assistance to rebel groups (Meier et al., 2023; Berlin and Malone, 2023). Governments, in contrast, typically receive training and troop assistance. These trends align with theoretical expectations that the forms of support most commonly provided depend on the primary recipients in each conflict, whether governments or rebel groups.
+The findings from the regression analysis suggest that while structural conflict factors are correlated to the provision of external support, temporal and contextual elements play a decisive role within individual conflicts. This aligns with existing literature on the provision of external support, which emphasises the importance of conflict characteristics in shaping external intervention strategies (Berlin and Malone, 2023; Engström, Pettersson, and Öberg, 2024).
+  
+While the random effects model examining H1 shows no statistically significant results, the fixed effects model reveals that the correlation between internationalised intrastate conflicts, wars, and the post-Cold War period and the provision of external support are statistically significant. Regression analyses for individual forms of support further reveal distinct patterns in the relationship between conflict characteristics and the provision of external support, with notable differences between the random and fixed effects models. These findings are consistent with prior research suggesting that the Cold War significantly shaped patterns of external intervention. During this period, superpowers engaged in proxy conflicts, fueling insurgencies and prolonging wars, whereas the post-Cold War era saw a shift towards more selective and strategic forms of external support (Testerman, 2015; Kalyvas and Balcells, 2010 in Roberts, 2019). The absence of a significant relationship between cumulative conflict duration and the provision of support challenges assumptions that protracted conflicts necessarily attract sustained external intervention.
 
-## Regression
-- random effects logistic regression: Findings align with the literature
-  - The Cold War intensified conflicts through superpower support, but its end shifted patterns, reducing insurgencies and prolongation, while rebel groups lost aid, leading many conflicts to peter out or end in settlements (Testerman, 2015; Kalyvas and Balcells, 2010 in Roberts, 2019).
-  - It makes sense that conflict intensity affects the provision of external support as a higher intensity might increase the chances of conflict spillover or other types of escalation, which external supporters might seek to prevent. However, interestingly, intensity does not seem to affect troop support but rather indirect forms of support.
-  - The relevance of coalition support suggests that the provision of certain forms of support depends heavily on whether other coalition partners agree to the provision of that support 
-Overall, comparing different conflicts, the provision of weapons and intelligence seems to be heavily connected to conflict characteristics
+For H2, which explores whether conflict characteristics influence the type of external support provided, results reveal that conflict intensity (H2a) is significantly correlated to the provision of weapons, materiel and statistics, funding, and intelligence in both fixed and random effects models. This aligns with the argument that higher-intensity conflicts are more likely to receive external support due to concerns about spillover effects and escalation (*INSERT REFERENCE*). Interestingly, however, intensity does not appear to significantly impact the provision of troop support, suggesting that external actors may not relate the intensity of a conflict to increased levels of support. Besides intensity, the provision of access to infrastructure, weapons, materiel and statistics, training and expertise, funding, and access to territory show consistent correlations with conflict duration (H2c), the type of conflict (H2d), and whether a conflict is taking place after 9/11 (H2f) or after the Cold War (H2g). Within a conflict, conflict intensity and duration seem to be more correlated with the provision of indirect external support, which could indicate that external actors are more likely to provide indirect support to conflicts that are more intense and have been ongoing for a longer time, as these conflicts might require more resources and capabilities to sustain. Conflict incompatibility (H2b) and region (H2e) on the other hand are not significantly correlated with the provision of most external support, suggesting that these factors play a less prominent role in shaping external intervention strategies. The lack of significant correlations between conflict incompatibility and region with external support provision is surprising, as previous research has highlighted the importance of these factors in shaping conflict dynamics and external interventions (*insert reference on colonial ties and incompatibility*). 
 
-## Implications
-- Pacifism vs. need for military interventions
-  - Diplomacy does not always work; What do we do with aggressors like Putin?
-  - Do military interventions help bringing peace or do they fuel conflict?
-  - Is pacifism still feasible today?
-- How do we find peace in a world in which a country with a strong military can move a border and assert its own interests (without facing effective consequences for its breach of international humanitarian law)?
-  - Neighbouring countries will still have to deal with the perpetrators after the end of the conflict and in a world as interconnected as ours many other countries have to as well
-    - For that reason, many countries are seeking diplomatic solutions but what do we do when that doesn’t work? How can we maintain diplomatic/economic relations with countries that have breached international humanitarian law?
-  - If we are serious about peace-making, we will have to strengthen international organisations like the UN again
-- War prevention, early mediation, getting into the mind of the enemy
-- Since conflict can have long-lasting and devastating effects on a country’s economic and social development, the risk of armed conflict and violence should be considered in sustainable development policies and plans (Le, Bui and Uddin, 2022)
-- Policymakers in countries affected by conflict and fragility need to introduce inclusive approaches to help their economies recover from current conflicts and prevent the prospect of conflict eruption and persistence (World Bank and United Nations, 2018) (Le, Bui and Uddin, 2022)
+The significance of the periods after the Cold War and 9/11, and conflict intensity in both fixed and random effects models, suggests that broader geopolitical shifts and conflict dynamics play a crucial role in shaping external support provision, whether within one ongoing or between different conflicts.
 
-# Conclusion and recommendations
-- Characteristics of specific conflicts don’t matter. Rather it’s overall conflict characteristics that influence all conflicts (seen as regression results of fixed effects logistics regression and random effects logistic regression are the same)
+Random effects models highlight that indirect forms of support, such as intelligence and material aid, are more strongly linked to conflict characteristics than direct support, like troop deployment. Especially the provision of intelligence is strongly correlated with conflict characteristics, suggesting that external actors tailor intelligence support to specific conflict dynamics rather than adopting a one-size-fits-all approach. This supports the notion that intelligence-sharing plays a crucial role in modern conflict interventions, allowing external supporters to shape conflict outcomes strategically (Berlin and Malone, 2023; Engström, Pettersson, and Öberg, 2024 [*check reference*]).
 
-# References
+Notably, within-conflict variations in troop support are more strongly correlated with conflict characteristics than between-conflict variations, suggesting that direct military assistance is more sensitive to the specific dynamics of an ongoing conflict rather than structural differences across conflicts.
 
-# Appendices
+Findings suggest that coalition support (H3) is significantly associated with troop support, access to infrastructure, intelligence, and access to territory in the random effects model. However, in the fixed effects model, it only remains statistically significant for troop support. This suggests that coalition dynamics play a more prominent role in shaping the types of external support provided across different conflicts than within individual conflicts.
+
+The findings highlight key theoretical implications for Criminology and conflict studies. The weak correlation between troop presence and conflict characteristics suggests that direct military interventions are not necessarily correlated to structural factors but may instead be influenced by geopolitical considerations, alliance structures, and domestic political constraints. The significant correlation of duration and intensity with the provision of indirect external support within a conflict, could indicate that external actors are more likely to provide indirect support to conflicts that are more intense and have been ongoing for a longer time, as these conflicts might require more resources and capabilities to sustain. This would suggest a calculation of risk and reward on the part of external actors, indicating that support unfolds in a calculated, bureaucratic manner, devoid of immediate emotional reaction. The absence of adequate control variables like colonial ties or regional factors as control variables makes it impossible to assess whether emotional elements play a role in the provision of external support. Further research is needed to explore, which factors play a role in supporters' decisions to provide support and how their provision of support affects the continuance of conflict and mass violence.
+
+The interconnected nature of modern conflicts underscores the necessity for early mediation, intelligence-sharing, and conflict prevention strategies. This is particularly relevant in the context of sustainable development policies, as conflict and fragility pose significant barriers to economic and social progress (Le, Bui, and Uddin, 2022). To mitigate the risk of prolonged violence, policymakers in conflict-affected regions should adopt inclusive recovery strategies that address the root causes of instability (World Bank and United Nations, 2018).
+
+Overall, while both models provide insights into the determinants of external support, random effects models perform better in explaining broader cross-conflict patterns, whereas fixed effects models capture within-conflict variation more effectively. The weaker correlation of troop presence with conflict characteristics in both models suggests that direct intervention may be driven by factors beyond conflict characteristics alone, such as diplomatic or geopolitical considerations. 
+
+## Conclusion and recommendations
+While diplomacy *remains* the preferred approach to resolving conflicts, the persistence of aggressive state actors — such as Russia's actions in Ukraine — challenges the viability of purely pacifist strategies. Historical patterns suggest that military interventions can sometimes bring stability but may also exacerbate conflicts, as seen in Iraq and Afghanistan (*INSERT REFERENCE*). Given that external support often takes indirect forms (e.g., intelligence-sharing, training, and funding), policymakers must consider the long-term implications of such interventions. If external support is provided selectively to prolong conflicts rather than resolve them, it risks perpetuating cycles of violence. These findings reinforce the importance of understanding the strategic logic behind external support provision, both from a policy and criminological perspective. As global security dynamics continue to evolve, future research should explore case studies of external support to assess its long-term impact on conflict resolution and stability.
+
+## References
+
+## Appendices
 ```{r Region (Appendix 1), echo=FALSE}
 #Trend analysis of conflicts by region
 # Prepare the data for visualization
@@ -1357,6 +1471,44 @@ ggplot(coalition_summary, aes(x = year, y = conflict_count, color = ext_coalitio
     legend.position = "bottom"
   )
   ###Why is NA not being portrayed???
+```
+
+```{r Table Random effects linear regression - statistical significance, echo=FALSE}
+# Create the data frame manually
+rlin_table <- data.frame(
+  Independent_Variable = c("Intercept", "Incompatibility", "Type of conflict", "Intensity", "Region", "Duration", "9/11", "Cold War", "Coalition Support", "N"),
+  Troop_Support = c(NA, NA, "3.691 (Interstate); 162.037 (Internationalised intrastate)", NA, NA, NA, NA, NA, NA, 2330),
+  Troop_Presence = c(NA, NA, "-2.059 (Internationalised intrastate)", "2.697 (War)", NA, NA, NA, NA, "3.114 (Coalition)", 1449),
+  Access_to_Infrastructure = c(2.043, NA, "-2.716 (Internationalised intrastate)", NA, NA, NA, NA, "3.073 (After)", "4.229 (Coalition)", 1449),
+  Weapons = c(6.825, NA, NA, "3.996 (War)", NA, NA, "2.625 (After)", "-5.280 (After)", NA, 1449),
+  Materiel_and_Statistics = c(6.907, NA, "3.296 (Internationalised intrastate)", "2.899 (War)", NA, NA, NA, NA, NA, 1449),
+  Training_and_Expertise = c(7.523, NA, "3.053 (Internationalised intrastate)", NA, NA, NA, NA, "-3.517 (After)", NA, 1449),
+  Funding = c(5.261, NA, "2.414 (Internationalised intrastate)", "4.441 (War)", NA, -2.612, "2.072 (After)", "-2.516 (After)", "-2.187 (Coalition)", 1449),
+  Intelligence = c(NA, "-2.986 (Government)", "2.170 (Internationalised intrastate)", NA, "2.936 (Americas)", NA, "7.519 (After)", "2.022 (After)", "2.797 (Coalition)", 1449),
+  Access_to_Territory = c(NA, NA, "-3.118 (Interstate)", NA, "2.214 (Middle East); 3.787 (Africa); 2.063 (Americas)", NA, "-2.071 (after)", NA, "2.165 (Coalition)", 1449))
+
+# Generate a gt table
+gtrlin_tbl <- rlin_table %>%
+  gt() %>%
+  tab_header(
+    title = "Statistical significance in the random effects linear regression models"
+  ) %>%
+  cols_label(
+    Independent_Variable = "Independent Variable",
+    Troop_Support = "Troop Support",
+    Troop_Presence = "Troop Presence",
+    Access_to_Infrastructure = "Access to Infrastructure",
+    Weapons = "Weapons",
+    Materiel_and_Statistics = "Materiel and Statistics",
+    Training_and_Expertise = "Training and Expertise",
+    Funding = "Funding",
+    Intelligence = "Intelligence",
+    Access_to_Territory = "Access to Territory"
+  ) %>%
+  fmt_missing(columns = everything(), missing_text = "")
+
+# Print the table
+gtrlin_tbl
 ```
 
 ```{r Table RE log regression, include=FALSE}
