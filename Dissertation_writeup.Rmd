@@ -27,6 +27,11 @@ word_count <- str_count(paste(rmd_text, collapse = " "), "\\S+")
 print(word_count)
 ```
 
+*INSERT CONTENT PAGE*
+  - including figures
+  - including Appendices
+*INSERT PAGE NUMBERS*
+
 ## Declaration and Copyright statement
 ### Dissertation Declaration
 This work is all the author’s original work unless referenced clearly to the contrary. No portion of the work referred to in the dissertation has been submitted in support of an application for another degree or qualification of this or any other university or other institute of learning.
@@ -643,9 +648,9 @@ where where p is the probability of the dependent variable, α is the intercept,
   ### *How do I include the equations in the text?*
   ### *correct introduction of random and fixed effects in the equation?*
   
-An overall comparison was made between the effects of conflict characteristics on the provision of external support within and between conflicts, with the statistically significant characteristics in the models for the provision of troop support and intelligence being compared in detail. These models were chosen for detailed comparison based on the high correlation between conflict characteristics and the provision of the corresponding support in either the FE or RE models. They further allow for a more detailed comparison of the correlation with various conflict characteristics between the provision of direct or indirect support. Despite discussions on redefining statistical significance (Benjamin et al., 2018), this report rejects the null hypothesis that the population's estimated coefficient is zero when p <.05.
-  ### *Correct to speak of coefficient here or would this need to be log odds ration as we're using logistic models?*
-Multicollinearity was monitored throughout the analysis using variance inflation factors (VIF) and all models were tested against standard regression assumptions to ensure validity and reliability. However, as most predictors were categorical, the linearity assumption did not apply to them and homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. For fixed effects models the Adjusted Pseudo R-Squared was used to assess model fit. The Bayesian Information Criterion (BIC) and Akaike Information Criterion (AIC) were used to evaluate the random effects models' goodness-of-fit; with lower values denoting a better fit (Gellman and Hill, 2007).
+An overall comparison was made between the effects of conflict characteristics on the provision of external support within and between conflicts, with the statistically significant characteristics in the models for the provision of troop support and intelligence being compared in detail. These models were chosen for detailed comparison based on the high correlation between conflict characteristics and the provision of the corresponding support in either the FE or RE models. They further allow for a more detailed comparison of the correlation with various conflict characteristics between the provision of direct or indirect support. Coefficients were exponentiated for easier comparison and despite discussions on redefining statistical significance (Benjamin et al., 2018), this report rejects the null hypothesis that the population's estimated coefficient is zero when p <.05.
+  ### *Correct to speak of coefficient here or would this need to be log odds ratio as we're using logistic models?*
+Multicollinearity was monitored throughout the analysis using variance inflation factors (VIF) and all models were tested against standard regression assumptions to ensure validity and reliability. However, as most predictors were categorical, the linearity assumption did not apply to them and homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. For FE models the Adjusted Pseudo R-Squared was used to assess model fit. The Bayesian Information Criterion (BIC) and Akaike Information Criterion (AIC) were used to evaluate the RE models' goodness-of-fit; with lower values denoting a better fit (Gellman and Hill, 2007).
 
 ## Findings
 ```{r Preparations for visualisations, echo=FALSE}
@@ -834,7 +839,8 @@ rlogregress_0 <- glmer(ext_sup ~  incompatibility + type + intensity + region + 
 summary(rlogregress_0)
   ### nothing is significant
 
-#Exponentiate results
+#Exponentiate coefficients
+exp(coef(rlogregress_0))
 exp(fixef(rlogregress_0)) #to exponentiate only the fixed effects coefficients.
 
 #Check multicollinearity
@@ -868,7 +874,9 @@ vif(flogregress_0)
 #Checking linearity
 #plot(allEffects(flogregress_0))
   ### doesn't work. Is there another way to check this?
-      
+
+#Exponentiate coefficients
+exp(coef(flogregress_0))
 ```
 
 ```{r Regression Troop support, include=FALSE}
@@ -911,6 +919,9 @@ vif(flogregress_x)
   ##Warning: No intercept: vifs may not be sensible. 
   ##no multicollinearity
 
+#Exponentiate coefficients
+exp(coef(flogregress_x))
+
 #Check for NAs to see where 785 observations that were dropped due to NAs might be coming from
 colSums(is.na(merged_ucdp))
   ##783 NAs for ext_coalition
@@ -945,6 +956,9 @@ summary(flogregress_p)
 #Check multicollinearity
 vif(flogregress_p)
   ##no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(flogregress_p))
 ```
 
 ```{r Regression Access to infrastructure/joint operations, include=FALSE}
@@ -975,6 +989,9 @@ summary(flogregress_y)
 #Check multicollinearity
 vif(flogregress_y)
   ##no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(flogregress_y))
 ```
 
 ```{r Regression Weapons, include=FALSE}  
@@ -1004,6 +1021,9 @@ summary(flogregress_w)
 #Check multicollinearity
 vif(flogregress_w)
   ##no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(flogregress_w))
 ```
 
 ```{r Regression Materiel and statistics, include=FALSE}  
@@ -1033,6 +1053,9 @@ summary(flogregress_m)
 #Check multicollinearity
 vif(flogregress_m)
   ##no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(flogregress_m))
 ```
 
 ```{r Regression Training and expertise, include=FALSE}  
@@ -1063,6 +1086,9 @@ summary(flogregress_t)
 #Check multicollinearity
 vif(flogregress_t)
   ##no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(flogregress_t))
 ```
 
 ```{r Regression Funding, include=FALSE}  
@@ -1092,6 +1118,9 @@ summary(flogregress_f)
 #Check multicollinearity
 vif(flogregress_f)
   ##no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(flogregress_f))
 ```
 
 ```{r Regression Intelligence, include=FALSE}  
@@ -1121,6 +1150,9 @@ summary(flogregress_i)
 #Check multicollinearity
 vif(flogregress_i)
   ##no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(flogregress_i))
 ```
 
 ```{r Regression Access to territory, include=FALSE}  
@@ -1150,6 +1182,9 @@ summary(flogregress_l)
 #Check multicollinearity
 vif(flogregress_l)
   ##no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(flogregress_l))
 ```
 
 The RE model for the provision of external support (Table 2) shows no statistically significant results. However, the FE model reveals that the correlation between internationalised intrastate conflicts, wars, and the post-Cold War period and the provision of external support are statistically significant. 
@@ -1251,9 +1286,9 @@ Within conflicts, as captured by the FE models (Table 4), the provision of exter
 
   ###*add more Findings so that all variables are covered?*
 
-Model-specific results further illustrate these patterns: troop support is most strongly correlated to coalition involvement and conflict type across both models, whereas intelligence provision and weapons supply show broader but less consistent correlations with conflict characteristics. In the RE model (Table 5), interstate conflicts are associated with higher odds of receiving troop support (log odds = 5.905) compared to intrastate conflicts, holding all other conflict characteristics constant. The average log odds of troop support provision for support provided in a coalition are 9.650 larger than the average log odds of bilateral support, controlling for all other conflict characteristics included in the model. In contrast, the FE model (Table 6) finds that internationalised intrastate conflicts are correlated to the provision of troop support, with a log odds difference of 64.637 compared to intrastate conflicts, holding all other factors constant. The strong correlation between coalition support and the provision of troop support remains in the FE model, but its effect is much larger (log odds = 42.236) than in the random effects model. However, the FE model also suggests that conflicts occurring after 9/11 and after the Cold War are negatively correlated with the provision of troop support, with reductions in the average log odds of 3.443 and 13.187 compared to the average log odds before 9/11 and during the Cold War, respectively — correlations that are non-significant in the RE model.  
+Model-specific results further illustrate these patterns: troop support is most strongly correlated to coalition involvement and conflict type across both models, whereas intelligence provision and weapons supply show broader but less consistent correlations with conflict characteristics. In the RE model (Table 5), interstate conflicts are associated with higher odds (504.151) of receiving troop support compared to intrastate conflicts, holding all other conflict characteristics constant. The *average(?)* odds of troop support provision for support provided in a coalition are  33712.247 larger than the average odds of bilateral support, controlling for all other conflict characteristics included in the model. In contrast, the FE model (Table 6) finds that internationalised intrastate conflicts are correlated to the provision of troop support, with an odds difference of *11786432631969029355286460062.000* compared to intrastate conflicts, holding all other factors constant. The strong correlation between coalition support and the provision of troop support remains in the FE model, but its effect is much larger (odds = *2202685333377795584.000*) than in the random effects model. However, the FE model also suggests that conflicts occurring after 9/11 and after the Cold War are negatively correlated with the provision of troop support, with reductions in the average odds of  0.032 and 0.000 compared to the average odds before 9/11 and during the Cold War, respectively - correlations that are non-significant in the RE model.
 
-For intelligence support, both models find that the average log odds for wars are smaller than that for minor armed conflicts to receive this form of aid (log odds = -0.808 in RE; -1.123 in FE), holding all other factors constant. Both models further indicate that conflicts occurring after the Cold War are correlated with the provision of intelligence, although the effect is stronger in the FE model (log odds = 2.130) than in the RE model (log odds = 1.592). The RE model identifies regional differences, with conflicts in the Americas having a log odds of intelligence provision that is 4.121 larger than the log odds of conflicts in Europe, controlling for incompatibility, type, intensity, region, duration, 9/11, Cold War, and coalition support. It further indicates that conflicts about government have a log odds of being provided intelligence that is 1.831 smaller than the log odds of conflicts about territory, controlling for type, intensity, region, duration, 9/11, Cold War, and coalition support. While the RE model suggests that intelligence provision is correlated to the time period after 9/11 (log odds = 2.410) and coalition support (log odds = 1.076), holding all other variables constant, these effects do not emerge as statistically significant in the FE model. Notably, only the FE model finds that the log odds of receiving intelligence support increases with the duration of the conflict (log odds = 0.111 per year).
+For intelligence support, both models find that the average odds for wars are smaller than that for minor armed conflicts to receive this form of aid (odds = 0.486 in RE; 0.325 in FE), holding all other factors constant. Both models further indicate that conflicts occurring after the Cold War are correlated with the provision of intelligence, although the effect is stronger in the FE model (odds = 8.413) than in the RE model (odds = 1.631). The RE model identifies regional differences, with conflicts in the Americas having an odds of intelligence provision that is 124.034 larger than the odds of conflicts in Europe, controlling for incompatibility, type, intensity, region, duration, 9/11, Cold War, and coalition support. It further indicates that conflicts about government have a odds of being provided intelligence that is 0.140 smaller than the odds of conflicts about territory, controlling for type, intensity, region, duration, 9/11, Cold War, and coalition support. While the RE model suggests that intelligence provision is correlated to the time period after 9/11 (odds = 3.049) and coalition support (odds = 2.401), holding all other variables constant, these effects do not emerge as statistically significant in the FE model. Notably, only the FE model finds that the odds of receiving intelligence support increases with the duration of the conflict (odds = 1.118 per year).
 
 ```{r Table 5: random effects logistic regression results, echo=FALSE}
 #Visualising random effects logistic regression for those forms of support that are correlated to the most conflict characteristics: troop support, intelligence and weapons
