@@ -336,27 +336,27 @@ summary(rlogregress_x)
 
 ##the differences in statistical significance suggest that the logistic regression model might be better fit for interpretation
 
+#However, did not converge
+#Fitting negative binomial regression instead
+rnbregress_x <- glmer.nb(ext_x ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rnbregress_x)
+
 #Exponentiate results
-exp(fixef(rlogregress_x))
+exp(fixef(rnbregress_x)) #to exponentiate only the fixed effects coefficients.
 
 #Check multicollinearity
-#Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model. 
-#It measures how much the variance of a regression coefficient increases due to collinearity with other predictors.
-  #VIF < 5: Low to moderate multicollinearity (acceptable).
-  #VIF = 5–10: Moderate multicollinearity (investigate further; might require adjustments).
-  #VIF > 10: High multicollinearity (likely problematic; consider corrective actions).
-vif(rlogregress_x)
-  ##no multicollinearity
+vif(rnbregress_x)
+  #no multicollinearity
 
-#Checking linearity assumption
-plot(allEffects(rlogregress_x))
-  #straight line: assumption met for duration
+#Checking linearity for binomial logistic regression
+plot(allEffects(rnbregress_x))
+  #
 
 #Test the model for outliers
 #Cook's distance is a measure of the influence of each observation on the regression coefficients.
 #It is used to identify influential data points that may have a large impact on the regression coefficients.
 #Values greater than 1 are considered influential.
-cooks.distance(rlogregress_x)
+cooks.distance(rnbregress_x)
   ##no influential data points
 
 #1.3. Fixed effects linear regression
@@ -421,17 +421,15 @@ vif(rlinregress_p)
 #2.2 random effects logistic regression
 rlogregress_p <- glmer(ext_p ~  incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_p)
+  #did not converge
 
-#Exponentiate results
-exp(fixef(rlogregress_p))
+#Fitting negative binomial regression instead
+rnbregress_p <- glmer.nb(ext_p ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
+summary(rnbregress_p)
 
 #Check multicollinearity
-vif(rlogregress_p)
+vif(rnbregress_p)
   ##no multicollinearity
-
-#Checking linearity assumption
-plot(allEffects(rlogregress_p))
-  #straight line: assumption met for duration
 
 #2.3. Fixed effects linear regression
 flinregress_p <- plm(ext_p ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + ext_coalition, data = merged_ucdp, index = c("dyad_id", "year"), model = "within")
@@ -871,7 +869,7 @@ gtflog_tbl
 
 #2. Full results
 #Visualizing random effects logistic regression as a table
-tab_model(rlogregress_p, rlogregress_y, rlogregress_w, rlogregress_m, rlogregress_t, rlogregress_f, rlogregress_i, rlogregress_l, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Foreign troop presence", "Access to infrastructure/joint operations", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"))
+tab_model(rlogregress_x, rlogregress_p, rlogregress_y, rlogregress_w, rlogregress_m, rlogregress_t, rlogregress_f, rlogregress_i, rlogregress_l, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Troop support", "Foreign troop presence", "Access to infrastructure/joint operations", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"))
   
 #Visualizing fixed effects logistic regression as a table
 tab_model(flogregress_p, flogregress_y, flogregress_w, flogregress_m, flogregress_t, flogregress_f, flogregress_i, flogregress_l, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Foreign troop presence", "Access to infrastructure/joint operations", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"))

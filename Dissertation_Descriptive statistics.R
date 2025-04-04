@@ -757,6 +757,31 @@ ggplot(type_summary, aes(x = year, y = conflict_count, fill = type)) +
            color = "black")  # Optional, adjust color if needed
   ###Would like to add patterns but receive Error in seq.default(from, to, by) : invalid '(to - from)/by'
 
+#4.3. Bivariate analysis between conflict type and region
+# Create a summary dataset for conflict type and region
+type_region_summary <- merged_ucdp %>%
+  group_by(region, type) %>%
+  summarise(conflict_count = n(), .groups = "drop")
+
+# Create a stacked bar plot for conflict type by region 
+  #excluding NA as a category of region
+ggplot(type_region_summary %>% filter(!is.na(region)), aes(x = region, y = conflict_count, fill = type)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Conflict type by region",
+       x = "Region",
+       y = "Number of conflicts",
+       fill = "Type of conflict") +
+  scale_fill_manual(
+    values = c(
+      "extrasystemic" = "#8c510a",
+      "interstate" = "#01665e",
+      "intrastate" = "#dfc27d",
+      "internationalised intrastate" = "#80cdc1"
+    )
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 #5. External support offered
 #5.1. Distribution of external support offered
 #Create a bar plot
@@ -1675,3 +1700,38 @@ variable_table %>%
     style = cell_text(weight = "bold", align = "left", size = px(13)),
     locations = cells_body(rows = Variable == "")
   )
+
+#DAG with Latex code
+#Template
+\begin{tikzpicture}[scale = .7]
+\footnotesize
+\draw[black, fill=black] (0,0) circle (2pt) node[left]{$D_{i1}$};
+\draw[black, fill=black] (5,0) circle (2pt) node[below]{$D_{i2}$};
+\draw[black, fill=black] (10,0) circle (2pt) node[right]{$D_{i3}$};
+\draw[black, fill=black] (0,2) circle (2pt) node[above left]{$Y_{i1}$};
+\draw[black, fill=black] (5,2) circle (2pt) node[above]{$Y_{i2}$};
+\draw[black, fill=black] (10,2) circle (2pt) node[above right]{$Y_{i3}$};
+\draw[gray, fill=gray] (5,4) circle (2pt) node[above]{$U_i$};
+\draw[gray, fill=gray] (0,-2) circle (2pt) node[below left]{$V_{i1}$};
+\draw[gray, fill=gray] (5,-2) circle (2pt) node[below]{$V_{i2}$};
+\draw[gray, fill=gray] (10,-2) circle (2pt) node[below right]{$V_{i3}$};
+\draw[-latex] (0,.1) to node[anchor = west, pos = .5]{$\delta_1$} (0,1.9);
+\draw[-latex] (5,.1) to node[anchor = west, pos = .5]{$\delta_2$} (5,1.9);
+\draw[-latex] (10,.1) to node[anchor = west, pos = .5]{$\delta_3$} (10,1.9);
+\draw[-latex] (.1,2)--(4.9,2);
+\draw[-latex] (5.1,2)--(9.9,2);
+\draw[-latex, color = gray] (0,-1.9)--(0,-.1);
+\draw[-latex, color = gray] (5,-1.9)--(5,-.5);
+\draw[-latex, color = gray] (10,-1.9)--(10,-.1);
+\draw[-latex, color = gray] (.1,-2)--(4.9,-2);
+\draw[-latex, color = gray] (5.1,-2)--(9.9,-2);
+\draw[-latex, color = gray] (4.9,4)--(.1,2.1);
+\draw[-latex, color = gray] (5,3.9)--(5,2.5);
+\draw[-latex, color = gray] (5.1,4)--(9.9,2.1);
+\draw[-latex, color = gray] (4.95,3.95)--(.1,.1);
+\draw[-latex, color = gray] (5.05,3.95)--(9.9,.1);
+\draw[-latex, color = gray] (5,3.95) to [out=315,in=45] (5.1,.1);
+\draw[-latex, color = gray] (0,-2) to [out=135,in=225] (-.1,1.9);
+\draw[-latex, color = gray] (5,-2) to [out=135,in=225] (4.9,1.9);
+\draw[-latex, color = gray] (10,-2) to [out=45,in=315] (10.1,1.9);
+\end{tikzpicture}
