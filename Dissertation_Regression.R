@@ -317,6 +317,57 @@ options (scipen = 999)
 #Form of support provided (DV) ~ Reason for conflict/incompatibility (IV), Form of conflict (IV) and conflict intensity (IV), support as a coalition (IV)
 #Running random effects logistic and linear regression for all forms of support separately
 
+#0. Overall provision of external support
+#0.2. random effects logistic regression
+rlogregress_0 <- glmer(ext_sup ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
+summary(rlogregress_0)
+  # did not converge
+
+#Fitting PPML regression instead
+rppmlregress_0 <- glmer(ext_sup ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), family = poisson, data = merged_ucdp)
+summary(rppmlregress_0)
+
+#Exponentiate coefficients
+exp(fixef(rppmlregress_0)) #to exponentiate only the fixed effects coefficients.
+
+#Check multicollinearity
+#Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model.
+#It measures how much the variance of a regression coefficient increases due to collinearity with other predictors.
+#VIF < 5: Low to moderate multicollinearity (acceptable).
+#VIF = 5–10: Moderate multicollinearity (investigate further; might require adjustments).
+#VIF > 10: High multicollinearity (likely problematic; consider corrective actions).
+vif(rnbregress_0)
+  #no multicollinearity
+
+#Checking linearity for binomial logistic regression
+#The linearity assumption for logistic regression requires that the log odds of the dependent variable are a linear combination of the independent variables.
+#This assumption can be checked by plotting the predicted probabilities against the independent variables.
+#The plot should show a linear relationship between the independent variables and the log odds of the dependent variable.
+plot(allEffects(rnbregress_0))
+
+#0.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
+flogregress_0 <- feglm(ext_sup ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
+summary(flogregress_0)
+
+tab_model(flogregress_0)
+  #did not converge
+
+#Fitting negative binomial regression instead
+fnbregress_0 <- fenegbin(ext_sup ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, data = merged_ucdp)
+summary(fnbregress_0)
+  #did not work (all coefficients are NA)
+
+# Fitting a Poisson Pseudo Maximum Likelihood (PPML) Fixed Effects model
+fppmlregress_0 <- feglm(ext_sup ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = poisson, data = merged_ucdp)
+summary(fppmlregress_0)
+
+#Check multicollinearity
+vif(fppmlregress_0)
+  ##no multicollinearity but not sure it's working as receiving the same number for every single variable
+
+#Exponentiate coefficients
+exp(coef(fppmlregress_0))
+
 #1. Troop support
 #1.1. random effects linear regression
 rlinregress_x <- lmer(ext_x ~ incompatibility + type + intensity + region + cumulative_duration + nine_eleven + cold_war + (1 | dyad_id), data = merged_ucdp)
@@ -350,7 +401,17 @@ vif(rnbregress_x)
 
 #Checking linearity for binomial logistic regression
 plot(allEffects(rnbregress_x))
-  #
+
+#Fitting Poisson Pseudo Maximum Likelihood (PPML) regression to be able to compare it with the FE models
+rppmlregress_x <- glmer(ext_x ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), family = poisson, data = merged_ucdp)
+summary(rppmlregress_x)
+
+#Exponentiate results
+exp(fixef(rppmlregress_x)) #to exponentiate only the fixed effects coefficients.
+
+#Check multicollinearity
+vif(rppmlregress_x)
+  #no multicollinearity
 
 #Test the model for outliers
 #Cook's distance is a measure of the influence of each observation on the regression coefficients.
@@ -405,9 +466,29 @@ vif(flogregress_xi)
   ##No intercept: vifs may not be sensible.
   ##no multicollinearity
 
-#Check linearity
-plot(allEffects(flogregress_xi))
-  ###Doesn't work
+# However as model did not converge
+#Fitting negative binomial regression instead
+fnbregress_x <- fenegbin(ext_x ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, data = merged_ucdp)
+summary(fnbregress_x)
+#did not work (all coefficients are NA)
+
+# Fitting a Poisson Pseudo Maximum Likelihood (PPML) Fixed Effects model
+fppmlregress_x <- feglm(ext_x ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = poisson, data = merged_ucdp)
+summary(fppmlregress_x)
+
+#Coefficients
+coef(fppmlregress_x) #provides coefficients
+##Region categories and interstate were dropped
+#confint(fppmlregress_x) #provides confidence intervals
+#If the confidence interval crosses zero, the result is not statistically significant
+##code is being shown at the end of this chunk
+
+#Check multicollinearity
+vif(fppmlregress_x)
+  #no multicollinearity
+
+#Exponentiate coefficients
+exp(coef(fppmlregress_x))
 
 #2. Foreign troop presence
 #2.1. random effects linear regression
@@ -446,8 +527,18 @@ summary(flogregress_p)
 vif(flogregress_p)
   ##no multicollinearity
 
-#Check linearity
-plot(allEffects(flogregress_p))
+#Model did not converge
+#Fitting negative binomial regression instead
+fnbregress_p <- fenegbin(ext_p ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, data = merged_ucdp)
+summary(fnbregress_p)
+  #did not work (all coefficients are NA)
+
+# Fitting a Poisson Pseudo Maximum Likelihood (PPML) Fixed Effects model
+fppmlregress_p <- feglm(ext_p ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = poisson, data = merged_ucdp)
+summary(fppmlregress_p)
+
+#exponentiate coefficients
+exp(coef(fppmlregress_p)) #provides coefficients
 
 #3. Access to infrastructure/joint operations
 #3.1. random effects linear regression

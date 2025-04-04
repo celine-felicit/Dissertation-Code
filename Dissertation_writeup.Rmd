@@ -202,134 +202,6 @@ merged_ucdp <- merged_ucdp %>%
     )
   )
 
-#Identify most common combinations of support: Create a new column with the most common combinations of support
-merged_ucdp <- merged_ucdp %>%
-  mutate(
-    ext_combination = case_when(
-      ext_sum == 0 ~ "no support",                                    # No support provided
-      ext_sum > 2 ~ "several forms of support",                       # More than two types of support provided
-
-      # Explicitly include unknown and other support combinations
-      ext_u == 1 & ext_o == 1 ~ "unknown and other support",
-      ext_u == 1 & ext_l == 1 ~ "unknown support and access to territory",
-      ext_u == 1 & ext_i == 1 ~ "unknown support and intelligence",
-      ext_u == 1 & ext_f == 1 ~ "unknown support and funding",
-      ext_u == 1 & ext_t == 1 ~ "unknown support and training",
-      ext_u == 1 & ext_m == 1 ~ "unknown support and materiel",
-      ext_u == 1 & ext_w == 1 ~ "unknown support and weapons",
-      ext_u == 1 & ext_y == 1 ~ "unknown support and infrastructure",
-      ext_u == 1 & ext_p == 1 ~ "unknown support and foreign troop presence",
-      ext_u == 1 & ext_x == 1 ~ "unknown support and troop support",
-
-      ext_o == 1 & ext_l == 1 ~ "other support and access to territory",
-      ext_o == 1 & ext_i == 1 ~ "other support and intelligence",
-      ext_o == 1 & ext_f == 1 ~ "other support and funding",
-      ext_o == 1 & ext_t == 1 ~ "other support and training",
-      ext_o == 1 & ext_m == 1 ~ "other support and materiel",
-      ext_o == 1 & ext_w == 1 ~ "other support and weapons",
-      ext_o == 1 & ext_y == 1 ~ "other support and infrastructure",
-      ext_o == 1 & ext_p == 1 ~ "other support and foreign troop presence",
-      ext_o == 1 & ext_x == 1 ~ "other support and troop support",
-
-      # Two types of support - explicit labeling
-      ext_l == 1 & ext_i == 1 ~ "access to territory and intelligence",
-      ext_l == 1 & ext_f == 1 ~ "access to territory and funding",
-      ext_l == 1 & ext_t == 1 ~ "access to territory and training",
-      ext_l == 1 & ext_m == 1 ~ "access to territory and materiel",
-      ext_l == 1 & ext_w == 1 ~ "access to territory and weapons",
-      ext_l == 1 & ext_y == 1 ~ "access to territory and infrastructure",
-      ext_l == 1 & ext_p == 1 ~ "access to territory and foreign troop presence",
-      ext_l == 1 & ext_x == 1 ~ "access to territory and troop support",
-
-      ext_i == 1 & ext_f == 1 ~ "intelligence and funding",
-      ext_i == 1 & ext_t == 1 ~ "intelligence and training",
-      ext_i == 1 & ext_m == 1 ~ "intelligence and materiel",
-      ext_i == 1 & ext_w == 1 ~ "intelligence and weapons",
-      ext_i == 1 & ext_y == 1 ~ "intelligence and infrastructure",
-      ext_i == 1 & ext_p == 1 ~ "intelligence and foreign troop presence",
-      ext_i == 1 & ext_x == 1 ~ "intelligence and troop support",
-
-      ext_f == 1 & ext_t == 1 ~ "funding and training",
-      ext_f == 1 & ext_m == 1 ~ "funding and materiel",
-      ext_f == 1 & ext_w == 1 ~ "funding and weapons",
-      ext_f == 1 & ext_y == 1 ~ "funding and infrastructure",
-      ext_f == 1 & ext_p == 1 ~ "funding and foreign troop presence",
-      ext_f == 1 & ext_x == 1 ~ "funding and troop support",
-
-      ext_t == 1 & ext_m == 1 ~ "training and materiel",
-      ext_t == 1 & ext_w == 1 ~ "training and weapons",
-      ext_t == 1 & ext_y == 1 ~ "training and infrastructure",
-      ext_t == 1 & ext_p == 1 ~ "training and foreign troop presence",
-      ext_t == 1 & ext_x == 1 ~ "training and troop support",
-
-      ext_m == 1 & ext_w == 1 ~ "materiel and weapons",
-      ext_m == 1 & ext_y == 1 ~ "materiel and infrastructure",
-      ext_m == 1 & ext_p == 1 ~ "materiel and foreign troop presence",
-      ext_m == 1 & ext_x == 1 ~ "materiel and troop support",
-
-      ext_w == 1 & ext_y == 1 ~ "weapons and infrastructure",
-      ext_w == 1 & ext_p == 1 ~ "weapons and foreign troop presence",
-      ext_w == 1 & ext_x == 1 ~ "weapons and troop support",
-
-      ext_y == 1 & ext_p == 1 ~ "infrastructure and foreign troop presence",
-      ext_y == 1 & ext_x == 1 ~ "infrastructure and troop support",
-      
-      ext_p == 1 & ext_x == 1 ~ "foreign troop presence and troop support",
-
-      # Single forms of support
-      ext_u == 1 ~ "unknown support",
-      ext_o == 1 ~ "other support",
-      ext_l == 1 ~ "access to territory",
-      ext_i == 1 ~ "intelligence",
-      ext_f == 1 ~ "funding",
-      ext_t == 1 ~ "training",
-      ext_m == 1 ~ "materiel",
-      ext_w == 1 ~ "weapons",
-      ext_y == 1 ~ "infrastructure",
-      ext_p == 1 ~ "foreign troop presence",
-      ext_x == 1 ~ "troop support",
-
-      TRUE ~ "no support"  # Default case to ensure all cases are covered
-    )
-  ) %>%
-  # Convert to factor with proper levels
-  mutate(
-    ext_combination = factor(
-      ext_combination,
-      levels = c(
-        "no support",
-        "unknown support",
-        "other support",
-        "access to territory", "intelligence", "funding", "training",
-        "materiel", "weapons", "infrastructure", "foreign troop presence", "troop support",
-        "unknown and other support",
-        "unknown support and access to territory", "unknown support and intelligence", 
-        "unknown support and funding", "unknown support and training", 
-        "unknown support and materiel", "unknown support and weapons", 
-        "unknown support and infrastructure", "unknown support and foreign troop presence", 
-        "unknown support and troop support",
-        "other support and access to territory", "other support and intelligence", 
-        "other support and funding", "other support and training", 
-        "other support and materiel", "other support and weapons", 
-        "other support and infrastructure", "other support and foreign troop presence", 
-        "other support and troop support",
-        "access to territory and intelligence", "funding and weapons", 
-        "intelligence and training", "materiel and weapons", 
-        "training and infrastructure", "foreign troop presence and troop support",
-        "several forms of support"
-      )
-    )
-  )
-
-# Ensure that ext_combination is correctly set as a factor
-class(merged_ucdp$ext_combination) #factor
-
-#check that there's no NAs
-sum(is.na(merged_ucdp$ext_combination))
-
-# Verify the output
-table(merged_ucdp$ext_combination)
-
 #Creation of a variable to differentiate between indirect and direct support
 merged_ucdp <- merged_ucdp %>%
   mutate(
@@ -501,32 +373,28 @@ The study of external support in armed conflicts has provided critical insights 
 
 The content of interventions remains underexplored, despite its impact on conflict trajectories. Differentiating between support types - military training, material aid, or safe havens - can highlight distinct effects on outcomes (Roberts, 2019). Furthermore, the multi-actor dimension of support is frequently overlooked, despite evidence that sponsors selectively support specific groups within fragmented conflicts (Berlin and Malone, 2023). A focus on rebel groups introduces methodological challenges and selection bias, limiting generalisability to other armed organisations (Abrahms, Ward, and Kennedy, 2018; Phillips, 2019). This neglect obscures patterns of external support across diverse settings, undermining frameworks linking organisational attributes to state sponsorship. Moreover, qualitative approaches dominate the literature, often at the expense of quantitative or mixed-method analyses better suited to capturing temporal and contextual variations in support dynamics (Petrova, 2019). 
 
-## Methodology
-### Research Hypotheses
-The study aims to test several hypotheses regarding the relationship between conflict characteristics and external support. These hypotheses are grouped based on the type of relationship they examine, focusing on whether conflict characteristics influence the provision of external support, the form of support provided, and the impact of support coalitions on the type of assistance.
+## Research Design
+The study aims to test several hypotheses regarding the relationship between conflict characteristics and external support. These hypotheses are grouped based on the type of relationship they examine, focusing on whether conflict characteristics influence the provision of external support, the form of support provided, and the impact of support coalitions on the type of assistance. These conflict characteristics are considered to be strategical factors influencing the provision of external support. Thereby, this study aims to examine whether external supporters follow a 'cold', rational approach to external support. The hypotheses are as follows:
 
 ##### Hypothesis Group 1: Conflict Characteristics affect whether external support is provided to a conflict party.
 a)	Conflict intensity affects whether external support is provided.
-b)	Conflict incompatibility affects whether external support is provided
+b)	Territorial incompatibility affects whether external support is provided
 c)	The cumulative duration of conflict affects whether external support is provided.
 d)	The type of conflict affects whether external support is provided.
-e)	The region where the state conflict party is located affects whether external support is provided.
-f)	Whether a conflict is taking place before or after 9/11 affects whether external support is provided.
-g)	Whether a conflict is taking place during or after the Cold War affects whether external support is provided.
+e)	Whether a conflict is taking place before or after 9/11 affects whether external support is provided.
+f)	Whether a conflict is taking place during or after the Cold War affects whether external support is provided.
 
 ##### Hypothesis Group 2: Conflict characteristics influence what kind of external support is provided.
 a)	Conflict intensity affects what kind of external support is provided.
-b)	Conflict incompatibility affects what kind of external support is provided.
+b)	Territorial incompatibility affects what kind of external support is provided.
 c)	The cumulative duration of conflict affects what kind of external support is provided.
 d)	The type of conflict affects what kind of external support is provided.
-e)	The region where the state conflict party is located affects what kind of external support is provided.
-f)	Whether a conflict is taking place before or after 9/11 affects what kind of external support is provided.
-g)	Whether a conflict is taking place during or after the Cold War affects what kind of external support is provided.
+e)	Whether a conflict is taking place before or after 9/11 affects what kind of external support is provided.
+f)	Whether a conflict is taking place during or after the Cold War affects what kind of external support is provided.
 
 ##### Hypothesis 3: Whether support is provided in a coalition or as bilateral support affects what kind of external support is provided.
 
-### Research Design
-```{tikz, fig.cap = "Figure 1: Directed Acyclic Graph on Conflict Characteristics and External Support", out.width = '100%', fig.ext=if (knitr:::is_latex_output()) 'pdf' else 'png', echo = FALSE, warning=FALSE}
+```{tikz, fig.cap = "Figure 1: Directed Acyclic Graph on Conflict Characteristics and External Support", out.width = '100%', echo = FALSE, warning=FALSE}
 \usetikzlibrary{positioning, arrows, shapes.geometric}
 
 \begin{tikzpicture}[
@@ -577,6 +445,7 @@ g)	Whether a conflict is taking place during or after the Cold War affects what 
 
 Based on the outlined Literature, Figure 1 portrays the underlying assumptions and relationships between conflict characteristics and external support. The dependent variable 'provision of external support' is assumed to be both directly and indirectly influenced by independent conflict characteristics (incompatibility, type of conflict, intensity, region, cumulative duration, point in time of the conflict), as well as the identity of the external supporter, the support recipient and their relationship with one another (i.e., colonial ties, shared cultural/ideological ties, a common enemy) and economic and political factors such as trade connections and the supporter's total defence spending. These independent factors are not only assumed to have a direct or indirect effect on the provision of external support but also on the kind of external support that is provided to one of the conflict parties. A limitation of this conceptual model is the absence of temporal dynamics, which could influence the provision and kind of external support. Despite these limitations, the model provides a structured framework for testing the hypotheses outlined above.
 
+## Methodology
 #### Data and operationalisation
 ```{r Info on dataset, include=FALSE, warning=FALSE}
 #Number of dyads
@@ -613,7 +482,7 @@ Despite their comprehensive nature, these datasets have several limitations. As 
 
 Its state-based armed conflict definition includes only incompatibilities concerning government and territory, potentially overlooking underlying causes. Additionally, conflicts that fail to meet the annual threshold of 25 battle-related deaths are missing, and cases where information on key variables such as incompatibility, actors, or intensity is uncertain are excluded. The datasets lack precise geographic data, instead assigning location based on the government side in a dyad rather than where the conflict occurs. This raises concerns about whether the 'region' variable used in the analysis accurately reflects the location of fighting. The ESD further narrows the scope by only recording first-degree supporters - external actors directly assisting conflict parties - while ignoring second-degree supporters such as states providing logistical assistance or financial aid to regional coalitions (Meier, 2022). While differentiating between ten different kinds of support, the categorisation of support types still simplifies complex interactions where states may provide multiple forms of aid over time. Additionally, non-state troop support is uniformly coded as zero, and support by international organisations, diaspora groups, private businesses, and religious institutions is excluded. Finally, the ESD’s threshold for recording assistance could lead to underreporting of minor interventions, which may affect the accuracy of support-related conclusions.
 
-The study incorporates dependent, independent, and control variables (Table 1), categorised based on their measurement scales. All nominal independent variables were factorised to improve analytical clarity. The order of conflict type was changed so that 'intrastate' instead of 'interstate' would be the reference group to allow for clearer interpretation in the regression analyses. The dependent variables measuring external support were expanded to differentiate between types of support (ext_category, ext_type) and their most frequent combinations (ext_combination). Conflict characteristics were kept as per their original categorisation, while cumulative duration was derived using a time-based formula. To prevent non-convergence in the regression analyses due to a low number of cases in the category 'territory and government', a new variable capturing territorial incompatibility was derived from the original 'incompatibility' variable. As some of the support forms provided refer to territory, it was decided to go with this category rather than capturing governmental incompatibility.
+The study incorporates dependent, independent, and control variables (Table 1), categorised based on their measurement scales. All nominal independent variables were factorised to improve analytical clarity. The order of conflict type was changed so that 'intrastate' instead of 'interstate' would be the reference group to allow for clearer interpretation in the regression analyses. The dependent variables measuring external support, as defined in the Literature Review (see Meier et al., 2023; Meier, 2022), were expanded to differentiate between types of support (ext_category, ext_type). Conflict characteristics were kept as per their original categorisation, while cumulative duration was derived using a time-based formula. To prevent non-convergence in the regression analyses due to a low number of cases in the category 'territory and government', a new variable capturing territorial incompatibility was derived from the original 'incompatibility' variable. As some of the support forms provided refer to territory, it was decided to go with this category rather than capturing governmental incompatibility.
 
 ```{r Preparation Variable table, echo=FALSE, warning=FALSE}
 #Calculate proportions for variables
@@ -673,12 +542,6 @@ ext_coalition_proportion <- merged_ucdp %>%
 #Proportion of external support category
 ext_category_proportion <- merged_ucdp %>%
   group_by(ext_category) %>%
-  summarise(Count = n()) %>%
-  mutate(Proportion = round(Count / sum(Count) * 100, 2))
-
-#Proportion of external support combinations
-ext_combination_proportion <- merged_ucdp %>%
-  group_by(ext_combination) %>%
   summarise(Count = n()) %>%
   mutate(Proportion = round(Count / sum(Count) * 100, 2))
 
@@ -765,7 +628,7 @@ ext_u_proportion <- merged_ucdp %>%
 # Create a dataframe with variable details
 variable_table <- data.frame(
   Category = c(
-    "Dependent Variables", rep("", 23),
+    "Dependent Variables", rep("", 17),
     "Independent Variables", rep("", 17),
     "Control Variables", rep("", 3)
   ),
@@ -773,7 +636,6 @@ variable_table <- data.frame(
     "", 
     "ext_sup", "ext_x", "ext_p", "ext_y", "ext_w", "ext_m", "ext_t", "ext_f", "ext_i", "ext_l", "ext_o", "ext_u",
     "ext_category",  
-    "ext_combination", rep("", 5), 
     "ext_type", rep("", 3),
     "", 
     "type", rep("", 3), 
@@ -794,7 +656,6 @@ variable_table <- data.frame(
     "Funding support (1 = Yes)", "Intelligence support (1 = Yes)", 
     "Access to territory (1 = Yes)", "Other support (1 = Yes)", "Unknown support (1 = Yes)",
     "Categorisation of the form of external support provided (i.e.,  whether no support, one individual form or several forms of support are provided)", 
-    "Most common combinations of external support (up to three explicitly listed)", "no support", "access to territory", "training and expertise", "weapons", "several forms of support",
     "Categorisation of external support as direct, indirect, or no support", "indirect", "direct", "direct and indirect",
     "", 
     "Type of conflict (1 = Extrasystemic, 2 = Interstate, 3 = Intrastate, 4 = Internationalised Intrastate)", "intrastate", "interstate", "internationalised intrastate",
@@ -810,7 +671,7 @@ variable_table <- data.frame(
   ),
   Measurement_Scale = c(
     "", 
-    rep("Binary", 12), "Ordinal", "Nominal", rep("", 5), "Nominal", rep("", 3),
+    rep("Binary", 12), "Ordinal", "Nominal", rep("", 3),
     "", 
     "Nominal", rep("", 3), "Binary", "Nominal", rep("", 3), "Binary", "Ratio", "Nominal", rep("", 5),
     "", 
@@ -832,7 +693,6 @@ variable_table <- data.frame(
     ext_o_proportion$Proportion[2],
     ext_u_proportion$Proportion[2],
     ext_category_proportion$Proportion[13],
-    "", ext_combination_proportion$Proportion[c(1, 4, 7, 9, 24)],
     "", ext_type_proportion$Proportion[2:4],
     "", 
     "", type_proportion$Proportion[1:3], 
@@ -887,7 +747,7 @@ Missing data analysis identified few cases of missing values for the variables u
 ### Data analysis
 Descriptive statistical methods were employed to summarise and analyse the data. This included the calculation of total conflict counts per year, as well as the summarisation of conflict intensity and the mean and median conflict durations by region. These statistics were visualised through various graphical methods, such as stacked bar charts for conflict intensity levels and line plots for the evolution of external support types, thereby providing a clear depiction of temporal trends in conflict characteristics and support dynamics.
   
-Regression analysis, utilising random (RE) and fixed effects (FE) models, aimed to investigate the factors influencing the provision of various forms of external support in armed conflict. For each separate form of support, FE and RE logistic regression models were fitted to the data to test the research hypotheses that conflict characteristics, as well as coalition support influence the provision of external support (H2, H3). FE models control for individual, herein conflict dyad, getting rid of any variation between individual dyads (Huntington-Klein, 2023). RE models make the assumption that the slopes originate from a known random distribution, such as a normal distribution. This enhances the estimation of the individual effects individually, increases the precision of estimates (lowering the standard errors), and employs a weighted average of within and between variance rather than simply within variation (Huntington-Klein, 2023). The choice of regression models was guided by theoretical considerations and empirical data characteristics. The decision to include both RE and FE effects models was driven by the need to account for both within-dyad and between-dyad variations. Despite the potential for the inclusion of within-between hybrid models (Fairbrother, 2014; Mundlak, 1978), time constraints precluded this approach, and the simpler RE and FE models were deemed sufficient. As the dependent variables are binary, binomial logistic regression models were deemed appropriate. However, as linear probability models can be fitted in cases where the dependent variable is binary, each form of external support was first analysed through four models: RE linear, RE logistic, FE linear, and FE logistic regression. In all models, the primary independent variables included conflict incompatibility, type of conflict, conflict intensity, cumulative conflict duration, whether support was provided in a coalition, and historical events such as the end of the Cold War and the aftermath of 9/11. Originally, the region of conflict was also included as an independent variable, but it was later excluded due to its correlation with conflict type (Appendix 4), leading to non-convergence of multiple models. After a first analysis, the logistic regression models were deemed more suitable for several forms of external support due to significant differences in statistical significance across the models, particularly in the case of binary dependent variables (Table 2; Appendix 6). As such, logistic regression was preferred for interpreting the effects, with all final models being fitted via maximum likelihood method of the following equations:
+Regression analysis, utilising random (RE) and fixed effects (FE) models, aimed to investigate the factors influencing the provision of various forms of external support in armed conflict. For each separate form of support, FE and RE logistic regression models were fitted to the data to test the research hypotheses that conflict characteristics, as well as coalition support influence the provision of external support (H2, H3). FE models control for individual, herein conflict dyad, getting rid of any variation between individual dyads (Huntington-Klein, 2023). RE models make the assumption that the slopes originate from a known random distribution, such as a normal distribution. This enhances the estimation of the individual effects individually, increases the precision of estimates (lowering the standard errors), and employs a weighted average of within and between variance rather than simply within variation (Huntington-Klein, 2023). The choice of regression models was guided by theoretical considerations and empirical data characteristics. The decision to include both RE and FE effects models was driven by the need to account for both within-dyad and between-dyad variations. Despite the potential for the inclusion of within-between hybrid models (Fairbrother, 2014; Mundlak, 1978), time constraints precluded this approach, and the simpler RE and FE models were deemed sufficient. As the dependent variables are binary, binomial logistic regression models were deemed appropriate. However, as linear probability models can be fitted in cases where the dependent variable is binary, each form of external support was first analysed through four models: RE linear, RE logistic, FE linear, and FE logistic regression. In all models, the primary independent variables included conflict incompatibility, type of conflict, conflict intensity, cumulative conflict duration, whether support was provided in a coalition, and historical events such as the end of the Cold War and the aftermath of 9/11. Originally, the region of conflict was also included as an independent variable, but it was later excluded due to its correlation with conflict type (Appendix 4), leading to non-convergence of multiple models. Exploratory analyses of the dependent variables and an assessment of Table 1 deemed the dependent variable functional but led to the recoding of 'incompatibility' to focus on territorial disputes to prevent non-convergence in the regression analyses due to a low number of cases in the category 'territory and government'. After a first analysis, the logistic regression models were deemed more suitable for several forms of external support due to significant differences in statistical significance across the models, particularly in the case of binary dependent variables (Table 2; Appendix 6). As such, logistic regression was preferred for interpreting the effects, with all final models being fitted via maximum likelihood method of the following equations:
 
 FE Logistic Regression:
 $$
@@ -902,35 +762,60 @@ $$
 \gamma_{\text{dyad\_id}}
 $$
 
-where where p is the probability of the dependent variable, alpha is the intercept, β is the coefficient for each independent variable, and γdyad_id represents the fixed effect for each dyad.
+where where p is the probability of the dependent variable, $\alpha$ is the intercept, $\beta$ is the coefficient for each independent variable, and $gamma_{\text{dyad\_id}$ represents the fixed effect for each dyad.
 
 RE Logistic Regression:
 $$
 \log \left( \frac{\text{provision of support}}{\text{no provision of support}} \right) =
-\alpha + \beta_1 \cdot \text{territorial incompatibility} + 
+\alpha_i + 
+\beta_1 \cdot \text{territorial incompatibility} + 
 \beta_2 \cdot \text{type} + 
 \beta_3 \cdot \text{intensity} + 
 \beta_4 \cdot \text{duration} + 
 \beta_5 \cdot \text{nine eleven} + 
 \beta_6 \cdot \text{cold war} + 
-\beta_7 \cdot \text{coalition support} + 
-\sim \mathcal{N}(0, \sigma^2)
+\beta_7 \cdot \text{coalition support}
 $$
 
-where where p is the probability of the dependent variable, alpha is the intercept, β is the coefficient for each independent variable, and udyad_id∼N(0,σ2) represents the random effect for each dyad.These analyses provide an overview of trends in the provision of external support without making inferential claims about causal relationships. 
-
-  ### *correct introduction of random and fixed effects in the equation?*
+where where p is the probability of the dependent variable, $\alpha_i$ is the intercept varying between dyads (i), $\beta$ is the coefficient for each independent variable.
   
-As both RE and FE models for the overall provision of support, troop support, and foreign troop presence showed non-convergence, they were refitted using negative binomial (NB) regression models. While this approach worked for the RE models, all coefficients in the FE models came back as NAs and as there were no signs of overdispersion, they were refitted as Poisson Pseudo Maximum Likelihood (PPML) models. The NB and PPML regression models were fitted using the same independent variables as the logistic regression models, with the dependent variable being the count of the respective form of external support. The NB regression models were fitted using the following equations:
-*INSERT EQUATION FOR RE NEGATIVE BINOMIAL REGRESSION*
-*INSERT EQUATION FOR FE PPML REGRESSION*
+As both RE and FE models for the overall provision of support, troop support, and foreign troop presence showed non-convergence, they were refitted as Poisson Pseudo Maximum Likelihood (PPML) models. The PPML regression models were fitted using the same independent variables as the logistic regression models, with the dependent variable being the count of the respective form of external support, using the following equations:
 
-The Bayesian Information Criterion (BIC), Akaike Information Criterion (AIC) (for RE models), and the Adjusted Pseudo R-Squared (for FE models) were used to model fit throughout the process of refitting; with lower AIC and BIC values denoting a better fit (Gellman and Hill, 2007). The exclusion of the region variable and the recoding of the incompatibility into a binary variable focused on territorial disputes had no effect on the BIC of the FE models, most AIC and BIC values for the RE models increased slightly. While this indicates worse model-fit, these steps were still deemed necessary to ensure model conversion. The refitting of the FE models for troop support and foreign troop presence as PPML and for RE models as NB models increased the BIC for these models, however they were still deemed as a better fit as they allowed model conversion.
+FE PPML Regression:
+$$
+\mathbb{E}(Y_{i} \mid X_{i}, \gamma_i) = \exp\left(
+\gamma_i + 
+\beta_1 \cdot \text{Territorial Incompatibility}_{i} + 
+\beta_2 \cdot \text{Type}_{i} + 
+\beta_3 \cdot \text{Intensity}_{i} + 
+\beta_4 \cdot \text{Duration}_{i} + 
+\beta_5 \cdot \text{Post 9/11}_{i} + 
+\beta_6 \cdot \text{Cold War}_{i} + 
+\beta_7 \cdot \text{Coalition Support}_{i}
+\right)
+$$
+where $\gamma_i$ represents the dyad-specific fixed effects. The exponentiation is key to PPML, as the model estimates log-linear coefficients using a Poisson-based pseudo-likelihood, even when the dependent variable is not truly count data. Different to the RE model, $\gamma_i$ is treated as a parameter to be estimated, rather than a random draw from a distribution.
 
-An overall comparison was made between the effects of conflict characteristics on the provision of external support within and between conflicts, with the statistically significant characteristics in the models for foreign troop presence and intelligence being compared in detail. These models were chosen for detailed comparison based on the high correlation between conflict characteristics and the provision of the corresponding support in either the FE or RE models. They further allow for a more detailed comparison of the correlation with various conflict characteristics between the provision of direct or indirect support. However, due to the use of different regression models, the coefficients of the RE and FE models cannot be directly compared. The results of the logistic regression models were interpreted using odds ratios, which indicate the change in odds of the dependent variable for a one-unit increase in the independent variable. The results of the negative binomial and PPML regression models were interpreted using incidence rate ratios (IRR), which indicate the change in the expected count of the dependent variable for a one-unit increase in the independent variable. Coefficients of the logistic regression models were exponentiated for easier comparison and despite discussions on redefining statistical significance (Benjamin et al., 2018), this report rejects the null hypothesis that the population's estimated coefficient is zero when p <.05. As all dependent variables measure different conflict characteristics multicollinearity was not assumed. It was still monitored throughout the analysis using variance inflation factors (VIF). All models were further tested against standard regression assumptions to ensure validity and reliability. However, as most predictors were categorical, the linearity assumption did not apply to them and homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. 
+RE PPML Regression:
+$$
+\mathbb{E}(Y_{i} \mid X_{i}, \alpha_i) = \exp\left(
+\alpha_i + 
+\beta_1 \cdot \text{Territorial Incompatibility}_{i} + 
+\beta_2 \cdot \text{Type}_{i} + 
+\beta_3 \cdot \text{Intensity}_{i} + 
+\beta_4 \cdot \text{Duration}_{i} + 
+\beta_5 \cdot \text{Post 9/11}_{i} + 
+\beta_6 \cdot \text{Cold War}_{i} + 
+\beta_7 \cdot \text{Coalition Support}_{i}
+\right)
+$$
+where $\mathbb{E}(Y_{it} \mid X_{it}, \alpha_i)$ is the expected count outcome (e.g. probability of receiving support) for unit i, conditional on covariates and random effect, and $\alpha_i$ is the dyad-specific random effect. These analyses provide an overview of trends in the provision of external support without making inferential claims about causal relationships. 
 
-  ###*Add bit on regression assumptions for negative binomial models*
-  ###*Add bit on regression assumptions for PPML*
+The Bayesian Information Criterion (BIC), Akaike Information Criterion (AIC) (for RE models), and the Adjusted Pseudo R-Squared (for FE models) were used to assess model fit throughout the process of refitting, with lower AIC and BIC values denoting a better fit (Gellman and Hill, 2007). The exclusion of the region variable and the recoding of the incompatibility into a binary variable focused on territorial disputes had no effect on the BIC of the FE models, however, most AIC and BIC values for the RE models increased slightly. While this indicates worse model-fit, these steps were still deemed necessary to ensure model conversion. The refitting of the models for troop support and foreign troop presence as PPML increased the BIC for these models, however they were still deemed as a better fit as they allowed model conversion.
+
+An overall comparison was made between the effects of conflict characteristics on the provision of external support within and between conflicts, with the statistically significant characteristics in the models for foreign troop presence and intelligence being compared in detail. These models were chosen for detailed comparison based on the high correlation between conflict characteristics and the provision of the corresponding support in either the FE or RE models. They further allow for a more detailed comparison of the correlation with various conflict characteristics between the provision of direct or indirect support. However, the use of different models for direct forms of support due to non-convergence prevents a comparison between the provision of direct and indirect support. 
+
+The results of the logistic regression models were interpreted using odds ratios, which indicate the change in odds of the dependent variable for a one-unit increase in the independent variable. The results of the PPML regression models were interpreted using incidence rate ratios (IRR), which indicate the change in the expected count of the dependent variable for a one-unit increase in the independent variable. While the dependent variables are binary, PPML assumes that the dependent variable is a count variable, which allows for the estimation of the expected count of the dependent variable. While not fitting the character of the variable, this treatment was was accepted as the best option for the analysis to proceed. Coefficients of the logistic regression models were exponentiated for easier comparison and despite discussions on redefining statistical significance (Benjamin et al., 2018), this report rejects the null hypothesis that the population's estimated coefficient is zero when p <.05. As all dependent variables measure different conflict characteristics multicollinearity was not assumed. For the RE models, where this was possible, it was still monitored throughout the analysis using variance inflation factors (VIF). All models were further tested against standard regression assumptions to ensure validity and reliability. However, as most predictors were categorical, the linearity assumption did not apply to them and homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. 
 
 ## Findings
 ```{r Preparations for visualisations, echo=FALSE, warning=FALSE}
@@ -1041,52 +926,6 @@ ggplot(combined_type, aes(x = year, y = conflict_count, linetype = ext_type)) +
   ###NA is not being portrayed, so how do I get rid of it in the legend?
 ```
 
-
-```{r Frequent support combinations (Figure 5), echo=FALSE, warning=FALSE}
-# Prepare the data for visualization
-combination_summary <- merged_ucdp %>%
-  filter(year >= 1975 & year <= 2017) %>%  # Filter data for 1975-2017
-  group_by(year, ext_combination) %>%
-  summarise(conflict_count = n(), .groups = "drop")  # Count conflicts for each combination and year
-
-# Create the grouped line chart for the 10 most frequent support combinations
-# Identify the 10 most frequent support combinations
-top_10_combinations <- combination_summary %>%
-  group_by(ext_combination) %>%
-  summarise(total_count = sum(conflict_count)) %>%
-  arrange(desc(total_count)) %>%
-  slice_head(n = 10) %>%
-  pull(ext_combination)
-
-# Filter dataset to include only the top 10 combinations
-top_combination_summary <- combination_summary %>%
-  filter(ext_combination %in% top_10_combinations)
-
-# Plot grouped line chart
-ggplot(top_combination_summary, aes(x = year, y = conflict_count, color = ext_combination, linetype = ext_combination)) +
-  geom_line(size = 1) +  # Line for each support type
-  labs(
-    title = "Figure 5: Evolution of the 10 Most Common External Support Combinations",
-    x = "Year",
-    y = "Number of Conflict-Dyads",
-    color = "Support Combination",
-    linetype = "Support Combination"
-  ) +
-  scale_color_viridis_d(option = "magma") + # Colour-blind friendly palette
-  scale_linetype_manual(values = c("solid", "dashed", "dotted", "dotdash", "twodash",
-                                   "longdash", "solid", "dotted", "dashed", "twodash")) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1),
-    legend.position = "bottom"
-  )
-  ###change colour of several forms of support as barely visible
-  ###check with fixed ext_combination
-    ###If 3 is the average of provided support should this variable be rescaled to not only indicate combinations of two in detail but also combinations of three?
-```
-
-[*add findings once variable is fixed*]
-
 ### Regression Analysis
 ```{r Preparation Regression Analysis, include=FALSE, warning=FALSE}
 #Preparation
@@ -1114,19 +953,14 @@ options (scipen = 999)
 ```
 
 ```{r Regression External support, include=FALSE, warning=FALSE}
-#0.2. random effects logistic regression
-rlogregress_0 <- glmer(ext_sup ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(rlogregress_0)
-  ### did not converge
-
-#Fitting negative binomial regression instead
-rnbregress_0 <- glmer.nb(ext_sup ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
-summary(rnbregress_0)
-  ##nothing is significant
+# Random effects
+# Logistic regression did not converge
+# Fitting PPML regression instead
+rppmlregress_0 <- glmer(ext_sup ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), family = poisson, data = merged_ucdp)
+summary(rppmlregress_0)
 
 #Exponentiate coefficients
-#exp(coef(rnbregress_0))
-#exp(fixef(rnbregress_0)) #to exponentiate only the fixed effects coefficients.
+exp(fixef(rppmlregress_0)) #to exponentiate only the fixed effects coefficients.
 
 #Check multicollinearity
 #Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model.
@@ -1134,93 +968,63 @@ summary(rnbregress_0)
   #VIF < 5: Low to moderate multicollinearity (acceptable).
   #VIF = 5–10: Moderate multicollinearity (investigate further; might require adjustments).
   #VIF > 10: High multicollinearity (likely problematic; consider corrective actions).
-vif(rnbregress_0)
+vif(rppmlregress_0)
   #no multicollinearity
 
 #Checking linearity for binomial logistic regression
   #The linearity assumption for logistic regression requires that the log odds of the dependent variable are a linear combination of the independent variables.
   #This assumption can be checked by plotting the predicted probabilities against the independent variables.
   #The plot should show a linear relationship between the independent variables and the log odds of the dependent variable.
-plot(allEffects(rnbregress_0))
-  #
+plot(allEffects(rppmlregress_0))
+  #straight line for duration = linearity assumption is met
 
-#0.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_0 <- feglm(ext_sup ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
-summary(flogregress_0)
-
-tab_model(flogregress_0)
-  #did not converge
-
-#Fitting negative binomial regression instead
-fnbregress_0 <- fenegbin(ext_sup ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, data = merged_ucdp)
-summary(fnbregress_0)
-  #did not work (all coefficients are NA)
-
+# Fixed effects 
+# Logistic regression did not converge and neither did negative binomial regression
 # Fitting a Poisson Pseudo Maximum Likelihood (PPML) Fixed Effects model
 fppmlregress_0 <- feglm(ext_sup ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = poisson, data = merged_ucdp)
 summary(fppmlregress_0)
 
 #Check multicollinearity
 vif(fppmlregress_0)
-  ##no multicollinearity but not sure it's working as receiving the same number for every single variable
-
-#Checking linearity
-#plot(allEffects(fppmlregress_0))
-  ### doesn't work. Is there another way to check this?
+  #no multicollinearity but it's bot working as receiving the same number for every single variable
+  # will assess multicollinearity theoretically and through variable table
 
 #Exponentiate coefficients
-#exp(coef(fppmlregress_0))
+exp(coef(fppmlregress_0))
 ```
 
 ```{r Regression Troop support, include=FALSE, warning=FALSE}
 #1. Troop support
-#1.2. random effects logistic regression
-rlogregress_x <- glmer(ext_x ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(rlogregress_x)
-  ##did not converge
+# Logistic models did not converge so fitting PPML instead
 
-#Fitting negative binomial regression instead
-rnbregress_x <- glmer.nb(ext_x ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
-summary(rnbregress_x)
+#1.1. random effects 
+#Fitting Poisson Pseudo Maximum Likelihood (PPML) regression to be able to compare it with the FE models
+rppmlregress_x <- glmer(ext_x ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), family = poisson, data = merged_ucdp)
+summary(rppmlregress_x)
 
 #Exponentiate results
-#exp(fixef(rnbregress_x)) #to exponentiate only the fixed effects coefficients.
+exp(fixef(rppmlregress_x)) #to exponentiate only the fixed effects coefficients.
 
 #Check multicollinearity
-vif(rnbregress_x)
+vif(rppmlregress_x)
   #no multicollinearity
 
 #Checking linearity for binomial logistic regression
-#plot(allEffects(rnbregress_x))
-  #
+plot(allEffects(rnbregress_x))
+  #negative linear relationship for duration = linearity is met
 
-#1.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_x <- feglm(ext_x ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
-summary(flogregress_x)
-  #did not converge
-
-#Fitting negative binomial regression instead
-fnbregress_x <- fenegbin(ext_x ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, data = merged_ucdp)
-summary(fnbregress_x)
-  #
-
+#1.2. Fixed effects 
 # Fitting a Poisson Pseudo Maximum Likelihood (PPML) Fixed Effects model
 fppmlregress_x <- feglm(ext_x ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = poisson, data = merged_ucdp)
 summary(fppmlregress_x)
 
 #Coefficients
-#coef(fppmlregress_x) #provides coefficients
-  ##Region categories and interstate were dropped
-#confint(fppmlregress_x) #provides confidence intervals
+coef(fppmlregress_x) #provides coefficients
+confint(fppmlregress_x) #provides confidence intervals
   #If the confidence interval crosses zero, the result is not statistically significant
-  ##code is being shown at the end of this chunk
-
-#Check multicollinearity
-vif(fppmlregress_x)
-  ##no multicollinearity
 
 #Exponentiate coefficients
-#exp(coef(fppmlregress_x))
+exp(coef(fppmlregress_x))
 
 #Check for NAs to see where 785 observations that were dropped due to NAs might be coming from
 colSums(is.na(merged_ucdp))
@@ -1230,53 +1034,35 @@ colSums(is.na(merged_ucdp))
 
 ```{r Regression Foreign troop presence, include=FALSE, warning=FALSE}
 #2. Foreign troop presence
-#2.2 random effects logistic regression
-rlogregress_p <- glmer(ext_p ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
-summary(rlogregress_p)
+# Logistic models did not converge, so fitting PPML instead
 
-#Exponentiate results
-exp(fixef(rlogregress_p))
-  #seems to not have converged
-
-#Fitting negative binomial regression instead
-rnbregress_p <- glmer.nb(ext_p ~  territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp)
-summary(rnbregress_p)
+#2.1. random effects 
+#Fitting Poisson Pseudo Maximum Likelihood (PPML) regression to be able to compare it with the FE models
+rppmlregress_p <- glmer(ext_p ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), family = poisson, data = merged_ucdp)
+summary(rppmlregress_p)
   
 #Check multicollinearity
-vif(rnbregress_p)
-  ##no multicollinearity
+vif(rppmlregress_p)
+  #no multicollinearity
 
 #Check linearity
-#plot(allEffects(rnbregress_p))
-  #
+plot(allEffects(rppmlregress_p))
+  #horizontal line = linearity is met
 
-#2.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
-flogregress_p <- feglm(ext_p ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
-summary(flogregress_p)
+#Exponentiate results
+exp(fixef(rppmlregress_p)) #to exponentiate only the fixed effects coefficients.
 
-#Table
-tab_model(flogregress_p, show.ci = FALSE, show.se = TRUE, show.stat = TRUE, show.re.var = FALSE,
-          pred.labels = c("territorial (territory)", "type (intrastate)", "intensity (war)", "cumulative_duration", "nine_eleven (after)", "cold_war (after)", "ext_coalition (coalition)"),
-          title = "Fixed Effects Logistic Regression for Foreign Troop Presence")
-  #did not converge
-
-#Fitting negative binomial regression instead
-fnbregress_p <- fenegbin(ext_p ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, data = merged_ucdp)
-summary(fnbregress_p)
-  #did not work (all coefficients are NA)
-
+#2.2. Fixed effects 
 # Fitting a Poisson Pseudo Maximum Likelihood (PPML) Fixed Effects model
 fppmlregress_p <- feglm(ext_p ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = poisson, data = merged_ucdp)
 summary(fppmlregress_p)
 
-#Check multicollinearity
-vif(fppmlregress_p)
-  ##no multicollinearity but not sure it worked
+exp(coef(fppmlregress_p)) #Exponentiate coefficients
 ```
 
 ```{r Regression Access to infrastructure/joint operations, include=FALSE, warning=FALSE}
 #3. Access to infrastructure/joint operations
-#3.2. random effects logistic regression
+#3.1. random effects logistic regression
 rlogregress_y <- glmer(ext_y ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_y)
 
@@ -1285,27 +1071,20 @@ exp(fixef(rlogregress_y))
 
 #Check multicollinearity
 vif(rlogregress_y)
-  ##no multicollinearity
+  #no multicollinearity
 
 #Check linearity
 plot(allEffects(rlogregress_y))
   #negative linear relationship for duration
 
-#3.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
+#3.2. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_y <- feglm(ext_y ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_y)
-
-#Check multicollinearity
-vif(flogregress_y)
-  ##no multicollinearity
-
-#Exponentiate coefficients
-exp(coef(flogregress_y))
 ```
 
 ```{r Regression Weapons, include=FALSE, warning=FALSE}  
 #4. weapons
-#4.2. random effects logistic regression
+#4.1. random effects logistic regression
 rlogregress_w <- glmer(ext_w ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_w)
 
@@ -1314,19 +1093,15 @@ exp(fixef(rlogregress_w))
 
 #Check multicollinearity
 vif(rlogregress_w)
-  ##no multicollinearity
+  #no multicollinearity
 
 #Check linearity
 plot(allEffects(rlogregress_w))
-  #
+  #horizontal line for duration = linearity is met
 
-#4.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
+#4.2. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_w <- feglm(ext_w ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_w)
-
-#Check multicollinearity
-vif(flogregress_w)
-  #no multicollinearity
 
 #Exponentiate coefficients
 exp(coef(flogregress_w))
@@ -1334,7 +1109,7 @@ exp(coef(flogregress_w))
 
 ```{r Regression Materiel and statistics, include=FALSE, warning=FALSE}  
 #5. materiel and statistics
-#5.2. random effects logistic regression
+#5.1. random effects logistic regression
 rlogregress_m <- glmer(ext_m ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_m)
 
@@ -1343,19 +1118,15 @@ exp(fixef(rlogregress_m))
 
 #Check multicollinearity
 vif(rlogregress_m)
-  ##no multicollinearity
+  #no multicollinearity
 
 #Check linearity
 plot(allEffects(rlogregress_m))
-  #negative linear relationship for duration
+  #negative linear relationship for duration = linearity is met
 
 #5.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_m <- feglm(ext_m ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_m)
-
-#Check multicollinearity
-vif(flogregress_m)
-  ##no multicollinearity
 
 #Exponentiate coefficients
 exp(coef(flogregress_m))
@@ -1363,7 +1134,7 @@ exp(coef(flogregress_m))
 
 ```{r Regression Training and expertise, include=FALSE, warning=FALSE}  
 #6. training and expertise
-#6.2. random effects logistic regression
+#6.1. random effects logistic regression
 rlogregress_t <- glmer(ext_t ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_t)
 
@@ -1372,19 +1143,15 @@ exp(fixef(rlogregress_t))
 
 #Check multicollinearity
 vif(rlogregress_t)
-  ##no multicollinearity
+  #no multicollinearity
 
 #check linearity
 plot(allEffects(rlogregress_t))
-  #straight line: assumption met for duration
+  #negative linear relationship for duration = linearity is met
 
-#6.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
+#6.2. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_t <- feglm(ext_t ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_t)
-
-#Check multicollinearity
-vif(flogregress_t)
-  ##no multicollinearity
 
 #Exponentiate coefficients
 exp(coef(flogregress_t))
@@ -1392,7 +1159,7 @@ exp(coef(flogregress_t))
 
 ```{r Regression Funding, include=FALSE, warning=FALSE}  
 #7. funding
-#7.2. random effects logistic regression
+#7.1. random effects logistic regression
 rlogregress_f <- glmer(ext_f ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_f)
 
@@ -1401,19 +1168,15 @@ exp(fixef(rlogregress_f))
 
 #Check multicollinearity
 vif(rlogregress_f)
-  ##no multicollinearity
+  #no multicollinearity
 
 #check linearity
 plot(allEffects(rlogregress_f))
-  #
+  #negative linear relationship for duration = linearity is met
 
-#7.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
+#7.2. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_f <- feglm(ext_f ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_f)
-
-#Check multicollinearity
-vif(flogregress_f)
-  ##no multicollinearity
 
 #Exponentiate coefficients
 exp(coef(flogregress_f))
@@ -1421,7 +1184,7 @@ exp(coef(flogregress_f))
 
 ```{r Regression Intelligence, include=FALSE, warning=FALSE}  
 #8. intelligence
-#8.2. random effects logistic regression
+#8.1. random effects logistic regression
 rlogregress_i <- glmer(ext_i ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_i)
 
@@ -1430,19 +1193,15 @@ exp(fixef(rlogregress_i))
 
 #Check multicollinearity
 vif(rlogregress_i)
-  ##no multicollinearity
+  #no multicollinearity
 
 #check linearity
 plot(allEffects(rlogregress_i))
-  #
+  #positive linear relationship for duration = linearity is met
 
-#8.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
+#8.2. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_i <- feglm(ext_i ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_i)
-
-#Check multicollinearity
-vif(flogregress_i)
-  ##no multicollinearity
 
 #Exponentiate coefficients
 exp(coef(flogregress_i))
@@ -1450,7 +1209,7 @@ exp(coef(flogregress_i))
 
 ```{r Regression Access to territory, include=FALSE, warning=FALSE}  
 #9. access to territory
-#9.2. random effects logistic regression
+#9.1. random effects logistic regression
 rlogregress_l <- glmer(ext_l ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition + (1 | dyad_id), data = merged_ucdp, family = "binomial")
 summary(rlogregress_l)
   
@@ -1459,49 +1218,45 @@ exp(fixef(rlogregress_l))
 
 #Check multicollinearity
 vif(rlogregress_l)
-  ##no multicollinearity
+  #no multicollinearity
 
 #check linearity
 plot(allEffects(rlogregress_l))
-  #
+  #horizontal line for duration = linearity is met
 
-#9.4. Fixed effects logistic regression (Random Intercepts for dyad_id)
+#9.2. Fixed effects logistic regression (Random Intercepts for dyad_id)
 flogregress_l <- feglm(ext_l ~ territorial + type + intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition | dyad_id, family = binomial, data = merged_ucdp)
 summary(flogregress_l)
-
-#Check multicollinearity
-vif(flogregress_l)
-  ##no multicollinearity
 
 #Exponentiate coefficients
 exp(coef(flogregress_l))
 ```
 
-*The RE model for the provision of external support (Table 2) shows no statistically significant results. However, the FE model reveals that the correlation between internationalised intrastate conflicts, wars, and the post-Cold War period and the provision of external support are statistically significant.* 
+The models for the provision of external support (Table 2a; 2b) show no statistically significant results. However, the results of the regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of external support, with notable differences between the RE and FE models.
 
 ```{r Table 2: Overall provision of external support, echo=FALSE, warning=FALSE}
 #Visualising random effects logistic regression for overall provision of external support
-tab_model(rnbregress_0, 
+tab_model(rppmlregress_0, 
   pred.labels = c("(Intercept)", "Incompatibility (territorial)", "Type (interstate)", "Type (internationalised intratstate)", "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition support"), 
-  dv.labels = c("Troop support", "Weapons", "Intelligence"),
-  title = "Random Effects Negative Binomial Regression Results: External Support Determinants"
+  dv.labels = c("Troop support"),
+  title = "Table 2a: Random Effects Negative Binomial Regression Results: External Support Determinants"
 )
 
 #Visualising fixed effects logistic regression for overall provision of external support
 tab_model(fppmlregress_0, 
   pred.labels = c("Type (internationalised intratstate)", "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition Support"), 
-  title = "Fixed Effects PPML Regression Results: External Support Determinants"
+  title = "Table 2b: Fixed Effects PPML Regression Results: External Support Determinants"
 )
 ```
-  
-The results of the regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of external support, with notable differences between the RE and FE models.
+
+In the RE logistic regression (Table 3), the type of conflict — particularly internationalised intrastate conflicts — emerges as strongly correlated to the provision of external support, showing significance in seven of the nine models. Other influential factors include conflict intensity and the post-Cold War period, which are strongly correlated with multiple forms of support. Intelligence provision appears to be the most sensitive to conflict characteristics, with seven out of nine independent variables reaching statistical significance. Medium-level correlations are observed for access to infrastructure, weapons, materiel and logistics, training and expertise, and funding, while troop support and troop presence exhibit the weakest correlations. While troop support was correlated to the type of conflict, troop presence was correlated to the post-Cold War and post-9/11 eras. 
 
 ```{r Table 3: RE logistic regression - statistical significance, echo=FALSE, warning=FALSE}
 # Create the data frame manually
 rlog_table <- data.frame(
   Independent_Variable = c("Intercept", "Territorial dispute", "Type of conflict", "Intensity", "Duration", "9/11", "Cold War", "Coalition Support", "N", "AIC", "BIC"),
-  Troop_Support = c("***", NA, "*** (Interstate); *** (Internationalised intrastate)", NA, NA, NA, NA, NA, 1451, 951.7, 1009.8),
-  Troop_Presence = c("***", NA, NA, ". (War)", NA, "* (After)", NA, NA, 1451, 328.5, 386.5),
+  Troop_Support = c("***", NA, "*** (Interstate); *** (Internationalised intrastate)", NA, NA, NA, NA, NA, 1451, 949.6, 1002.4),
+  Troop_Presence = c("***", NA, NA, ". (War)", NA, "* (After)", NA, NA, 1451, 326.5, 379.3),
   Access_to_Infrastructure = c("***", NA,"** (Internationalised intrastate)" , NA, "*", NA, "*** (After)", "*** (Coalition)", 1451, 1250.3, 1303.1),
   Weapons = c("***", NA, "* (Internationalised intrastate)", "*** (War)", NA, "* (After)", "*** (After)", NA, 1451, 1094.5, 1147.3),
   Materiel_and_Statistics = c("***", ".", "** (Internationalised intrastate)", "*** (War)", NA, NA, "* (After)", NA, 1451, 1210.8, 1263.6),
@@ -1534,9 +1289,9 @@ gtrlog_tbl <- rlog_table %>%
 # Print the table
 gtrlog_tbl
 ```
-
-In the RE logistic regression (Table 3), the type of conflict — particularly internationalised intrastate conflicts — emerges as strongly correlated to the provision of external support, showing significance in seven of the nine models. Other influential factors include conflict intensity and the post-Cold War period, which are strongly correlated with multiple forms of support. Intelligence provision appears to be the most sensitive to conflict characteristics, with seven out of nine independent variables reaching statistical significance. Medium-level correlations are observed for access to infrastructure, weapons, materiel and logistics, training and expertise, funding, and access to territory, while troop support and troop presence exhibit the weakest correlations.
   
+Within conflicts, as captured by the FE models (Table 4), the provision of external support is overall less correlated to conflict characteristics than in the comparison between conflicts (RE). The era post-Cold War, as well as conflict intensity, show the most significance across FE models. However, conflict intensity, as well as duration are correlated with the provision of indirect external support within a conflict but not with the provision of direct support. The provision of weapons and intelligence are correlated with the most conflict characteristics, with conflict intensity, duration, and the post-Cold War era beign significant in both. The provision of troop support is only correlated to the type of conflict, while troop presence is correlated to the Post-Cold war and post-9/11 eras. Access to infrastructure is not correlated to any conflict characteristics and the provision of materiel and statistics, training and expertise, funding and access to territory are only correlated to one or two conflict characteristics.
+
 ```{r Table 4: FE logistic regression - statistical significance, echo=FALSE, warning=FALSE}
 # Create the data frame manually
 flog_table <- data.frame(
@@ -1576,54 +1331,67 @@ gtflog_tbl <- flog_table %>%
 gtflog_tbl
 ```
 
-### *add more Findings so that all variables are covered?*
+All models were tested against standard regression assumptions to ensure validity and reliability. The data, sourced from the UCDP, was deemed appropriate for addressing the research questions, as it comprehensively captures armed conflict characteristics and external support. Although, empirical datasets rarely meet all theoretical criteria perfectly (Gellman and Hill, 2007). Assessment of Table 1 deemed the dependent variable functional and multicollinearity for RE models was examined using VIFs, with all values below 5, indicating no significant collinearity issues (O'Brien, 2007). As most predictors were categorical, the linearity assumption did not apply to them. Where possible (RE models) linearity was tested for the only continuous predictor, cumulative duration, which showed a linear relationship with the log odds of the dependent variable in all RE models. The independence of errors assumption was not met due to multiple observations per conflict and dyad. Homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. The binary nature of the dependent variable confirmed the appropriateness of logistic regression. 
+
+## Discussion
+The findings of this study align with existing literature on conflict dynamics and external interventions. Over time, the number of wars has slightly increased, indicating a shift towards more intense conflicts, while conflict duration has also grown, suggesting that many conflicts persist rather than being resolved. These trends are consistent with research highlighting the protracted nature of modern armed conflicts (Quinn, Mason, and Gurses, 2007). The nature of external support has also evolved. While troop support has declined, the total number of external interventions continues to rise (Figure 4), demonstrating a persistent strategic interest in shaping conflict trajectories through both direct and indirect means (Engström, Pettersson, and Öberg, 2024; Chang and Sellak, 2022). Recent years have seen a shift toward multilateral coalitions and collaborative interventions (Appendix 5), with nearly one-third of all support instances involving such coalitions, reflecting a greater emphasis on burden-sharing and legitimacy (Meier et al., 2023). 
+
+The findings from the regression analysis suggest that while structural conflict factors are correlated to the provision of external support, temporal and contextual elements play a decisive role within individual conflicts. This aligns with existing literature on the provision of external support, which emphasises the importance of conflict characteristics in shaping external intervention strategies (Berlin and Malone, 2023; Engström, Pettersson, and Öberg, 2024).
+
+While the models examining H1 shows no statistically significant results, regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of external support, with notable differences between the RE and FE models. Therefore H1 cannot be completely rejected but the results rather indicate that the provision of external support is not only correlated to conflict characteristics but that it further may be dependent on the form of support provided. 
+
+The RE models show that the provision of indirect support is more correlated to conflict characteristics than direct support, with intelligence provision being the most sensitive to these factors. This finding aligns with existing literature suggesting that indirect forms of support are often more prevalent in contemporary conflicts (*INSERT REFERNCE*). Especially the provision of intelligence is strongly correlated with conflict characteristics, which could suggest that external actors tailor intelligence support to specific conflict dynamics rather than adopting a one-size-fits-all approach. This supports the notion that intelligence-sharing plays a crucial role in modern conflict interventions, allowing external supporters to shape conflict outcomes strategically (Schultz, 2010; Bapat, 2011; Sawyer, Cunningham and Reed, 2017).
+
+For H2, which explores whether conflict characteristics influence the type of external support provided, results reveal that conflict intensity (H2a) is significantly correlated to the provision of weapons, materiel and statistics, funding, and intelligence in both FE and RE models. This aligns with the argument that higher-intensity conflicts are more likely to receive external support due to concerns about spillover effects and escalation (Cunningham, 2010; Gregory, 2000). However, intensity does not appear to significantly impact the provision of troop support, suggesting that external actors may not relate the intensity of a conflict to increased levels of direct support. 
+
+Besides intensity, the provision of access to infrastructure, weapons, materiel and statistics, training and expertise, funding, and access to territory show consistent correlations with conflict duration (H2c), the type of conflict (H2d), and whether a conflict is taking place after 9/11 (H2e) or after the Cold War (H2f) in the RE models. Particularly internationalised intrastate conflicts, is strongly correlated with the provision of external support. Within a conflict, conflict intensity, duration, and the post-Cold War era seem to be more correlated with the provision of indirect external support. These findings are consistent with prior research suggesting that the Cold War significantly shaped patterns of external intervention. During this period, superpowers engaged in proxy conflicts, fueling insurgencies and prolonging wars, whereas the post-Cold War era saw a shift towards more selective and strategic forms of external support (Testerman, 2015; Kalyvas and Balcells, 2010 in Roberts, 2019). The significance of the periods after the Cold War and 9/11, and conflict intensity in both FE and RE models, suggests that broader geopolitical shifts and conflict dynamics play a crucial role in shaping external support provision, whether within one ongoing or between different conflicts. This divergence highlights the complexity of external support dynamics and suggests that different forms of support may be influenced by different factors.
+
+Territorial incompatibility (H2b) on the other hand is not significantly correlated with the provision of most external support, suggesting that this factor plays a less prominent role in shaping external intervention strategies. The lack of significant correlations between territorial incompatibility with external support provision is surprising, as previous research has highlighted the importance of this factor in shaping conflict dynamics and external interventions (Cunningham, 2010; Gregory, 2000). *What does this mean? Interpret!* 
+The absence of a significant relationship between cumulative conflict duration and the provision of support challenges assumptions that protracted conflicts necessarily attract sustained external intervention.
+
+Model-specific results further illustrate these patterns: troop presence is most strongly correlated to the post-Cold War and post-9/11 eras (FE), and conflict intensity (RE), whereas intelligence provision and weapons supply show broader but less consistent correlations with conflict characteristics. 
+
+In the RE model (Table 5), the average IRR of foreign troop presence is 2.52 units higher for wars compared to minor armed conflicts, holding all other conflict characteristics constant. The average IRR is further 10.18 units higher for conflicts taking place after 9/11 compared to conflicts before 9/11, controlling for all other variables. 
 
 ```{r Table 5: random effects logistic regression results, echo=FALSE, warning=FALSE}
-#Visualising random effects logistic regression for those forms of support that are correlated to the most conflict characteristics: troop support, intelligence and weapons
+#Visualising random effects logistic and PPML regression for those forms of support that are correlated to the most conflict characteristics: troop presence, intelligence and weapons
 tab_model(
-  rnbregress_x, 
-  rlogregress_w, 
+  rppmlregress_p, 
   rlogregress_i, 
   pred.labels = c("(Intercept)", "Incompatibility (territorial)", "Type (interstate)", "Type (internationalised intratstate)", 
                   "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition support"), 
-  dv.labels = c("Troop support", "Weapons", "Intelligence"),
-  title = "Random Effects Logistic Regression Results: External Support Determinants"
+  dv.labels = c("Troop presence (PPML)", "Intelligence"),
+  title = "Random Effects Logistic and PPML Regression Results: External Support Determinants"
 )
 ```
 
 ```{r Table 6: fixed effects logistic regression results, echo=FALSE, warning=FALSE}
-#Visualising fixed effects logistic regression for those forms of support that are correlated to the most conflict characteristics: troop support, intelligence and weapons
-tab_model(fppmlregress_x, flogregress_w, flogregress_i,
+#Visualising fixed effects logistic regression for those forms of support that are correlated to the most conflict characteristics: troop presence, intelligence and weapons
+tab_model(fppmlregress_p, 
+          flogregress_i,
   pred.labels = c("Type (internationalised intratstate)", "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition support"), 
-  dv.labels = c("Troop support", "Weapons", "Intelligence"),
+  dv.labels = c("Troop presence (PPML)", "Intelligence"),
   title = "Fixed Effects Logistic and PPML Regression Results: External Support Determinants"
 )
 ```
 
-All models were tested against standard regression assumptions to ensure validity and reliability. The data, sourced from the UCDP, was deemed appropriate for addressing the research questions, as it comprehensively captures armed conflict characteristics and external support. Although, empirical datasets rarely meet all theoretical criteria perfectly (Gellman and Hill, 2007). Multicollinearity was examined using variance inflation factors (VIFs), with all values below 5, indicating no significant collinearity issues (O'Brien, 2007). *Add test for FE as all VIFs portray same numbers?* As most predictors were categorical, the linearity assumption did not apply to them. Linearity was tested using the `allEffects()` function for the only continuous predictor, cumulative duration, which showed a linear relationship with the log odds of the dependent variable in all RE models. [*add how assumption was tested in fixed effects*] The independence of errors assumption was not met due to multiple observations per conflict and dyad. Homoscedasticity and normality of residuals were not relevant due to the logistic nature of the models. The binary nature of the dependent variable confirmed the appropriateness of logistic regression. 
-*Add assumptions for negative binomial regression*
-*Add assumptions for Poisson Pseudo Maximum Likelihood (PPML) regression*
+For intelligence support, both models find that the odds for wars are lower than that for minor armed conflicts to receive this form of aid (odds = 0.44 in RE; 0.33 in FE), holding all other factors constant. Both models further indicate that conflicts occurring after the Cold War are correlated with the provision of intelligence, although the effect is stronger in the FE model (odds = 8.41) than in the RE model (odds = 6.4). Both models find that the odds of receiving intelligence support increase with each year in conflict duration (by 1.06 in RE and 1.12 in FE models). While the RE model suggests that intelligence provision is correlated to the time period after 9/11 (odds = 8.27) and coalition support (odds = 4.49), holding all other variables constant, these effects do not emerge as statistically significant in the FE model.
 
-Model fit assessment reveals differences both across different forms of external support and between the FE and RE models. 
+Findings suggest that coalition support (H3) is significantly associated with access to infrastructure, funding, intelligence, and access to territory in the RE model. However, in the FE model, it shows no statistical significance at all. This suggests that coalition dynamics play a more prominent role in shaping the types of external support provided across different conflicts than within individual conflicts.
 
-! Possible issue of reverse causality regarding duration?: Interventions, whether direct (troops) or indirect (weapons, logistics, training), frequently prolong conflicts by altering the cost-benefit calculations of belligerents (Fearon, in Testerman, 2015; Lacina, 2006). 
+While the correlation to different conflict characteristics of troop presence and troop support might seem counterintuitive at first, this could indicate an escalation in the provision of external support with the former being a precondition for the latter. Conflict intensity (RE), and the post-Cold war and post-9/11 eras (FE) might be first incentives for external supporters to provide more direct support but once troops are already present, the type of conflict might then become a more important factor in the decision to provide troop support.
 
-## Discussion
+The findings highlight key theoretical implications for Criminology and conflict studies. The weak correlation between direct support and conflict characteristics suggests that direct military interventions may be driven by factors beyond conflict characteristics alone, such as diplomatic or geopolitical considerations. 
 
-RE models
-- The provision of intelligence (7), funding (5), training (5), materiel (5), weapons (5), access to infrastructure (5) seem to be highly correlated to conflict characteristics
-  - All indirect forms of support, suggesting that indirect forms of support are more correlated than direct support
-- Troop presence and troop support are correlated to different conflict characteristics, indicating no trends in the correlation between conflict characteristics and the provision of direct support.
+However, this study is not without limitations. The analysis is based on a dataset that primarily focuses on state-based conflicts, which may not fully capture the complexities of non-state actors and their interactions with external support. The analysis is further limited by the availability of data on external support, which may not encompass all forms of assistance provided to conflict parties. The exclusion of regional variations in conflict characteristics and external support may further limit the generalisability of the findings, as well as their interpretation from a criminological perspective. Tobler's law (Tobler, 1970), "everything is related to everything else, but near things are more related than distant things" suggests that geographic proximity may play a significant role in shaping the dynamics of external support. Not controlling for geographic proximity might thereby ignore important contextual factors that influence the provision of external support. It further limits the interpretation from a 'hot' and 'cold' support perspective. While intensity might trigger a 'forward panic' (Collins, *year* in Rafter, 2016), the absence of adequate control variables of more emotional factors like shared cultural ties, as well geographic proximity, which might have an effect on the perceived urgency of intervention, makes it impossible to assess whether emotional elements play a role in the provision of external support. Further research should examine the emotional factors that play a role in supporters' decision to get involved. This could further explore how the provision of support affects the continuance of conflict and mass violence and whether this differs between 'hot' and 'cold' support. The inability to test recipient and provider characteristics further limits this study and warrants further research into the role of these factors in shaping external support provision.
 
-
-Limitations
-The study's limitations include the potential for reverse causality, as external support may prolong conflicts rather than resolve them. The dataset's focus on state-based conflicts may not fully capture the complexities of non-state actors and their interactions with external support. Additionally, the reliance on UCDP data may introduce biases in conflict classification and external support reporting. The analysis is also limited by the availability of data on external support, which may not encompass all forms of assistance provided to conflict parties. Further, while the use of different regression models was deemed necessary due to non-convergence, this approach introduces inconsistencies in the interpretation of results and makes comparison between models difficult.
-The analysis also does not consider the potential impact of regional variations in conflict characteristics and external support, which may limit the generalisability of the findings. Finally, the study's reliance on quantitative data may overlook important qualitative aspects of external support and its effects on conflict dynamics. Future research should therefore enhance this study by incorporating qualitative data and case studies to provide a more comprehensive understanding of the relationship between external support and conflict dynamics. 
+The study's limitations further include the potential for reverse causality, as external support may prolong conflicts rather than resolve them. Interventions, whether direct (troops) or indirect (weapons, logistics, training), frequently prolong conflicts by altering the cost-benefit calculations of belligerents (Fearon, in Testerman, 2015; Lacina, 2006). Further, while the use of different regression models was deemed necessary due to non-convergence, this approach introduces inconsistencies in the interpretation of results and makes comparison between models difficult. Finally, the study's reliance on quantitative data may overlook important qualitative aspects of external support and its effects on conflict dynamics. Future research should therefore enhance this study by incorporating qualitative data and case studies to provide a more comprehensive understanding of the relationship between external support and conflict dynamics. 
 
 ## Conclusion and recommendations
 While diplomacy *remains* the preferred approach to resolving conflicts, the persistence of aggressive state actors — such as Russia's actions in Ukraine — challenges the viability of purely pacifist strategies. Historical patterns suggest that military interventions can sometimes bring stability but may also exacerbate conflicts, as seen in Iraq and Afghanistan (*INSERT REFERENCE*). Given that external support often takes indirect forms (e.g., intelligence-sharing, training, and funding), policymakers must consider the long-term implications of such interventions. The interconnected nature of modern conflicts underscores the necessity for early mediation, intelligence-sharing, and conflict prevention strategies. This is particularly relevant in the context of sustainable development policies, as conflict and fragility pose significant barriers to economic and social progress (Le, Bui, and Uddin, 2022). To mitigate the risk of prolonged violence, policymakers in conflict-affected regions should adopt inclusive recovery strategies that address the root causes of instability (World Bank and United Nations, 2018). If external support is provided selectively to prolong conflicts rather than resolve them, it risks perpetuating cycles of violence. These findings reinforce the importance of understanding the strategic logic behind external support provision, both from a policy and criminological perspective. As global security dynamics continue to evolve, future research should explore case studies of external support to assess its long-term impact on conflict resolution and stability.
 
   ###*add specific findings/implications of this study*
+  ###*What else could be done to bring this discussion into Criminology?*
 
 ## References
 
@@ -1939,11 +1707,11 @@ gtflog_tbl <- flog_table_o %>%
 gtflog_tbl
 ```
 
-```{r Table RE log regression, include=FALSE, warning=FALSE}
-#Visualising random effects logistic regression as a table
+```{r Table RE log and PPML regression, include=FALSE, warning=FALSE}
+#Visualising random effects logistic and PPML regression as a table
 tab_model(
-  rnbregress_x,
-  rnbregress_p,
+  rppmlregress_x,
+  rppmlregress_p,
   rlogregress_y,
   rlogregress_w,
   rlogregress_m,
@@ -1952,16 +1720,16 @@ tab_model(
   rlogregress_i, 
   rlogregress_l,
   pred.labels = c("(Intercept)", "Incompatibility (territorial)", "Type (interstate)", "Type (internationalised intratstate)", "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition support"), 
-  dv.labels = c("Troop support", "Troop presence", "Access to infrastructure", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"),
-  title = "Random Effects Logistic and Negative Binomial Regression Results"
+  dv.labels = c("Troop support (PPML)", "Troop presence (PPML)", "Access to infrastructure", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"),
+  title = "Random Effects Logistic and PPML Regression Results"
 )
 ```
 
 ```{r Table FE log regression, include=FALSE, warning=FALSE}
 #Visualising fixed effects logistic regression as a table
  tab_model(
-  flogregress_x,
-  flogregress_p,
+  fppmlregress_x,
+  fppmlregress_p,
   flogregress_y,
   flogregress_w,
   flogregress_m,
@@ -1970,7 +1738,7 @@ tab_model(
   flogregress_i, 
   flogregress_l,
   pred.labels = c("Type (internationalised intratstate)", "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition support"), 
-  dv.labels = c("Troop support", "Troop presence", "Access to infrastructure", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"),
-  title = "Fixed Effects Logistic Regression Results"
+  dv.labels = c("Troop support (PPML)", "Troop presence (PPML)", "Access to infrastructure", "Weapons", "Materiel and statistics", "Training and expertise", "Funding", "Intelligence", "Access to territory"),
+  title = "Fixed Effects Logistic and PPML Regression Results"
 )
 ```

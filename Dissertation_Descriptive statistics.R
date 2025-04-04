@@ -242,17 +242,17 @@ merged_ucdp <- merged_ucdp %>%
       ext_p == 1 & ext_x == 1 ~ "foreign troop presence and troop support",
       
       # Single forms of support
-      ext_u == 1 ~ "unknown support",
-      ext_o == 1 ~ "other support",
-      ext_l == 1 ~ "access to territory",
-      ext_i == 1 ~ "intelligence",
-      ext_f == 1 ~ "funding",
-      ext_t == 1 ~ "training",
-      ext_m == 1 ~ "materiel",
-      ext_w == 1 ~ "weapons",
-      ext_y == 1 ~ "infrastructure",
-      ext_p == 1 ~ "foreign troop presence",
-      ext_x == 1 ~ "troop support",
+      ext_u == 1 & ext_o == 0 & ext_l == 0 & ext_i == 0 & ext_f == 0 & ext_m == 0 & ext_t == 0 & ext_w == 0 & ext_y == 0 & ext_p == 0 & ext_x == 0 ~ "unknown support",
+      ext_o == 1 & ext_l == 0 & ext_i == 0 & ext_f == 0 & ext_m == 0 & ext_t == 0 & ext_w == 0 & ext_y == 0 & ext_p == 0 & ext_x == 0 & ext_u == 0 ~ "other support",
+      ext_l == 1 & ext_o == 0 & ext_i == 0 & ext_f == 0 & ext_m == 0 & ext_t == 0 & ext_w == 0 & ext_y == 0 & ext_p == 0 & ext_x == 0 & ext_u == 0 ~ "access to territory",
+      ext_i == 1 & ext_o == 0 & ext_l == 0 & ext_f == 0 & ext_m == 0 & ext_t == 0 & ext_w == 0 & ext_y == 0 & ext_p == 0 & ext_x == 0 & ext_u == 0 ~ "intelligence",
+      ext_f == 1 & ext_o == 0 & ext_l == 0 & ext_i == 0 & ext_m == 0 & ext_t == 0 & ext_w == 0 & ext_y == 0 & ext_p == 0 & ext_x == 0 & ext_u == 0 ~ "funding",
+      ext_t == 1 & ext_o == 0 & ext_l == 0 & ext_i == 0 & ext_f == 0 & ext_m == 0 & ext_w == 0 & ext_y == 0 & ext_p == 0 & ext_x == 0 & ext_u == 0 ~ "training",
+      ext_m == 1 & ext_o == 0 & ext_l == 0 & ext_i == 0 & ext_f == 0 & ext_t == 0 & ext_w == 0 & ext_y == 0 & ext_p == 0 & ext_x == 0 & ext_u == 0 ~ "materiel",
+      ext_w == 1 & ext_o == 0 & ext_l == 0 & ext_i == 0 & ext_f == 0 & ext_m == 0 & ext_t == 0 & ext_y == 0 & ext_p == 0 & ext_x == 0 & ext_u == 0 ~ "weapons",
+      ext_y == 1 & ext_o == 0 & ext_l == 0 & ext_i == 0 & ext_f == 0 & ext_m == 0 & ext_t == 0 & ext_w == 0 & ext_p == 0 & ext_x == 0 & ext_u == 0 ~ "infrastructure",
+      ext_p == 1 & ext_o == 0 & ext_l == 0 & ext_i == 0 & ext_f == 0 & ext_m == 0 & ext_t == 0 & ext_w == 0 & ext_y == 0 & ext_x == 0 & ext_u == 0 ~ "foreign troop presence",
+      ext_x == 1 & ext_o == 0 & ext_l == 0 & ext_i == 0 & ext_f == 0 & ext_m == 0 & ext_t == 0 & ext_w == 0 & ext_y == 0 & ext_p == 0 & ext_u == 0 ~ "troop support",
       
       TRUE ~ "no support"  # Default case to ensure all cases are covered
     )
@@ -294,6 +294,12 @@ sum(is.na(merged_ucdp$ext_combination))
 
 # Verify the output
 table(merged_ucdp$ext_combination)
+
+#Proportion of external support combinations
+ext_combination_proportion <- merged_ucdp %>%
+  group_by(ext_combination) %>%
+  summarise(Count = n()) %>%
+  mutate(Proportion = round(Count / sum(Count) * 100, 2))
 
 #Creation of a variable to differentiate between indirect and direct support
 merged_ucdp <- merged_ucdp %>%
