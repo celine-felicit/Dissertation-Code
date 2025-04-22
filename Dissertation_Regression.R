@@ -988,3 +988,43 @@ tab_model(flogregress_x, flogregress_w, flogregress_i, pred.labels = c("(Interce
 
 #Visualising fixed effects logistic regression only for the most common forms of support (> 45 counts in descriptive analysis): training, materiel, weapons, infrastructure
 tab_model(flogregress_m, flogregress_w, flogregress_y, flogregress_t, pred.labels = c("(Intercept)", "Incompatibility (government)", "Incompatibility (territory and government)", "Type (intrastate)", "Type (internationalised intratstate)", "Intensity (war)", "Region (Middle East)", "Region (Asia)", "Region (Africa)", "Region (Americas)", "Duration", "9/11", "Cold War", "Coalition support"), dv.labels = c("Materiel and statistics", "Weapons", "Access to infrastructure/joint operations", "Training and expertise"))
+
+
+# Tables for Dissertation #
+```{r Table2a: Overall provision of external support, echo=FALSE, warning=FALSE}
+#Visualising random effects logistic regression for overall provision of external support
+tab_model(rppmlregress_0, 
+          pred.labels = c("(Intercept)", "Incompatibility (territorial)", "Type (interstate)", "Type (internationalised intratstate)", "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition support"), 
+          dv.labels = c("External support"),
+          title = "Table 2a: Random Effects Negative Binomial Regression Results: External Support Determinants"
+)
+
+#Visualising fixed effects logistic regression for overall provision of external support
+tab_model(fppmlregress_0, 
+          pred.labels = c("Type (internationalised intratstate)", "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition Support"),
+          dv.labels = c("External support"),
+          title = "Table 2b: Fixed Effects PPML Regression Results: External Support Determinants"
+)
+```
+
+```{r Table 4a: random effects logistic regression results, echo=FALSE, warning=FALSE}
+#Visualising random effects logistic and PPML regression for those forms of support that are correlated to the most conflict characteristics: troop presence, intelligence and weapons
+tab_model(
+  rppmlregress_x, 
+  rlogregress_i, 
+  pred.labels = c("(Intercept)", "Incompatibility (territorial)", "Type (interstate)", "Type (internationalised intratstate)", 
+                  "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition support"), 
+  dv.labels = c("Troop support (PPML)", "Intelligence"),
+  title = "Table 4a: RE Logistic and PPML Regression Results - External Support Determinants"
+)
+```
+
+```{r Table 4b: fixed effects logistic regression results, echo=FALSE, warning=FALSE}
+#Visualising fixed effects logistic regression for those forms of support that are correlated to the most conflict characteristics: troop presence, intelligence and weapons
+tab_model(fppmlregress_x, 
+          flogregress_i,
+          pred.labels = c("Type (internationalised intratstate)", "Intensity (war)", "Cumulative duration", "After 9/11", "Post-Cold War", "Coalition support"), 
+          dv.labels = c("Troop support (PPML)", "Intelligence"),
+          title = "Table 4b: FE Logistic and PPML Regression Results - External Support Determinants"
+)
+```

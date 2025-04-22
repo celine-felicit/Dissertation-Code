@@ -1635,38 +1635,46 @@ print(chi_5.1)
 ###6.1. Conflict party and ext_type
 
 #Variable table
+```{r Table 1: Variable table, echo=FALSE, warning=FALSE}
 # Create a dataframe with variable details
 variable_table <- data.frame(
   Category = c(
-    "Dependent Variables", rep("", 15),
-    "Independent Variables", rep("", 5),
+    "Dependent Variables", rep("", 17),
+    "Independent Variables", rep("", 17),
     "Control Variables", rep("", 3)
   ),
   Variable = c(
-    "", "ext_sup", "ext_x", "ext_p", "ext_y", "ext_w", "ext_m", "ext_t", "ext_f", "ext_i", "ext_l", "ext_o", "ext_u",
-    "ext_category", "ext_combination", "ext_type",
-    "", "type", "intensity", "incompatibility", "cumulative_duration", "region",
-    "", "cold_war", "nine_eleven", "ext_coalition"
+    "", 
+    "ext_sup", "ext_x", "ext_p", "ext_y", "ext_w", "ext_m", "ext_t", "ext_f", "ext_i", "ext_l", "ext_o", "ext_u",
+    "ext_category",  
+    "ext_type", rep("", 3),
+    "", 
+    "type", rep("", 3), 
+    "intensity", 
+    "incompatibility", rep("", 3),
+    "territorial", 
+    "cumulative_duration", 
+    "region", rep("", 5),
+    "", 
+    "cold_war", "nine_eleven", "ext_coalition"
   ),
   Description = c(
     "", 
-    "External support provided (0 = No, 1 = Yes)",
+    "External support provided (1 = Yes)",
     "Troop support (1 = Yes)", "Foreign troop presence (1 = Yes)", 
-    "Access to infrastructure/joint operations (1 = Yes)", "Weapons support (1 = Yes)", 
+    "Access to infrastructure/joint operations (1 = Yes)", "Weapons support (1 = Yes)",
     "Materiel and logistics support (1 = Yes)", "Training and expertise support (1 = Yes)", 
     "Funding support (1 = Yes)", "Intelligence support (1 = Yes)", 
     "Access to territory (1 = Yes)", "Other support (1 = Yes)", "Unknown support (1 = Yes)",
-    "Categorized external support (e.g., no support, direct, indirect, troop support, etc.)",
-    "Most common combinations of external support (up to three explicitly listed)",
-    "Categorization of external support as direct, indirect, or mixed",
-    
+    "Categorisation of the form of external support provided (i.e.,  whether no support, one individual form or several forms of support are provided)", 
+    "Categorisation of external support as direct, indirect, or no support", "Indirect", "Direct", "Direct and indirect",
     "", 
-    "Type of conflict (1 = Extrasystemic, 2 = Interstate, 3 = Intrastate, 4 = Internationalized Intrastate)",
+    "Type of conflict (1 = Extrasystemic, 2 = Interstate, 3 = Intrastate, 4 = Internationalised Intrastate)", "Intrastate", "Interstate", "Internationalised intrastate",
     "Conflict intensity (1 = Minor conflict, 2 = War)", 
-    "Conflict incompatibility (1 = Territory, 2 = Government, 3 = Both)",
+    "Conflict incompatibility (1 = Territory, 2 = Government, 3 = Both)", "Territory", "Government", "Territory and government",
+    "Conflict incompatibility is about territory (1 = Yes)",
     "Cumulative years of conflict (Years since first observed conflict year)",
-    "Region of conflict (1 = Europe, 2 = Middle East, 3 = Asia, 4 = Africa, 5 = Americas)",
-    
+    "Region of conflict (1 = Europe, 2 = Middle East, 3 = Asia, 4 = Africa, 5 = Americas)", "Europe", "Middle East", "Asia", "Africa", "Americas", 
     "", 
     "Cold War status (0 = Cold War, 1 = Post-Cold War)",
     "Period relative to 9/11 (0 = Before 9/11, 1 = After 9/11)",
@@ -1674,70 +1682,346 @@ variable_table <- data.frame(
   ),
   Measurement_Scale = c(
     "", 
-    rep("Nominal", 12), "Ordinal", "Nominal", "Nominal",
+    rep("Binary", 12), "Ordinal", "Nominal", rep("", 3),
     "", 
-    "Nominal", "Nominal", "Nominal", "Ratio", "Nominal",
+    "Nominal", rep("", 3), "Binary", "Nominal", rep("", 3), "Binary", "Ratio", "Nominal", rep("", 5),
     "", 
-    "Nominal", "Nominal", "Nominal"
+    "Binary", "Binary", "Binary"
+  ),
+  #add the proportions
+  Proportion = c(
+    "", 
+    ext_sup_proportion$Proportion[2], 
+    ext_x_proportion$Proportion[2], 
+    ext_p_proportion$Proportion[2], 
+    ext_y_proportion$Proportion[2], 
+    ext_w_proportion$Proportion[2],
+    ext_m_proportion$Proportion[2], 
+    ext_t_proportion$Proportion[2],
+    ext_f_proportion$Proportion[2],
+    ext_i_proportion$Proportion[2],
+    ext_l_proportion$Proportion[2],
+    ext_o_proportion$Proportion[2],
+    ext_u_proportion$Proportion[2],
+    ext_category_proportion$Proportion[13],
+    "", ext_type_proportion$Proportion[2:4],
+    "", 
+    "", type_proportion$Proportion[1:3], 
+    intensity_proportion$Proportion[2], 
+    "", incompatibility_proportion$Proportion[1:3], 
+    territorial_proportion$Proportion[2], 
+    cumulative_duration = "7.892", 
+    "", region_proportion$Proportion[1:5],
+    "", 
+    cold_war_proportion$Proportion[2], 
+    nine_eleven_proportion$Proportion[2], 
+    ext_coalition_proportion$Proportion[2]
   ),
   stringsAsFactors = FALSE
 )
 
-# Create a formatted table using gt
+# Create the table using gt
 variable_table %>%
   gt() %>%
-  tab_header(title = "Variable Table: Conflict Characteristics and External Support") %>%
+  tab_header(title = "Table 1: Variables - Conflict Characteristics and External Support") %>%
   cols_label(
     Category = "Category",
     Variable = "Variable Name",
     Description = "Description",
-    Measurement_Scale = "Measurement Scale"
+    Measurement_Scale = "Measurement Scale",
+    Proportion = "Proportion of defining category or Mean"
   ) %>%
   tab_options(table.font.size = "small") %>%
   tab_style(
     style = cell_text(weight = "bold", size = px(14)),
     locations = cells_column_labels()
   ) %>%
+  # Apply gray background only to category rows
   tab_style(
     style = cell_fill(color = "lightgray"),
-    locations = cells_body(rows = Variable == "")
+    locations = cells_body(rows = Category %in% c("Dependent Variables", "Independent Variables", "Control Variables"))
   ) %>%
+  # Make category rows bold and left-aligned
   tab_style(
     style = cell_text(weight = "bold", align = "left", size = px(13)),
+    locations = cells_body(rows = Category %in% c("Dependent Variables", "Independent Variables", "Control Variables"))
+  ) %>%
+  # Remove borders for rows where "Variable Name" is empty
+  tab_style(
+    style = cell_borders(sides = "top", color = "white", weight = px(0)), 
     locations = cells_body(rows = Variable == "")
   )
-
+```
 #DAG with Latex code
-#Template
-\begin{tikzpicture}[scale = .7]
-\footnotesize
-\draw[black, fill=black] (0,0) circle (2pt) node[left]{$D_{i1}$};
-\draw[black, fill=black] (5,0) circle (2pt) node[below]{$D_{i2}$};
-\draw[black, fill=black] (10,0) circle (2pt) node[right]{$D_{i3}$};
-\draw[black, fill=black] (0,2) circle (2pt) node[above left]{$Y_{i1}$};
-\draw[black, fill=black] (5,2) circle (2pt) node[above]{$Y_{i2}$};
-\draw[black, fill=black] (10,2) circle (2pt) node[above right]{$Y_{i3}$};
-\draw[gray, fill=gray] (5,4) circle (2pt) node[above]{$U_i$};
-\draw[gray, fill=gray] (0,-2) circle (2pt) node[below left]{$V_{i1}$};
-\draw[gray, fill=gray] (5,-2) circle (2pt) node[below]{$V_{i2}$};
-\draw[gray, fill=gray] (10,-2) circle (2pt) node[below right]{$V_{i3}$};
-\draw[-latex] (0,.1) to node[anchor = west, pos = .5]{$\delta_1$} (0,1.9);
-\draw[-latex] (5,.1) to node[anchor = west, pos = .5]{$\delta_2$} (5,1.9);
-\draw[-latex] (10,.1) to node[anchor = west, pos = .5]{$\delta_3$} (10,1.9);
-\draw[-latex] (.1,2)--(4.9,2);
-\draw[-latex] (5.1,2)--(9.9,2);
-\draw[-latex, color = gray] (0,-1.9)--(0,-.1);
-\draw[-latex, color = gray] (5,-1.9)--(5,-.5);
-\draw[-latex, color = gray] (10,-1.9)--(10,-.1);
-\draw[-latex, color = gray] (.1,-2)--(4.9,-2);
-\draw[-latex, color = gray] (5.1,-2)--(9.9,-2);
-\draw[-latex, color = gray] (4.9,4)--(.1,2.1);
-\draw[-latex, color = gray] (5,3.9)--(5,2.5);
-\draw[-latex, color = gray] (5.1,4)--(9.9,2.1);
-\draw[-latex, color = gray] (4.95,3.95)--(.1,.1);
-\draw[-latex, color = gray] (5.05,3.95)--(9.9,.1);
-\draw[-latex, color = gray] (5,3.95) to [out=315,in=45] (5.1,.1);
-\draw[-latex, color = gray] (0,-2) to [out=135,in=225] (-.1,1.9);
-\draw[-latex, color = gray] (5,-2) to [out=135,in=225] (4.9,1.9);
-\draw[-latex, color = gray] (10,-2) to [out=45,in=315] (10.1,1.9);
+```{tikz, fig.cap = "Figure 1: Directed Acyclic Graph on Conflict Characteristics and External Support", out.width = '100%', echo = FALSE, warning=FALSE}
+\usetikzlibrary{positioning, arrows, shapes.geometric}
+
+\begin{tikzpicture}[
+  scale=1, 
+  every node/.style={draw, ellipse, align=center, minimum width=2.5cm}, 
+  node distance=1.5cm, 
+  ->, >=stealth
+]
+
+% Conflict Characteristics and control variables
+\node (incompatibility) {Incompatibility};
+\node[below=of incompatibility] (type) {Type of conflict};
+\node[above=of incompatibility] (region) {Region};
+\node[right=3cm of region] (intensity) {Intensity};
+\node[below=of type] (multiactor) {Multi-actor dimension};
+\node[right=of type] (duration) {Cumulative Duration};
+\node[below=of multiactor] (coldwar) {Post Cold War};
+\node[below=of coldwar] (nineeleven) {Post 9/11};
+\node[right=of coldwar] (enemy) {Common enemy};
+\node[below=3cm of enemy] (culturalties) {Shared cultural or ideological ties};
+\node[below=of culturalties] (identityes) {Identity of external supporter};
+\node[left=of identityes] (identityrec) {Identity of support recipient};
+\node[right=of culturalties] (colonial) {Colonial ties};
+\node[right=of identityes] (democracy) {Democracy};
+
+\node[above=2cm of region] (spillover) {Chance of conflict spillover};
+\node[above=of spillover] (trade) {Trade connections};
+\node[above=of trade] (media) {Media coverage};
+\node[right=5cm of media] (geography) {Geographic proximity};
+
+\node[right=12cm of multiactor] (GDP) {Supporter's GDP};
+    \node[right=3cm of GDP] (defence) {Supporter's total defence spending};
+\node[below=of GDP] (military) {Military personnel};
+\node[right=of military] (greatpower) {Great power};
+
+% External Support
+\node[right=12cm of trade] (external) {Provision of External Support};
+\node[right=3cm of external] (coalition) {Coalition Support};
+\node[below=4cm of coalition] (form) {Form of support};
+\node[right=2cm of form] (direct) {Direct Support};
+\node[below=of direct] (indirect) {Indirect Support};
+\node[above=of direct] (troops) {Troops};
+\node[right=of troops] (presence) {Troop presence};
+\node[right=of direct] (infrastructure) {Access to infrastructure};
+\node[below=of infrastructure] (weapons) {Weapons};
+\node[below=of weapons] (logistics) {Materiel and statistics};
+\node[below=of logistics] (training) {Training and expertise};
+\node[below=of training] (intelligence) {Intelligence};
+\node[below=of intelligence] (funding) {Funding};
+\node[below=of funding] (territory) {Access to territory};
+
+% Connections
+\draw (incompatibility) -- (type);
+\draw (incompatibility) -- (intensity);
+\draw (incompatibility) -- (duration);
+\draw (incompatibility) -- (form);
+
+\draw (type) -- (intensity);
+\draw (type) -- (duration);
+\draw (type) -- (external);
+
+\draw (intensity) -- (duration);
+\draw (duration) -- (intensity);
+\draw (intensity) -- (defence);
+\draw (intensity) -- (GDP);
+\draw (intensity) -- (media);
+\draw (intensity) -- (external);
+\draw (external) -- (intensity);
+\draw (intensity) -- (form);
+\draw (form) -- (intensity);
+
+\draw (region) -- (incompatibility);
+\draw (region) -- (geography);
+\draw (geography) -- (trade);
+\draw (geography) -- (media);
+\draw (geography) -- (spillover);
+\draw (spillover) -- (external);
+\draw (spillover) -- (form);
+\draw (geography) -- (external);
+\draw (geography) -- (form);
+
+\draw (trade) -- (media);
+\draw (trade) -- (external);
+\draw (greatpower) -- (GDP);
+\draw (greatpower) -- (defence);
+\draw (greatpower) -- (military);
+\draw (greatpower) -- (external);
+\draw (defence) -- (military);
+\draw (defence) -- (external);
+\draw (GDP) -- (defence);
+
+\draw (duration) -- (external);
+\draw (external) -- (duration);
+\draw (duration) -- (form);
+
+\draw (coldwar) -- (culturalties);
+\draw (nineeleven) -- (culturalties);
+\draw (identityes) -- (culturalties);
+\draw (identityrec) -- (culturalties);
+\draw (democracy) -- (culturalties);
+\draw (colonial) -- (culturalties);
+\draw (culturalties) -- (enemy);
+\draw (enemy) -- (culturalties);
+\draw (enemy) -- (external);
+\draw (culturalties) -- (external);
+\draw (culturalties) -- (form);
+
+\draw (multiactor) -- (intensity);
+\draw (multiactor) -- (duration);
+\draw (multiactor) -- (type);
+\draw (multiactor) -- (external);
+\draw (media) -- (external);
+
+\draw (external) -- (coalition);
+\draw (coalition) -- (form);
+\draw (form) -- (direct);
+\draw (form) -- (indirect);
+\draw (direct) -- (troops);
+\draw (direct) -- (presence);
+\draw (indirect) -- (infrastructure);
+\draw (indirect) -- (weapons);
+\draw (indirect) -- (logistics);
+\draw (indirect) -- (training);
+\draw (indirect) -- (intelligence);
+\draw (indirect) -- (funding);
+\draw (indirect) -- (territory);
+
 \end{tikzpicture}
+```
+
+
+
+```{r, fig.cap = "Figure 1: Directed Acyclic Graph on Conflict Characteristics and External Support", out.width = '100%', echo = FALSE, warning=FALSE}
+cat("\\begin{landscape}\n")
+
+cat("
+\\begin{figure}[!htb]
+\\centering
+\\usetikzlibrary{positioning, arrows, shapes.geometric}
+\\begin{tikzpicture}[
+  scale=1,
+  every node/.style={draw, ellipse, align=center, minimum width=2.5cm},
+  node distance=1.5cm,
+  ->, >=stealth
+]
+
+% Conflict Characteristics and control variables
+\node (incompatibility) {Incompatibility};
+\node[below=of incompatibility] (type) {Type of conflict};
+\node[above=of incompatibility] (region) {Region};
+\node[right=3cm of region] (intensity) {Intensity};
+\node[below=of type] (multiactor) {Multi-actor dimension};
+\node[right=of type] (duration) {Cumulative Duration};
+\node[below=of multiactor] (coldwar) {Post Cold War};
+\node[below=of coldwar] (nineeleven) {Post 9/11};
+\node[right=of coldwar] (enemy) {Common enemy};
+\node[below=3cm of enemy] (culturalties) {Shared cultural or ideological ties};
+\node[below=of culturalties] (identityes) {Identity of external supporter};
+\node[left=of identityes] (identityrec) {Identity of support recipient};
+\node[right=of culturalties] (colonial) {Colonial ties};
+\node[right=of identityes] (democracy) {Democracy};
+
+\node[above=2cm of region] (spillover) {Chance of conflict spillover};
+\node[above=of spillover] (trade) {Trade connections};
+\node[above=of trade] (media) {Media coverage};
+\node[right=5cm of media] (geography) {Geographic proximity};
+
+\node[right=12cm of multiactor] (GDP) {Supporter's GDP};
+    \node[right=3cm of GDP] (defence) {Supporter's total defence spending};
+\node[below=of GDP] (military) {Military personnel};
+\node[right=of military] (greatpower) {Great power};
+
+% External Support
+\node[right=12cm of trade] (external) {Provision of External Support};
+\node[right=3cm of external] (coalition) {Coalition Support};
+\node[below=4cm of coalition] (form) {Form of support};
+\node[right=2cm of form] (direct) {Direct Support};
+\node[below=of direct] (indirect) {Indirect Support};
+\node[above=of direct] (troops) {Troops};
+\node[right=of troops] (presence) {Troop presence};
+\node[right=of direct] (infrastructure) {Access to infrastructure};
+\node[below=of infrastructure] (weapons) {Weapons};
+\node[below=of weapons] (logistics) {Materiel and statistics};
+\node[below=of logistics] (training) {Training and expertise};
+\node[below=of training] (intelligence) {Intelligence};
+\node[below=of intelligence] (funding) {Funding};
+\node[below=of funding] (territory) {Access to territory};
+
+% Connections
+\draw (incompatibility) -- (type);
+\draw (incompatibility) -- (intensity);
+\draw (incompatibility) -- (duration);
+\draw (incompatibility) -- (form);
+
+\draw (type) -- (intensity);
+\draw (type) -- (duration);
+\draw (type) -- (external);
+
+\draw (intensity) -- (duration);
+\draw (duration) -- (intensity);
+\draw (intensity) -- (defence);
+\draw (intensity) -- (GDP);
+\draw (intensity) -- (media);
+\draw (intensity) -- (external);
+\draw (external) -- (intensity);
+\draw (intensity) -- (form);
+\draw (form) -- (intensity);
+
+\draw (region) -- (incompatibility);
+\draw (region) -- (geography);
+\draw (geography) -- (trade);
+\draw (geography) -- (media);
+\draw (geography) -- (spillover);
+\draw (spillover) -- (external);
+\draw (spillover) -- (form);
+\draw (geography) -- (external);
+\draw (geography) -- (form);
+
+\draw (trade) -- (media);
+\draw (trade) -- (external);
+\draw (greatpower) -- (GDP);
+\draw (greatpower) -- (defence);
+\draw (greatpower) -- (military);
+\draw (greatpower) -- (external);
+\draw (defence) -- (military);
+\draw (defence) -- (external);
+\draw (GDP) -- (defence);
+
+\draw (duration) -- (external);
+\draw (external) -- (duration);
+\draw (duration) -- (form);
+
+\draw (coldwar) -- (culturalties);
+\draw (nineeleven) -- (culturalties);
+\draw (identityes) -- (culturalties);
+\draw (identityrec) -- (culturalties);
+\draw (democracy) -- (culturalties);
+\draw (colonial) -- (culturalties);
+\draw (culturalties) -- (enemy);
+\draw (enemy) -- (culturalties);
+\draw (enemy) -- (external);
+\draw (culturalties) -- (external);
+\draw (culturalties) -- (form);
+
+\draw (multiactor) -- (intensity);
+\draw (multiactor) -- (duration);
+\draw (multiactor) -- (type);
+\draw (multiactor) -- (external);
+\draw (media) -- (external);
+
+\draw (external) -- (coalition);
+\draw (coalition) -- (form);
+\draw (form) -- (direct);
+\draw (form) -- (indirect);
+\draw (direct) -- (troops);
+\draw (direct) -- (presence);
+\draw (indirect) -- (infrastructure);
+\draw (indirect) -- (weapons);
+\draw (indirect) -- (logistics);
+\draw (indirect) -- (training);
+\draw (indirect) -- (intelligence);
+\draw (indirect) -- (funding);
+\draw (indirect) -- (territory);
+
+\\end{tikzpicture}
+\\caption{Figure 1: Directed Acyclic Graph on Conflict Characteristics and External Support}
+\\end{figure}
+")
+
+cat("\\end{landscape}\n")
+```
