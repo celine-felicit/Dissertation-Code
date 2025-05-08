@@ -1,7 +1,7 @@
 ---
 title: "Undergraduate Dissertation: Cold Calculations - How Conflict Characteristics Shape External Support in Armed Conflicts"
 author: "Student ID: 11004503"
-date: "2025-05-13"
+date: "08/05/2025"
 output: 
   pdf_document:
     latex_engine: xelatex
@@ -26,7 +26,7 @@ header-includes:
   - \usepackage{float}               # Allows [H] placement specifier to force table position
   - \usepackage{amsmath}             # For advanced math typesetting
   - \usepackage{fancyhdr}            # For custom headers and footers
-  - \usepackage{caption}
+  - \usepackage{caption}             # For custom captions
   - \captionsetup[figure]{labelformat=empty}  # Suppresses "Figure X"
   - \captionsetup[table]{labelformat=empty}   # Suppresses "Table X"
 
@@ -44,13 +44,47 @@ header-includes:
   - |
     \postdate{\par\medskip
     Department of Criminology, School of Social Sciences, The University of Manchester\\
+    \textbf{CRIM30610 Long Dissertation}\\
     \textbf{Supervisor:} Thiago R. Oliveira\\
-    \textbf{Word count:} *INSERT WORD COUNT*
+    \textbf{Word count:} 8418/9000\\
     \end{center}\newpage
     \pagenumbering{arabic}
     }
 ---
 
+\newpage 
+
+# Table of Figures
+
+```{=latex}
+\begin{center}
+\begin{tabular}{l l r}
+\textbf{Type} & \textbf{Title} & \textbf{Page} \\
+
+\\[-0.3em]
+\multicolumn{3}{l}{\textbf{Tables}} \\[0.3em]
+Table 1 & Variables used in the analysis & 13 \\
+Table 2 & Regression Results – External Support Determinants & 20 \\
+Table 3 & Statistical Significance in the RE and FE Logistic Regression Models & 21 \\
+Table 4 & RE and FE Logistic and PPML Regression Results & 24 \\[1.2em]
+
+\multicolumn{3}{l}{\textbf{Figures}} \\[0.3em]
+Figure 1 & Directed Acyclic Graph on Conflict Characteristics and External Support & 10 \\
+Figure 2 & World armed conflicts by intensity level & 18 \\[0.3em]
+Figure 3 & Mean and Median Conflict Duration by Region & 18 \\
+Figure 4 & Direct and Indirect Support, 1975–2017 & 19 \\[1.2em]
+
+\multicolumn{3}{l}{\textbf{Appendices}} \\[0.3em]
+Appendix 1 & State-based Conflicts by Region, 1975–2017 & 26 \\
+Appendix 2 & State-based Conflicts by Type of Conflict, 1975–2017 & 26 \\
+Appendix 3 & Conflict Type by Region & 27 \\
+Appendix 4 & Evolution of State-based Conflicts by Incompatibility, 1975–2017 & 27 \\
+Appendix 5 & Evolution of External Support: Bilateral vs Coalition & 28 \\
+Appendix 6 & Statistical Significance in the RE Linear Regression models & 29 \\
+
+\end{tabular}
+\end{center}
+```
 \newpage 
 
 # Declaration and Copyright statement
@@ -67,7 +101,7 @@ ii.	The ownership of certain Copyright, patents, designs, trademarks and other i
 iii.	Further information on the conditions under which disclosure, publication and commercialisation of this dissertation, the Copyright and any Intellectual Property and/or Reproductions described in it may take place is available in the University IP Policy, in any relevant Dissertation restriction declarations deposited in the University Library, and The University Library’s regulations. 
 
 ## Data availability statement
-All analyses were conducted in R (@R2025), with the analytic code and input data made publicly available on GitHub [*INSERT GitHub link*] to ensure transparency and facilitate replication.
+All analyses were conducted in R (@R2025), with the analytic code and input data made publicly available on [GitHub](https://github.com/celine-felicit/Dissertation-Code) to ensure transparency and facilitate replication.
 
 # Abstract
 Despite its relevance to violence, victimisation, and state power, Criminology has historically neglected the study of armed conflicts (@hagan2015criminology; @doi:10.1177/13624806030073001; @ruggiero2015achilles; @mcgarry2015introduction). This dissertation aims to bridge this gap, using random and fixed effects logistic regression to examine the impact of conflict characteristics on the provision of external support. It seeks to provide insights into the motives and strategies of external supporters, essential for discussions around liability and responsibility in armed conflicts. Aligning with existing literature, the findings of this study suggest that external supporters tailor the provision of specific indirect support to specific conflict dynamics (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). Based in criminological research on violence (Collins (2008) in @alma992976076122201631) this suggests a 'cold', calculated approach to the provision of external support, where external supporters consider the conflict dynamics and the potential for escalation before providing support. This research contributes to a more comprehensive understanding of the interplay between external interventions and conflict dynamics, bridging critical gaps in criminology and offering a starting point for criminological discussion around the liability and responsibility of external supporters.
@@ -334,7 +368,7 @@ Despite a reduction in conflicts and deaths, the past decade remains the most vi
 
 While an extremely timely topic, Criminology has historically neglected AC (@hagan2015criminology; @doi:10.1177/13624806030073001; @ruggiero2015achilles; @mcgarry2015introduction), let alone ES. But even in research on ES, the content of interventions remains underexplored, despite its impact on conflict trajectories (see for example @CUNNINGHAMDAVIDE.2016PCWH; @KarlénNiklas2017Tlof; @AydinAysegul2012Noti). This research adopts an interdisciplinary approach, integrating Criminology, Peace and Conflict Studies, and Economics to examine whether conflict characteristics affect the provision of ES and identify trends and conditions under which ES is provided. By distinguishing between support types, it aims to provide a more robust understanding of the role of external supporters and their motives, essential for further discussions around liability and responsibility. In doing so, it bridges critical gaps in Criminology, contributing to a more comprehensive understanding of the interplay between external interventions and conflict dynamics.
 
-This dissertation addresses three research questions: (1) Do conflict characteristics influence the provision of ES? (2) Do they affect the form of support provided? (3) Does coalition-based support influence what type of support is provided? To answer these questions, the study uses fixed and random effects logistic regression models, allowing for the examination of both within- and between-dyad variation. These methods are well suited to the dyadic nature of AC data and support the identification of strategic patterns in support provision—insights essential for discussions on the liability and responsibility of external actors. The data comes from two Uppsala Conflict Data Program (UCDP) datasets: the Dyadic Dataset (Version 18.1), covering conflict characteristics between 1946 and 2024 (@HarbomLotta2008DDoA; @PetterssonTherése2018Ov1), and the External Support Dataset (Version 18.1), which captures ten forms of ES between 1975 and 2017 (@MeierVanessa2023Esia). Together, these sources provide a robust foundation for quantitatively analysing the relationship between conflict characteristics and ES. In doing so, this dissertation contributes to a more nuanced understanding of the interplay between external interventions and conflict dynamics, addressing critical gaps in criminological literature on accountability in AC. The dissertation is structured as follows: First, existing literature on AC and ES is reviewed, highlighting gaps in criminological scholarship and introducing the conceptual lens of ‘hot’ versus ‘cold’ mass violence. The research design and theoretical framework are then described, followed by the methodology, data, and operationalisation. Following the presentation of the findings, it finishes with the discussion and concluding reflections.
+This dissertation addresses three research questions: (1) Do conflict characteristics influence the provision of ES? (2) Do they affect the form of support provided? (3) Does coalition-based support influence what type of support is provided? The data comes from two Uppsala Conflict Data Program (UCDP) datasets: the Dyadic Dataset (Version 18.1), covering conflict characteristics between 1946 and 2018 (@HarbomLotta2008DDoA; @PetterssonTherése2018Ov1), and the External Support Dataset (Version 18.1), which captures ten forms of ES between 1975 and 2017 (@MeierVanessa2023Esia). Together, these sources provide a robust foundation for quantitatively analysing the relationship between conflict characteristics and ES. To answer the research questions, the study uses fixed and random effects logistic regression models, allowing for the examination of both within- and between-dyad variation. These methods are well suited to the dyadic nature of AC data and support the identification of strategic patterns in support provision—insights essential for discussions on the liability and responsibility of external actors. Therefore, this dissertation contributes to a more nuanced understanding of the interplay between external interventions and conflict dynamics, addressing critical gaps in criminological literature on accountability in AC. The dissertation is structured as follows: First, existing literature on AC and ES is reviewed, highlighting gaps in criminological scholarship and introducing the conceptual lens of ‘hot’ versus ‘cold’ mass violence. The research design and theoretical framework are then described, followed by the methodology, data, and operationalisation. Following the presentation of the findings, it finishes with the discussion and concluding reflections.
 
 # Literature Review
 The landscape of AC has shifted in recent decades, with a rise in internationalised intrastate conflicts where external states support non-state actors opposing governments (@DaviesShawn2024Ov1a). AC herein is defined as 'a contested incompatibility that concerns government and/or territory where the use of armed force between two parties, of which at least one is the government of a state, results in at least 25 battle-related deaths in a calendar year' (@Themner2018, p.2). The primary parties in such conflicts include governments, which control the state capital, and opposition organisations, which are formally organised groups using armed force to influence the outcome of the incompatibility.
@@ -354,7 +388,7 @@ To examine the dynamics of ES, offering insights into the motives and strategies
 War and AC profoundly impact parties involved, with ordinary civilians disproportionately suffering due to fatalities, displacement, and long-term public health crises from destroyed infrastructure (@hoeffler2003measuring). War-torn countries face reduced growth, higher poverty rates, and weakened institutions, with recovery dependent on robust policy reforms (@hoeffler2003measuring). High-intensity violence during conflicts lowers economic growth, life expectancy, and educational attainment, with these effects often persisting long-term (@LeThai-Ha2022Easi). However, economic impacts vary by context. Domestic wars typically reduce growth, while wars fought abroad can stimulate mild economic expansion through increased military spending and investments in related sectors (@federle2024price; @chupilkin2022economic). War economies sometimes exhibit resilience, particularly in developed states where increased labour and capital utilisation mitigate conflict's effects (@RaslerKaren1985WatE). Nonetheless, countries experiencing war on their territory often face catastrophic economic fallout, with non-initiators and losers suffering the largest GDP declines (@chupilkin2022economic). Wars and ACs generate significant spillover effects, with severity influenced by geographic proximity and economic ties to the conflict zone. Neighbouring countries often face adverse economic consequences, while distant nations experience milder effects due to limited trade links and geographic distance (@federle2024price). Weak trade integration can shield distant countries from severe supply shocks, and increased military spending may even stimulate economic activity in specific sectors (@federle2024price). However, regions with stronger economic ties to the conflict zone experience amplified negative impacts, including disrupted stability and heightened uncertainty (@FangXiangming2020TECo; @LeThai-Ha2022Easi). While inflation and output remain stable in distant countries, the ripple effects of war challenge interconnected global economies, highlighting the complex dynamics between conflict and economic stability (@federle2024price). The enduring economic and social costs of war underscore its profoundly criminogenic nature.
 
 ## External support to armed conflicts
-Research on ES in ACs highlights its significant impact on conflict dynamics and outcomes. External actors, including state and non-state supporters, play pivotal roles by shaping conflict processes through diverse forms of assistance, such as military training and direct intervention (@GleditschKristianSkrede2007TDoC; @SalehyanIdean2010TDoW; @645083f0-2904-37de-bfb3-649fda2cd398). The type and target of ES often align with intervening parties' strategic interests. Governments typically receive training and troop assistance, while rebel groups rely on material aid, including light weaponry and technical expertise (@MeierVanessa2023Esia; @BerlinMark2023GamH). Rebel sponsorship is more common when governments also receive support, reflecting the interconnected and escalating nature of interventions (@SalehyanIdean2011EESf). Nonetheless, support dynamics vary by conflict intensity, geographic proximity, and the relative strength of involved parties (@GoldmanOgenS.2016Dftr; @MeulewaeterChloé2021Meat; @OlsonLounsberyMarie2016FMIP). Rebel groups seen as either too strong or too weak are less likely to attract aid due to their perceived ability to succeed or fail independently (@SalehyanIdean2011EESf). The Cold War intensified conflicts through superpower support, but its end shifted patterns, reducing insurgencies and prolongation, while rebel groups lost aid, leading many conflicts to peter out or end in settlements (@TestermanMatthew2015RtCE; Kalyvas and Balcells, 2010 in @RobertsJordan2019TaRR).
+Research on ES in ACs highlights its significant impact on conflict dynamics and outcomes. External actors, including state and non-state supporters, play pivotal roles by shaping conflict processes through diverse forms of assistance, such as military training and direct intervention (@GleditschKristianSkrede2007TDoC; @SalehyanIdean2010TDoW; @645083f0-2904-37de-bfb3-649fda2cd398). The type and target of ES often align with intervening parties' strategic interests. Governments typically receive training and troop assistance, while rebel groups rely on material aid, including light weaponry and technical expertise (@MeierVanessa2023Esia; @BerlinMark2023GamH). Rebel sponsorship is more common when governments also receive support, reflecting the interconnected and escalating nature of interventions (@SalehyanIdean2011EESf). Nonetheless, support dynamics vary by conflict intensity, geographic proximity, and the relative strength of involved parties (@GoldmanOgenS.2016Dftr; @MeulewaeterChloé2021Meat; @OlsonLounsberyMarie2016FMIP). Rebel groups seen as either too strong or too weak are less likely to attract aid due to their perceived ability to succeed or fail independently (@SalehyanIdean2011EESf). The Cold War intensified conflicts through superpower support, but its end shifted patterns, reducing insurgencies and prolongation, while rebel groups lost aid, leading many conflicts to peter out or end in settlements (@TestermanMatthew2015RtCE; Kalyvas and Balcells (2010) in @RobertsJordan2019TaRR).
 
 Over recent decades, the number of actors providing ES has grown, despite only a slight rise in total conflicts (@MeierVanessa2023Esia). This proliferation adds veto players, complicating bargaining and potentially prolonging conflicts (@CunninghamDavidE.2010BrHe). By 2017, 77% of active conflict-dyads featured state support for governments alone, driven in part by the post-9/11 counterterrorism focus, which stigmatised support for non-state actors (@MeierVanessa2023Esia). Multilateral counter-extremism efforts, often led by UN Security Council members, have reinforced this trend (@MeierVanessa2023Esia). The internationalisation of intrastate conflicts highlights notable trends. While troop support has declined, the total number of external interventions continues to grow, reflecting persistent interest in shaping conflict trajectories through both direct and indirect means (@DaviesShawn2024Ov1a; @ChangYang-Ming2022Atoc). States that sponsor armed groups tend to back multiple organisations, with an average of 10.36 groups supported per state (@BerlinMark2023GamH). Training and expertise remain the most frequent forms of support, while material aid dominates assistance to rebel groups (@MeierVanessa2023Esia; @BerlinMark2023GamH). While foreign troops are deployed in less than 20% of conflicts, they are often associated with heavy force models, including strategic bombing and civilian protection (@SullivanPatriciaLynne2019SaTi). These evolving dynamics underscore ES's dual role as both an escalatory factor and a mechanism for resolution.
 
@@ -363,16 +397,10 @@ External supporters engage in civil conflicts for diverse and strategic reasons,
 Shared ethnic or ideological ties between sponsors and armed groups signal shared goals and reduce the risk that resources will be misused (@BerlinMark2023GamH; @SalehyanIdean2010TDoW) and are among the strongest predictors of ES (@SalehyanIdean2011EESf; @SozerBrendan2016Dopr). Common cultural or ideological ground facilitates communication and enhances trust, improving cooperation (@alma992983194640301631; @BaconTricia2018ItEo). Democratic states often support each other in combating rebels, reflecting shared values and interests in stability (@GoldmanOgenS.2016Dftr). However, relying on such ties can oversimplify sponsorship decisions, especially in contexts with multiple potential recipients or competing priorities (@BerlinMark2023GamH). Ultimately, prior research suggests that ES is a calculated foreign policy tool used to influence conflict outcomes while advancing sponsors’ strategic goals.
 
 ### The effects of external support on conflicts
-ES profoundly influences AC, shaping its onset (@CUNNINGHAMDAVIDE.2016PCWH; @ReganPatrickM2014Doid), duration (@AydinAysegul2012Noti; @AndersonNoel2019CIPC), outcomes (@SawyerKatherine2015TRoE), and recurrence (@KarlénNiklas2017Tlof). Many contemporary conflicts are recurrences of previous ones, particularly territorial disputes, which are prone to persistence due to entrenched incompatibilities (@QuinnJ.Michael2007StPD). In such cases, ES is often limited, as most states favour preserving territorial status quos.
-
-Interventions, whether direct (troops) or indirect (weapons, logistics, training), frequently prolong conflicts by altering the cost-benefit calculations of belligerents (Fearon in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo). Although external aid can alter power dynamics, it frequently intensifies conflicts, complicates negotiations, and reduces the likelihood of peaceful resolutions (@OlsonLounsberyMarie2016FMIP). It also internationalises conflicts, introducing new veto players and complicating bargaining dynamics (Zartman, 1992 in @SaidemanStephenM.2002DiIR; @SalehyanIdean2011EESf). When foreign states support rebel groups, they not only supply material resources but also confer political legitimacy, further complicating resolution efforts and prolonging violence (@PetrovaMarinaG.2019WMIW).
-
-ES’s impact extends to post-conflict dynamics. Rebel groups with sustained backing are more likely to remobilise, anticipating future assistance, thereby increasing conflict recurrence (@KarlénNiklas2017Tlof). Although ES can improve the odds of military victory (@Balch-LindsayDylan2008TIat), it often exacerbates humanitarian crises, with rebels exploiting moral hazards to attract further intervention (@RauchhausRobertW.2009PPiH). Thus, while ES can alter power dynamics and sustain resistance, it frequently intensifies violence, complicates negotiations, and reduces the chances of a peaceful resolution, underscoring its complex and paradoxical role in ACs.
+ES profoundly influences AC, shaping its onset (@CUNNINGHAMDAVIDE.2016PCWH; @ReganPatrickM2014Doid), duration (@AydinAysegul2012Noti; @AndersonNoel2019CIPC), outcomes (@SawyerKatherine2015TRoE), and recurrence (@KarlénNiklas2017Tlof). Many contemporary conflicts are recurrences of previous ones, particularly territorial disputes, which are prone to persistence due to entrenched incompatibilities (@QuinnJ.Michael2007StPD). In such cases, ES is often limited, as most states favour preserving territorial status quos. Interventions, whether direct (troops) or indirect (weapons, logistics, training), frequently prolong conflicts by altering the cost-benefit calculations of belligerents (Fearon (2004) in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo). Although external aid can alter power dynamics, it frequently intensifies conflicts, complicates negotiations, and reduces the likelihood of peaceful resolutions (@OlsonLounsberyMarie2016FMIP). It also internationalises conflicts, introducing new veto players and complicating bargaining dynamics (Zartman (1992) in @SaidemanStephenM.2002DiIR; @SalehyanIdean2011EESf). When foreign states support rebel groups, they not only supply material resources but also confer political legitimacy, further complicating resolution efforts and prolonging violence (@PetrovaMarinaG.2019WMIW). ES’s impact extends to post-conflict dynamics. Rebel groups with sustained backing are more likely to remobilise, anticipating future assistance, thereby increasing conflict recurrence (@KarlénNiklas2017Tlof). Although ES can improve the odds of military victory (@Balch-LindsayDylan2008TIat), it often exacerbates humanitarian crises, with rebels exploiting moral hazards to attract further intervention (@RauchhausRobertW.2009PPiH). Thus, while ES can alter power dynamics and sustain resistance, it frequently intensifies violence, complicates negotiations, and reduces the chances of a peaceful resolution, underscoring its complex and paradoxical role in ACs.
 
 ### Limitations of past research
-The study of ES in ACs has provided critical insights but is hindered by several limitations. Much research focuses predominantly on support for non-state armed groups, particularly rebel organisations, sidelining other actors and minor armed engagements (@WalterBarbaraF.2004DCBC; @QuinnJ.Michael2007StPD). Additionally, studies often emphasise the initial decision to delegate support (@SalehyanIdean2010TDoW; @alma992983194640301631), neglecting how support dynamics evolve throughout a conflict’s lifecycle and the strategic factors influencing its continuation or cessation (@KarlénNiklas2019TotT; @TokdemirEfe2021RRat).
-
-The content of interventions remains underexplored, despite its impact on conflict trajectories. Differentiating between support types - military training, material aid, or safe havens - can highlight distinct effects on outcomes (@RobertsJordan2019TaRR). Furthermore, the multi-actor dimension of support is frequently overlooked, despite evidence that sponsors selectively support specific groups within fragmented conflicts (@BerlinMark2023GamH). A focus on rebel groups introduces methodological challenges and selection bias, limiting generalisability to other armed organisations (@AbrahmsMax2018ECAT; @PhillipsBrianJ.2019TGRa). This neglect obscures patterns of ES across diverse settings, undermining frameworks linking organisational attributes to state sponsorship. Moreover, qualitative approaches dominate the literature, often at the expense of quantitative or mixed method analyses better suited to capturing temporal and contextual variations in support dynamics (@PetrovaMarinaG.2019WMIW). This research addresses these limitations by examining the interplay between conflict characteristics and different types of ES from a quantitative criminological angle, aiming to provide a starting point for further criminological discussions around the liability and responsibility of external supporters in ACs.
+The study of ES in ACs has provided critical insights but is hindered by several limitations. Much research focuses predominantly on support for non-state armed groups, particularly rebel organisations, sidelining other actors and minor armed engagements (@WalterBarbaraF.2004DCBC; @QuinnJ.Michael2007StPD). Additionally, studies often emphasise the initial decision to delegate support (@SalehyanIdean2010TDoW; @alma992983194640301631), neglecting how support dynamics evolve throughout a conflict’s lifecycle and the strategic factors influencing its continuation or cessation (@KarlénNiklas2019TotT; @TokdemirEfe2021RRat). The content of interventions remains underexplored, despite its impact on conflict trajectories. Differentiating between support types - military training, material aid, or safe havens - can highlight distinct effects on outcomes (@RobertsJordan2019TaRR). Furthermore, the multi-actor dimension of support is frequently overlooked, despite evidence that sponsors selectively support specific groups within fragmented conflicts (@BerlinMark2023GamH). A focus on rebel groups introduces methodological challenges and selection bias, limiting generalisability to other armed organisations (@AbrahmsMax2018ECAT; @PhillipsBrianJ.2019TGRa). This neglect obscures patterns of ES across diverse settings, undermining frameworks linking organisational attributes to state sponsorship. Moreover, qualitative approaches dominate the literature, often at the expense of quantitative or mixed method analyses better suited to capturing temporal and contextual variations in support dynamics (@PetrovaMarinaG.2019WMIW). This research addresses these limitations by examining the interplay between conflict characteristics and different types of ES from a quantitative criminological angle, aiming to provide a starting point for further criminological discussions around the liability and responsibility of external supporters in ACs.
 
 # Research Design
 The study aims to test several hypotheses regarding the relationship between conflict characteristics and ES. These hypotheses are grouped based on the type of relationship they examine, focusing on whether conflict characteristics influence the provision of ES, the form of support provided, and the impact of support coalitions on the type of assistance. These conflict characteristics are considered to be strategical factors influencing the provision of ES. Thereby, this study aims to examine whether external supporters follow a 'cold', rational approach to ES. The hypotheses are as follows:
@@ -541,7 +569,16 @@ f)	Whether a conflict is taking place during or after the Cold War affects what 
 \end{tikzpicture}
 }
 
-\caption{Figure 1: Directed Acyclic Graph on Conflict Characteristics and External Support}
+\captionsetup{justification=raggedright, singlelinecheck=false}
+\caption{
+\textbf{Figure 1: Directed Acyclic Graph on Conflict Characteristics and External Support.}\\
+\textcolor{OliveGreen}{OliveGreen} = Independent variables (H1 and H2); 
+\textcolor{Orchid}{Orchid} = Independent variable (H3); 
+\textcolor{RoyalBlue}{RoyalBlue} = Dependent variable (H1); 
+\textcolor{SkyBlue}{SkyBlue} = Dependent variables (H2 and H3); 
+\textcolor{Gray}{Gray} = Not included in the analysis.
+}
+
 \end{figure}
 \end{landscape}
 ```
@@ -577,11 +614,11 @@ colSums(is.na(merged_ucdp))
   #ext_type: 4
     ##Can be disregarded as a very minor number for 2234 observations in total
 ```
-This study draws on two key datasets from the Uppsala Conflict Data Program (UCDP): the UCDP Dyadic dataset (Version 18.1) (@HarbomLotta2008DDoA; @PetterssonTherése2018Ov1) and the UCDP External Support dataset (ESD) (Version 18.1) (@MeierVanessa2023Esia). The UCDP Dyadic dataset provides data on ACs, focusing on dyads — pairs of primary warring parties — and spans from 1946 to 2024, with the unit of analysis being the dyad-year. The dataset includes 2,935 observations across 25 variables, capturing various conflict characteristics such as the type of conflict, incompatibilities, and combatants. The ESD, covering the period from 1975 to 2017, focuses specifically on ES provided to conflict parties, detailing ten types of support such as military assistance, training, and funding. It offers 2,272 observations of 96 variables, coded from open-source material and subjected to intercoder reliability checks.
+This study draws on two key datasets from the Uppsala Conflict Data Program (UCDP): the UCDP Dyadic dataset (Version 18.1) (@HarbomLotta2008DDoA; @PetterssonTherése2018Ov1) and the UCDP External Support dataset (ESD) (Version 18.1) (@MeierVanessa2023Esia). The UCDP Dyadic dataset provides data on ACs, focusing on dyads — pairs of primary warring parties — and spans from 1946 to 2018, with the unit of analysis being the dyad-year. The dataset includes 2,935 observations across 25 variables, capturing various conflict characteristics such as the type of conflict, incompatibilities, and combatants. The ESD, covering the period from 1975 to 2017, focuses specifically on ES provided to conflict parties, detailing ten types of support such as military assistance, training, and funding. It offers 2,272 observations of 96 variables, coded from open-source material and subjected to intercoder reliability checks.
 
 The two datasets were merged using the common identifiers 'dyad_id' and 'year'. Prior to merging, the datasets were checked for uniqueness to ensure the absence of duplicate rows. The merging process ensured the removal of duplicates, retaining only the necessary columns for analysis. The underlying unit of analysis remains the dyad-year. The final dataset includes 2234 observations of 123 variables on 472 dyads in 212 conflicts from 1975-2017. The comprehensive information on both conflict characteristics and characteristics of ES allows the study to address research questions about the relationship between the two and the types of support provided by external actors.
 
-Despite their comprehensive nature, these datasets present several limitations. The availability of data on ES restricts the analysis to 1975–2017, excluding recent geopolitical developments. However, the period includes major historical phases - such as the Cold War, the post-Cold War era, and the aftermath of 9/11 - during which ES provision changed significantly (@TestermanMatthew2015RtCE; Kalyvas and Balcells (2010) in @RobertsJordan2019TaRR; @MeierVanessa2023Esia). The large sample enables comparative analysis across time, regions, and conflict types, which would be difficult to replicate through primary data collection. Still, UCDP’s state-based definition of AC includes only incompatibilities over government or territory, potentially overlooking underlying causes. Conflicts with fewer than 25 battle-related deaths per year are excluded, as are cases with uncertainty around key variables like incompatibility, actors, or intensity. Geographic precision is also lacking, as location is defined by the government side in a dyad (@Themner2018) rather than where the conflict occurs. The ESD, only records first-degree supporters - those directly aiding a conflict party -, while second-degree supporters (e.g., states providing logistical assistance or funding regional coalitions) are omitted (@Meier2022). Although the dataset distinguishes ten types of support, the categorisation simplifies complex, evolving interactions. Non-state troop support is consistently coded as zero, and support from international organisations, diaspora groups, businesses, or religious institutions is excluded (@Meier2022). Lastly, the ESD’s minimum threshold for recording assistance may result in underreporting minor interventions, potentially affecting the accuracy of conclusions about ES provision. 
+Despite their comprehensive nature, these datasets present several limitations. The availability of data on ES restricts the analysis to 1975–2017, excluding recent geopolitical developments. However, the period includes major historical phases - such as the Cold War, the post-Cold War era, and the aftermath of 9/11 - during which ES provision changed significantly (@TestermanMatthew2015RtCE; Kalyvas and Balcells (2010) in @RobertsJordan2019TaRR; @MeierVanessa2023Esia). The large sample enables comparative analysis across time, regions, and conflict types, which would be difficult to replicate through primary data collection. Still, UCDP’s state-based definition of AC includes only incompatibilities over government or territory, potentially overlooking underlying causes. Conflicts with fewer than 25 battle-related deaths per year are excluded, as are cases with uncertainty around key variables like incompatibility, actors, or intensity. Geographic precision is also lacking, as location is defined by the government side in a dyad (@Themner2018) rather than where the conflict occurs. The ESD only records first-degree supporters - those directly aiding a conflict party -, while second-degree supporters (e.g., states providing logistical assistance or funding regional coalitions) are omitted (@Meier2022). Although the dataset distinguishes ten types of support, the categorisation simplifies complex, evolving interactions. Non-state troop support is consistently coded as zero, and support from international organisations, diaspora groups, businesses, or religious institutions is excluded (@Meier2022). Lastly, the ESD’s minimum threshold for recording assistance may result in underreporting minor interventions, potentially affecting the accuracy of conclusions about ES provision. 
 
 The study incorporates dependent, independent, and control variables (Table 1), categorised based on their measurement scales. All nominal independent variables were factorised to improve analytical clarity. Conflict characteristics were kept as per their original categorisation, while cumulative duration was derived using a time-based formula. The order of conflict type was changed so that 'intrastate' instead of 'interstate' would be the reference group to allow for clearer interpretation in conducted regression analyses. The dependent variables measuring ES, as defined in the Literature Review (see @MeierVanessa2023Esia; @Meier2022), were expanded to differentiate between types of support (ext_category, ext_type).  
 
@@ -761,12 +798,12 @@ variable_table <- data.frame(
     "Categorisation of the form of external support provided (i.e.,  whether no support, one individual form or several forms of support are provided)", 
     "Categorisation of external support as direct, indirect, or no support", "Indirect", "Direct", "Direct and indirect",
     " ", 
-    "Type of conflict (1 = Extrasystemic, 2 = Interstate, 3 = Intrastate, 4 = Internationalised Intrastate)", "Intrastate", "Interstate", "Internationalised intrastate",
+    "Type of conflict (1 = Extrasystemic)", "Intrastate (3)", "Interstate (2)", "Internationalised intrastate (4)",
     "Conflict intensity (1 = Minor conflict, 2 = War)", 
-    "Conflict incompatibility (1 = Territory, 2 = Government, 3 = Both)", "Territory", "Government", "Territory and government",
+    "Conflict incompatibility", "Territory (1)", "Government (2)", "Territory and government (3)",
     "Conflict incompatibility is about territory (1 = Yes)",
     "Cumulative years of conflict (Years since first observed conflict year)",
-    "Region of conflict (1 = Europe, 2 = Middle East, 3 = Asia, 4 = Africa, 5 = Americas)", "Europe", "Middle East", "Asia", "Africa", "Americas", 
+    "Region of conflict", "Europe (1)", "Middle East (2)", "Asia (3)", "Africa (4)", "Americas (5)", 
     " ", 
     "Cold War status (0 = Cold War, 1 = Post-Cold War)",
     "Period relative to 9/11 (0 = Before 9/11, 1 = After 9/11)",
@@ -841,7 +878,7 @@ Descriptive statistical methods were employed to summarise and analyse the data.
   
 Regression analysis, utilising random (RE) and fixed effects (FE) models, was conducted to investigate factors influencing the provision of various forms of ES in AC. For each form of support, FE and RE logistic regression models were fitted to test the hypotheses that conflict characteristics and coalition support influence ES provision. FE models control for conflict dyad-level heterogeneity by accounting for within-dyad variation, thus removing time-invariant confounders specific to each dyad (@huntingtonklein2023fixed). In contrast, RE models assume individual effects are drawn from a random distribution (typically normal), which allows for estimating both within- and between-dyad variation, increasing precision and reducing standard errors (@huntingtonklein2023fixed). The decision to include both RE and FE effects models was driven by the need to account for both within-dyad and between-dyad variations, as this enables a more comprehensive assessment of how conflict characteristics influence external support, addressing both specific within-conflict dynamics and broader patterns across conflicts. Although hybrid models capturing both dimensions exist (@FairbrotherMalcolm2014TMMT; @MundlakYair1978Otpo), time constraints limited the analysis to the more conventional FE and RE specifications. 
 
-As the dependent variables are binary, binomial logistic regression was considered the most appropriate approach. However, for robustness, all support types were initially analysed through four model types: RE linear, RE logistic, FE linear, and FE logistic. The core independent variables included incompatibility, conflict type, intensity, cumulative duration, coalition support, and historical periods such as the post-Cold War and post-9/11 eras. Region was initially included but later excluded due to high multicollinearity with conflict type (Appendix 3), which led to convergence issues in several models. Preliminary analyses and variable assessment (Table 1) supported the overall functional validity of the dependent variables. However, the 'incompatibility' variable was recoded to focus on territorial disputes, avoiding instability caused by low case counts in the combined ‘territory and government’ category. Following initial estimation, logistic regression was selected for final interpretation, as it provided more robust results than linear models across several support types (Table 2; Appendix 6). All final models were estimated based on the corresponding FE or RE logistic regression equations:
+As the dependent variables are binary, binomial logistic regression was considered the most appropriate approach. However, for robustness, all support types were initially analysed through four model types: RE linear, RE logistic, FE linear, and FE logistic. The core independent variables included incompatibility, conflict type, intensity, cumulative duration, coalition support, and historical periods such as the post-Cold War and post-9/11 eras. Region was initially included but later excluded due to high multicollinearity with conflict type (Appendix 3), which led to convergence issues in several models. Preliminary analyses and variable assessment (Table 1) supported the overall functional validity of the dependent variables. However, the 'incompatibility' variable was recoded to focus on territorial disputes, avoiding instability caused by low case counts in the combined ‘territory and government’ category. Following initial estimation, logistic regression was selected for final interpretation, as it provided more robust results than linear models across several support types (Table 3a; Table 3b; Appendix 6). All final models were estimated based on the corresponding FE or RE logistic regression equations:
 
 FE Logistic Regression:
 $$
@@ -878,9 +915,9 @@ $$
 $$
 
 
-where where $\log \left( \frac{\text{provision of support}}{\text{no provision of support}} \right)$ is the natural logarithm of the odds of the dependent variable occurring, $\alpha_i$ is the intercept varying between dyads (i), and $\beta$ is the coefficient for each independent variable.
+where $\log \left( \frac{\text{provision of support}}{\text{no provision of support}} \right)$ is the natural logarithm of the odds of the dependent variable occurring, $\alpha_i$ is the intercept varying between dyads (i), and $\beta$ is the coefficient for each independent variable.
   
-Both RE and FE models for the overall provision of support, troop support, and foreign troop presence failed to converge and were consequently re-estimated using Poisson Pseudo Maximum Likelihood (PPML) models.^[PPML is widely endorsed in the methodological literature for producing consistent estimates under conditions where logistic models with fixed effects often encounter separation or quasi-complete separation issues (@SilvaJ.M.C.Santos2006TLoG). It is also robust to heteroscedasticity and handles high-dimensional fixed effects efficiently - an important feature for longitudinal dyadic conflict data (@correia2020ppmlhdfe). Given these advantages, PPML offers a methodologically sound alternative to logistic regression in contexts prone to convergence problems.] The refitted PPML models used the same set of independent variables as the logistic regressions, with the dependent variable defined as the provision of each respective form of external support and were estimated using the following equations:
+Both RE and FE models for the overall provision of support, troop support, and foreign troop presence failed to converge and were consequently re-estimated using Poisson Pseudo Maximum Likelihood (PPML) models.^[PPML is widely endorsed in the methodological literature for producing consistent estimates under conditions where logistic models with FE often encounter separation or quasi-complete separation issues (@SilvaJ.M.C.Santos2006TLoG). It is also robust to heteroscedasticity and handles high-dimensional FE efficiently - an important feature for longitudinal dyadic conflict data (@correia2020ppmlhdfe). Given these advantages, PPML offers a methodologically sound alternative to logistic regression in contexts prone to convergence problems.] The refitted PPML models used the same set of independent variables as the logistic regressions, with the dependent variable defined as the provision of each respective form of external support and were estimated using the following equations:
 
 FE PPML Regression:
 $$
@@ -1005,13 +1042,12 @@ ggplot(duration_region %>%
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top"
   ) +
-  annotate("text", x = "Americas",           # Set x to the last year
-           y = -0.5,                     # Push the label below the plot area
+  annotate("text", x = Inf, y = -0.5,       # Use Inf for right edge
            label = "Based on UCDP 18.1 data", 
            size = 3, 
-           hjust = 1,                  # Right-align text
-           vjust = 1,                  # Align text at the bottom
-           color = "black")            # Optional, adjust color if needed
+           hjust = 1,                     # Right-align text
+           vjust = 1,                     # Bottom-align text
+           color = "black")
 ```
 
 Intrastate conflicts are the most common type of conflict, followed by internationalised intrastate conflicts, whose number has been growing since the early 2000s (Appendix 2). While there is fluctuation between the incompatibility types 'territory' and 'government', most conflicts in 2017 were about territory and hardly any about territory and government (Appendix 4).
@@ -1046,8 +1082,7 @@ ggplot(combined_type %>%
       "direct" = "dotted",               # Direct support: dotted line
       "indirect" = "dashed",             # Indirect support: dashed line
       "direct and indirect" = "dotdash", # Direct and indirect: dot-dash line
-      "Total" = "solid"                 , # Total: solid line
-      "unknown" = "longdash"            # Unknown: long-dash line
+      "Total" = "solid"                  # Total: solid line
     )
   ) +
   theme_minimal() +
@@ -1063,8 +1098,6 @@ ggplot(combined_type %>%
            hjust = 1,                  # Right-align text
            vjust = 1,                  # Align text at the bottom
            color = "black")            # Optional, adjust color if needed
-  
-###NA is not being portrayed, so how do I get rid of it in the legend?
 ```
 
 ```{r Preparation Regression Analysis, include=FALSE, warning=FALSE}
@@ -1410,7 +1443,8 @@ modelsummary(models,
 )
 ```
 
-In the RE logistic regression (Table 3a), the type of conflict — particularly internationalised intrastate conflicts — emerges as strongly correlated to the provision of ES, showing significance in seven of the nine models. Other influential factors include conflict intensity and the post-Cold War period, which are strongly correlated with multiple forms of support. Intelligence provision appears to be the most sensitive to conflict characteristics, with seven out of nine independent variables reaching statistical significance. Medium-level correlations are observed for access to infrastructure, weapons, materiel and logistics, training and expertise, and funding, while troop support and troop presence exhibit the weakest correlations. While troop support was correlated to the type of conflict, troop presence was correlated to the post-Cold War and post-9/11 eras. 
+
+In the RE logistic regression (Table 3a), the type of conflict — particularly internationalised intrastate conflicts — emerges as strongly correlated to the provision of ES, showing significance in seven of the nine models. Other influential factors include conflict intensity and the post-Cold War period, which are strongly correlated with multiple forms of support. Intelligence provision appears to be the most sensitive to conflict characteristics, with six out of seven independent variables reaching statistical significance. Medium-level correlations are observed for access to infrastructure, weapons, materiel and logistics, training and expertise, and funding, while troop support and troop presence exhibit the weakest correlations. While troop support was correlated to the type of conflict, troop presence was correlated to the post-Cold War and post-9/11 eras. 
 
 ```{r Tables 3: RE and FE logistic regression - statistical significance, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 cat("\\begin{landscape}\n")
@@ -1429,12 +1463,20 @@ rlog_table <- data.frame(
   Access_to_Territory = c("**", "", ". (Interstate)", "", "", "", ". (After)", "** (Coalition)", 1451, 1294.9, 1347.7)
 )
 
+colnames(rlog_table)[which(names(rlog_table) == "Independent_Variable")] <- "Independent Variable"
+colnames(rlog_table)[which(names(rlog_table) == "Troop_Support")] <- "Troop Support"
+colnames(rlog_table)[which(names(rlog_table) == "Troop_Presence")] <- "Troop Presence"
+colnames(rlog_table)[which(names(rlog_table) == "Access_to_Infrastructure")] <- "Access to Infrastructure"
+colnames(rlog_table)[which(names(rlog_table) == "Materiel_and_Statistics")] <- "Materiel and Statistics"
+colnames(rlog_table)[which(names(rlog_table) == "Training_and_Expertise")] <- "Training and Expertise"
+colnames(rlog_table)[which(names(rlog_table) == "Access_to_Territory")] <- "Access to Territory"
+
 # Now print as a pdf‐friendly, auto‐sized, landscape table
 rlog_table %>%
   kable(
     format   = "latex",
     booktabs = TRUE,
-    caption  = "Table 3a: Statistical significance in the RE logistic regression models",
+    caption  = "Table 3a: Statistical Significance in the RE Logistic Regression Models",
     escape   = TRUE,
     align    = "lccccccccc"
   ) %>%
@@ -1461,12 +1503,20 @@ flog_table <- data.frame(
   Access_to_Territory = c("", "", "", ". (After)", "", "", 681, 1113.8, 0.169719)
 )
 
+colnames(flog_table)[which(names(flog_table) == "Independent_Variable")] <- "Independent Variable"
+colnames(flog_table)[which(names(flog_table) == "Troop_Support")] <- "Troop Support"
+colnames(flog_table)[which(names(flog_table) == "Troop_Presence")] <- "Troop Presence"
+colnames(flog_table)[which(names(flog_table) == "Access_to_Infrastructure")] <- "Access to Infrastructure"
+colnames(flog_table)[which(names(flog_table) == "Materiel_and_Statistics")] <- "Materiel and Statistics"
+colnames(flog_table)[which(names(flog_table) == "Training_and_Expertise")] <- "Training and Expertise"
+colnames(flog_table)[which(names(flog_table) == "Access_to_Territory")] <- "Access to Territory"
+
 # Now print as a pdf‐friendly, auto‐sized, landscape table
 flog_table %>%
   kable(
     format   = "latex",
     booktabs = TRUE,
-    caption  = "Table 3b: Statistical significance in the FE logistic regression models",
+    caption  = "Table 3b: Statistical Significance in the FE Logistic Regression Models",
     escape   = TRUE,
     align    = "lccccccccc"
   ) %>%
@@ -1487,21 +1537,19 @@ All models were tested against standard regression assumptions to ensure validit
 # Discussion
 The findings of this study align with existing literature on conflict dynamics and external interventions. Over time, the number of wars has slightly increased, indicating a shift towards more intense conflicts, while conflict duration has increased, suggesting that many conflicts persist rather than being resolved. These trends are consistent with research highlighting the protracted nature of modern ACs (@QuinnJ.Michael2007StPD). The nature of ES has also evolved. While troop support has declined, the total number of external interventions continues to rise (Figure 4), demonstrating a persistent strategic interest in shaping conflict trajectories through both direct and indirect means (@DaviesShawn2024Ov1a; @ChangYang-Ming2022Atoc). Recent years have seen a shift toward multilateral coalitions and collaborative interventions (Appendix 5), with nearly one-third of all support instances involving such coalitions, reflecting a greater emphasis on burden-sharing and legitimacy (@MeierVanessa2023Esia). 
 
-The findings from the regression analysis suggest that while structural conflict factors are correlated to the provision of ES, temporal and contextual elements play a decisive role within individual conflicts. This aligns with existing literature on the provision of ES, which emphasises the importance of conflict characteristics in shaping external intervention strategies (@BerlinMark2023GamH; @DaviesShawn2024Ov1a). While the models examining HG1 show no statistically significant results, regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of ES, with notable differences between the RE and FE models. Therefore, HG1 cannot be completely rejected but the results rather indicate that the provision of ES is not only correlated to conflict characteristics but that it may further be dependent on the form of support provided. 
+The findings from the regression analysis suggest that while structural conflict factors are correlated to the provision of ES, temporal and contextual elements play a decisive role within individual conflicts. This aligns with existing literature on the provision of ES, which emphasises the importance of conflict characteristics in shaping external intervention strategies (@BerlinMark2023GamH; @DaviesShawn2024Ov1a). While the models examining HG1 show no statistically significant results, regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of ES, with notable differences between the RE and FE models. 
 
-RE models show that the provision of indirect support is more correlated to conflict characteristics than direct support, with intelligence provision being the most sensitive to these factors. This finding aligns with existing literature suggesting that indirect forms of support are often more prevalent in contemporary conflicts (@MeierVanessa2023Esia; @BerlinMark2023GamH). Especially the provision of intelligence is strongly correlated with conflict characteristics, suggesting that external actors tailor intelligence support to specific conflict dynamics rather than adopting a one-size-fits-all approach. While no trends could be discovered in the provision of direct forms of support and the correlation to different conflict characteristics of troop presence and troop support might seem counter intuitive at first, it could indicate an escalation in the provision of ES with the former being a precondition for the latter. Conflict intensity (RE), and the post-Cold war era, as well as conflict duration (FE) might be first incentives for external supporters to provide more direct support but once troops are already present, the type of conflict might then become a more important factor in the decision to provide troop support.
+RE models show that the provision of indirect support is more correlated to conflict characteristics than direct support, with intelligence provision being the most sensitive to these factors. This finding aligns with existing literature suggesting that indirect forms of support are often more prevalent in contemporary conflicts (@MeierVanessa2023Esia; @BerlinMark2023GamH). Especially the provision of intelligence is strongly correlated with conflict characteristics, suggesting that external actors tailor intelligence support to specific conflict dynamics rather than adopting a one-size-fits-all approach. While no trends could be discovered in the provision of direct forms of support and the correlation to different conflict characteristics of troop presence and troop support might seem counter intuitive at first, it could indicate an escalation in the provision of ES with the former being a precondition for the latter. Conflict intensity (RE), and the post-Cold war era, as well as conflict duration (FE) might be first incentives for external supporters to provide more direct support but once troops are already present, the type of conflict might then become a more important factor in the decision to provide troop support. Therefore, HG1 cannot be completely rejected but the results rather indicate that the provision of ES is not only correlated to conflict characteristics but that it may further be dependent on the form of support provided. 
 
 For HG2, which explores whether conflict characteristics influence the type of ES provided, results reveal that conflict intensity (H2a) is significantly correlated to the provision of weapons, materiel and statistics, funding, and intelligence in both FE and RE models. This aligns with the argument that higher-intensity conflicts are more likely to receive ES due to concerns about spillover effects and escalation (@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI). However, intensity does not appear to significantly impact the provision of troop support, suggesting that external actors may not relate the intensity of a conflict to increased levels of direct support. 
 
-Besides intensity, the provision of access to infrastructure, weapons, materiel and statistics, training and expertise, funding, and access to territory show consistent correlations with conflict duration (H2c), the type of conflict (H2d), and whether a conflict is taking place after 9/11 (H2e) or after the Cold War (H2f) in the RE models. Particularly internationalised intrastate conflicts are strongly correlated with the provision of ES. Within a conflict, conflict intensity, duration, and the post-Cold War era seem to be more correlated with the provision of indirect ES. These findings are consistent with prior research suggesting that the Cold War significantly shaped patterns of external intervention. During this period, superpowers engaged in proxy conflicts, fuelling insurgencies and prolonging wars, whereas the post-Cold War era saw a shift towards more selective and strategic forms of ES (@TestermanMatthew2015RtCE; Kalyvas and Balcells (2010) in @RobertsJordan2019TaRR). The significance of the periods after the Cold War and 9/11, and conflict intensity in both FE and RE models, suggests that broader geopolitical shifts and conflict dynamics may play a crucial role in shaping ES provision, whether within one ongoing or between different conflicts. This divergence highlights the complexity of ES dynamics and suggests that different forms of support may be influenced by different factors. 
+Besides intensity, the provision of access to infrastructure, weapons, materiel and statistics, training and expertise, funding, and access to territory show consistent correlations with conflict duration (H2c), the type of conflict (H2d), and whether a conflict is taking place after 9/11 (H2e) or after the Cold War (H2f) in the RE models. Particularly internationalised intrastate conflicts are strongly correlated with the provision of ES. Within a conflict, conflict intensity, duration, and the post-Cold War era seem to be more correlated with the provision of indirect ES. These findings are consistent with prior research suggesting that the Cold War significantly shaped patterns of external intervention. During this period, superpowers engaged in proxy conflicts, fueling insurgencies and prolonging wars, whereas the post-Cold War era saw a shift towards more selective and strategic forms of ES (@TestermanMatthew2015RtCE; Kalyvas and Balcells (2010) in @RobertsJordan2019TaRR). The significance of the periods after the Cold War and 9/11, and conflict intensity in both FE and RE models, suggests that broader geopolitical shifts and conflict dynamics may play a crucial role in shaping ES provision, whether within one ongoing or between different conflicts. This divergence highlights the complexity of ES dynamics and suggests that different forms of support may be influenced by different factors. 
 
 On the other hand, territorial incompatibility (H2b) is not significantly correlated with the provision of most ES, suggesting that this factor plays a less prominent role in shaping external intervention strategies. The lack of significant correlations between territorial incompatibility with ES provision is surprising, as previous research has highlighted the importance of this factor in shaping conflict dynamics and external interventions (@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI). The absence of a significant relationship between cumulative conflict duration and the provision of support further challenges assumptions that protracted conflicts necessarily attract sustained external intervention. 
 
 Findings suggest that coalition support (H3) is significantly associated with access to infrastructure, funding, intelligence, and access to territory in the RE model. However, in the FE model, it shows no statistical significance at all. This suggests that coalition dynamics play a more prominent role in shaping the types of ES provided across different conflicts than within individual conflicts.
 
-Model-specific results further illustrate these patterns: troop support is most strongly correlated to the type of conflict, whereas intelligence provision shows broader but less consistent correlations with conflict characteristics. 
-
-In the RE model (Table 4a), the IRR of foreign troop support is 13.79 units higher for interstate conflicts, and 72.77 units higher for internationalised intrastate conflicts compared to intrastate conflicts, holding all other conflict characteristics constant. Due to issues with collinearity, the category of interstate conflicts was excluded from the FE model (Table 4b), making a comparison impossible. The average IRR of troop support for internationalised intrastate conflicts is 70.27 units higher than for intrastate conflicts, holding all other factors constant. The closeness of coefficients between the RE and FE models suggests that conflict type has roughly the same effect on the provision of troop support, both between and within conflicts. This suggests that the type of conflict could be a significant factor in determining the provision of troop support, with interstate and internationalised intrastate conflicts being more likely to receive this form of support than intrastate conflicts. The significance of especially internationalised intrastate conflicts might be explained by the fact that they are often more complex and involve multiple actors, which creates opportunities for external actors to provide support to one side or another, depending on their interests and objectives.
+Model-specific results further illustrate these patterns: troop support is most strongly correlated to the type of conflict, whereas intelligence provision shows broader but less consistent correlations with conflict characteristics. Already presented in Table 3, these models were selected for detailed analysis to explore how different conflict characteristics correlate with the provision of direct versus indirect support. In the RE model (Table 4a), the IRR of foreign troop support is 13.79 units higher for interstate conflicts, and 72.77 units higher for internationalised intrastate conflicts compared to intrastate conflicts, holding all other conflict characteristics constant. Due to issues with collinearity, the category of interstate conflicts was excluded from the FE model (Table 4b), making a comparison impossible. The average IRR of troop support for internationalised intrastate conflicts is 70.27 units higher than for intrastate conflicts, holding all other factors constant. The closeness of coefficients between the RE and FE models suggests that conflict type has roughly the same effect on the provision of troop support, both between and within conflicts. This suggests that the type of conflict could be a significant factor in determining the provision of troop support, with interstate and internationalised intrastate conflicts being more likely to receive this form of support than intrastate conflicts. The significance of especially internationalised intrastate conflicts might be explained by the fact that they are often more complex and involve multiple actors, which creates opportunities for external actors to provide support to one side or another, depending on their interests and objectives.
 
 \newpage
 
@@ -1560,16 +1608,14 @@ modelsummary(
 )
 ```
 
-For intelligence support, both models find that the odds for wars are lower than that for minor ACs to receive this form of aid (odds = 0.44 in RE; 0.33 in FE), holding all other factors constant. Both models further indicate that conflicts occurring after the Cold War are correlated with the provision of intelligence, although the effect is stronger in the FE model (odds = 8.41) than in the RE model (odds = 6.4). The odds of receiving intelligence support increase with each year in conflict duration (by 1.06 in RE and 1.12 in FE models). While the RE model suggests that intelligence provision is correlated to the time period after 9/11 (odds = 8.27) and coalition support (odds = 4.49), holding all other variables constant, these effects do not emerge as statistically significant in the FE model. These results could suggest that external actors tailor intelligence support to specific conflict dynamics and supporting the notion that intelligence-sharing plays a crucial role in modern conflict interventions, allowing external supporters to shape conflict outcomes strategically (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE).
-
-The findings highlight key theoretical implications for Criminology and conflict studies. The weak correlation between direct support and conflict characteristics suggests that direct military interventions may be driven by factors beyond conflict characteristics alone, such as diplomatic or geopolitical considerations. 
+For intelligence support, both models find that the odds for wars are lower than that for minor ACs to receive this form of aid (odds = 0.44 in RE; 0.33 in FE), holding all other factors constant. Both models further indicate that conflicts occurring after the Cold War are correlated with the provision of intelligence, although the effect is stronger in the FE model (odds = 8.41) than in the RE model (odds = 6.4). The odds of receiving intelligence support increase with each year in conflict duration (by 1.06 in RE and 1.12 in FE models). While the RE model suggests that intelligence provision is correlated to the time period after 9/11 (odds = 8.27) and coalition support (odds = 4.49), holding all other variables constant, these effects do not emerge as statistically significant in the FE model. These results could suggest that external actors tailor intelligence support to specific conflict dynamics and supporting the notion that intelligence-sharing plays a crucial role in modern conflict interventions, allowing external supporters to shape conflict outcomes strategically (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). The findings highlight key theoretical implications for Criminology and conflict studies. The weak correlation between direct support and conflict characteristics suggests that direct military interventions may be driven by factors beyond conflict characteristics alone, such as diplomatic or geopolitical considerations. 
 
 The inability to control for regional variation or geographic proximity limits the generalisability of the findings, as well as their interpretation from a criminological perspective. @ToblerW.R.1970ACMS law, 'everything is related to everything else, but near things are more related than distant things' suggests that geographic proximity may play a significant role in shaping the dynamics of ES. Not controlling for geographic proximity might thereby ignore important contextual factors that influence the provision of ES. Despite this, the results confirm existing theories that ES provision is influenced by conflict characteristics—particularly intensity and duration—yet also underscore that different forms of support respond to these characteristics in distinct ways. This supports a ‘cold logic’ interpretation, in which state actors rationally assess the strategic value of conflict before engaging, rather than reacting emotionally. This aligns with prior research suggesting intervention decisions are based on a rational assessment of costs, benefits, and political alignment (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). However, the absence of data on shared cultural ties or geographic proximity prevents assessment of whether certain interventions also follow a ‘hot’ logic, where emotional or identity-driven factors—such as shared ethnicity or history—play a role. This opens an important avenue for future research that more explicitly incorporates emotional, symbolic, and identity-based motivations.
 
-Further limitations arise from the dataset’s focus on state-based conflicts, which omits the growing influence of non-state actors and transnational networks in modern conflict. Additionally, provider and recipient characteristics—key to understanding the criminological dynamics of power, ideology, and legitimacy—could not be tested due to data constraints. Reverse causality also poses a risk: rather than resolving conflict, ES may prolong it by altering the incentives for continued violence (Fearon in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo). While model refitting and variable exclusion (i.e., 9/11 in the FE model for foreign troop presence) were necessary to achieve convergence, these changes limit comparability across models. The exclusive use of quantitative methods further restricts insight into the lived experiences and micro-level effects of ES. Future research should therefore enhance this study by incorporating qualitative data and case studies to provide a more comprehensive understanding of the relationship between ES and conflict dynamics.
+Further limitations arise from the dataset’s focus on state-based conflicts, which omits the growing influence of non-state actors and transnational networks in modern conflict. Additionally, provider and recipient characteristics—key to understanding the criminological dynamics of power, ideology, and legitimacy—could not be tested due to data constraints. Reverse causality also poses a risk: rather than resolving conflict, ES may prolong it by altering the incentives for continued violence (Fearon (2004) in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo). While model refitting and variable exclusion (i.e., 9/11 in the FE model for foreign troop presence) were necessary to achieve convergence, these changes limit comparability across models. The exclusive use of quantitative methods further restricts insight into the lived experiences and micro-level effects of ES. Future research should therefore enhance this study by incorporating qualitative data and case studies to provide a more comprehensive understanding of the relationship between ES and conflict dynamics.
 
 # Conclusion
-This study set out to examine how characteristics of AC shape the provision of ES, offering new insights into the strategic logic underlying state interventions. Contemporary examples such as Russia’s invasion of Ukraine, evidence the limitations of pacifist responses. But while military interventions can at times stabilise volatile regions, they often risk escalating violence or prolonging conflict (Fearon in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo; @OlsonLounsberyMarie2016FMIP). The findings show that ES—particularly indirect forms—is significantly influenced by conflict characteristics, suggesting a calculated, ‘cold’ approach to intervention. Rather than being random or purely humanitarian, ES appears to reflect strategic assessments of conflict dynamics, reinforcing existing literature on the instrumental use of support in warfare (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). Crucially, the type of support provided varies with conflict characteristics, indicating that ES is not a one-size-fits-all strategy. These results have important implications for criminology. If states make informed, strategic decisions to intervene in armed conflicts, they may bear greater responsibility for the violence and crimes that unfold in these contexts. Yet, this dimension of liability and complicity remains underexplored in criminological research. This study offers a starting point for engaging with ES as a site of criminological concern, where questions of accountability, harm, and power intersect. By broadening its focus to include the indirect consequences of state interventions, criminology can contribute to more effective policy responses and a deeper understanding of the global production and regulation of violence.
+This study set out to examine how characteristics of AC shape the provision of ES, offering new insights into the strategic logic underlying state interventions. Contemporary examples such as Russia’s invasion of Ukraine, evidence the limitations of pacifist responses. But while military interventions can at times stabilise volatile regions, they often risk escalating violence or prolonging conflict (Fearon (2004) in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo; @OlsonLounsberyMarie2016FMIP). The findings show that ES—particularly indirect forms—is significantly influenced by conflict characteristics, suggesting a calculated, ‘cold’ approach to intervention. Rather than being random or purely humanitarian, ES appears to reflect strategic assessments of conflict dynamics, reinforcing existing literature on the instrumental use of support in warfare (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). Crucially, the type of support provided varies with conflict characteristics, indicating that ES is not a one-size-fits-all strategy. These results have important implications for criminology. If states make informed, strategic decisions to intervene in armed conflicts, they may bear greater responsibility for the violence and crimes that unfold in these contexts. Yet, this dimension of liability and complicity remains underexplored in criminological research. This study offers a starting point for engaging with ES as a site of criminological concern, where questions of accountability, harm, and power intersect. By broadening its focus to include the indirect consequences of state interventions, criminology can contribute to more effective policy responses and a deeper understanding of the global production and regulation of violence.
 
 # Appendices
 ```{r Region (Appendix 1), echo=FALSE, warning=FALSE, fig.height=4, fig.width=6}
@@ -1586,7 +1632,7 @@ ggplot(region_summary %>%
        aes(x = year, y = conflict_count, fill = region)) +
   geom_area(alpha = 0.6, size = 1, color = "white") +  # Stacked area with transparent fill
   labs(
-    title = "Appendix 1: State-based conflicts by region (1975–2017)",
+    title = "Appendix 1: State-based Conflicts by Region, 1975–2017",
     x = "Year",
     y = "Number of conflicts",
     fill = "Region"
@@ -1635,7 +1681,7 @@ ggplot(type_summary,
            fill = type)) +
   geom_area(alpha = 0.6, size = 1, color = "white") +  # Stacked area with transparent fill
   labs(
-    title = "Appendix 2: State-based conflicts by type of conflict (1975–2017)",
+    title = "Appendix 2: State-based Conflicts by Type of Conflict, 1975–2017",
     x = "Year",
     y = "Number of conflicts",
     fill = "Conflict type"
@@ -1682,7 +1728,7 @@ ggplot(type_region_summary %>%
        aes(x = region, y = conflict_count, 
            fill = type)) + 
   geom_bar(stat = "identity", position = "stack") +  # stacked bar plot
-  labs(title = "Appendix 3: Conflict type by region",
+  labs(title = "Appendix 3: Conflict Type by Region",
        x = "Region",
        y = "Number of conflicts",
        fill = "Type of conflict") +
@@ -1698,13 +1744,12 @@ ggplot(type_region_summary %>%
   theme(
     plot.title = element_text(size = 11), # Adjust font size here
     axis.text.x = element_text(angle = 45, hjust = 1)) +
-  annotate("text", x = "Americas",  # Set x to the last year
-           y = -4,    # Push the label below the plot area
+  annotate("text", x = Inf, y = -4,       # Use Inf for right edge
            label = "Based on UCDP 18.1 data", 
            size = 3, 
-           hjust = 1,  # Right-align text
-           vjust = 1,  # Align text at the bottom
-           color = "black")  # Optional, adjust color if needed
+           hjust = 1,                     # Right-align text
+           vjust = 1,                     # Bottom-align text
+           color = "black")
 ```
 
 ```{r Incompatibility (Appendix 4), echo=FALSE, warning=FALSE, fig.height=4, fig.width=6}
@@ -1719,7 +1764,7 @@ incompatibility_summary <- merged_ucdp %>%
 ggplot(incompatibility_summary, aes(x = year, y = conflict_count, linetype = incompatibility)) +
   geom_line(linewidth = 1) +
   labs(
-    title = "Appendix 4: Evolution of state-based conflicts by incompatibility (1975–2017)",
+    title = "Appendix 4: Evolution of State-based Conflicts by Incompatibility, 1975–2017",
     x = "Year",
     y = "Number of conflicts",
     linetype = "Incompatibility"
@@ -1764,7 +1809,7 @@ ggplot(coalition_summary %>%
            linetype = ext_coalition)) +
   geom_line(linewidth = 1) +
   labs(
-    title = "Appendix 5: Evolution of external support: bilateral vs coalition",
+    title = "Appendix 5: Evolution of External Support: Bilateral vs Coalition",
     x = "Year",
     y = "Number of conflicts",
     color = "External support",
@@ -1812,12 +1857,20 @@ rlin_table <- data.frame(
   Intelligence = c("", "-2.986 (Government)", "2.170 (Internationalised intrastate)", "", "2.936 (Americas)", "", "7.519 (After)", "2.022 (After)", "2.797 (Coalition)", 1449),
   Access_to_Territory = c("", "", "-3.118 (Interstate)", "", "2.214 (Middle East); 3.787 (Africa); 2.063 (Americas)", "", "-2.071 (after)", "", "2.165 (Coalition)", 1449))
 
+colnames(rlin_table)[which(names(rlin_table) == "Independent_Variable")] <- "Independent Variable"
+colnames(rlin_table)[which(names(rlin_table) == "Troop_Support")] <- "Troop Support"
+colnames(rlin_table)[which(names(rlin_table) == "Troop_Presence")] <- "Troop Presence"
+colnames(rlin_table)[which(names(rlin_table) == "Access_to_Infrastructure")] <- "Access to Infrastructure"
+colnames(rlin_table)[which(names(rlin_table) == "Materiel_and_Statistics")] <- "Materiel and Statistics"
+colnames(rlin_table)[which(names(rlin_table) == "Training_and_Expertise")] <- "Training and Expertise"
+colnames(rlin_table)[which(names(rlin_table) == "Access_to_Territory")] <- "Access to Territory"
+
 # Now print as a pdf‐friendly, auto‐sized, landscape table
 rlog_table %>%
   kable(
     format   = "latex",
     booktabs = TRUE,
-    caption  = "Appendix 6: Statistical significance in the RE linear regression models",
+    caption  = "Appendix 6: Statistical Significance in the RE Linear Regression models",
     escape   = TRUE,      # escape LaTeX special characters
     align    = "lccccccccc"    # one left and nine centered columns
   ) %>%
