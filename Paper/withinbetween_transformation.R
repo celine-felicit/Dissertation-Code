@@ -264,7 +264,7 @@ wbm_0 <- wbm(ext_sup ~ intensity + cumulative_duration + nine_eleven + cold_war 
              | type + territorial # all variables that change between conflicts
              | (1 | dyad_id), 
              data = ucdp_panel, 
-             family = "binomial",
+             family = "poisson", #use poisson as model didn't converge with binomial
              control = glmerControl(optimizer = "bobyqa", # Use a more robust optimizer
                                     optCtrl = list(maxfun = 200000)  # Increase from the default 10000
              )
@@ -276,7 +276,7 @@ wbm_x <- wbm(ext_x ~ intensity + cumulative_duration + nine_eleven + cold_war + 
     | type + territorial # all variables that change between conflicts
     | (1 | dyad_id), 
     data = ucdp_panel, 
-    family = "binomial",
+    family = "poisson", # Use poisson as model didn't converge with binomial
     control = glmerControl(optimizer = "bobyqa", # Use a more robust optimizer
                            optCtrl = list(maxfun = 200000)  # Increase from the default 10000
     )
@@ -288,7 +288,7 @@ wbm_p <- wbm(ext_p ~ intensity + cumulative_duration + nine_eleven + cold_war + 
     | type + territorial # all variables that change between conflicts
     | (1 | dyad_id), 
     data = ucdp_panel, 
-    family = "binomial",
+    family = "poisson", # Use poisson as model didn't converge with binomial
     control = glmerControl(optimizer = "bobyqa", # Use a more robust optimizer
                            optCtrl = list(maxfun = 200000)  # Increase from the default 10000
     )
@@ -306,20 +306,6 @@ wbm_y <- wbm(ext_y ~ intensity + cumulative_duration + nine_eleven + cold_war + 
     )
 )
 summary(wbm_y)
-
-# Scaling cumulative_duration
-ucdp_panel$cumulative_duration_z <- scale(ucdp_panel$cumulative_duration)
-# Then rerun the model
-wbm_yi <- wbm(
-  ext_y ~ intensity + cumulative_duration_z + nine_eleven + cold_war + ext_coalition
-  | type + territorial
-  | (1 | dyad_id),
-  data = ucdp_panel,
-  family = "binomial",
-  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 200000))
-)
-  # no warning messages now
-
 
 #4. Weapons
 wbm_w <- wbm(ext_w ~ intensity + cumulative_duration + nine_eleven + cold_war + ext_coalition # all variables that change within a conflict (which variables were included in FE)
@@ -350,7 +336,7 @@ wbm_t <- wbm(ext_t ~ intensity + cumulative_duration + nine_eleven + cold_war + 
     | type + territorial # all variables that change between conflicts
     | (1 | dyad_id), 
     data = ucdp_panel, 
-    family = "binomial",
+    family = "poisson",
     control = glmerControl(optimizer = "bobyqa", # Use a more robust optimizer
                            optCtrl = list(maxfun = 200000)  # Increase from the default 10000
     )
@@ -394,4 +380,18 @@ wbm_l <- wbm(ext_l ~ intensity + cumulative_duration + nine_eleven + cold_war + 
 summary(wbm_l)
 
 table(ucdp_panel$dyad_id, ucdp_panel$ext_l) %>% rowSums() %>% summary()
+
+# Potential fix if not converging as binomial
+# Scaling cumulative_duration
+ucdp_panel$cumulative_duration_z <- scale(ucdp_panel$cumulative_duration)
+# Then rerun the model
+wbm_yi <- wbm(
+  ext_y ~ intensity + cumulative_duration_z + nine_eleven + cold_war + ext_coalition
+  | type + territorial
+  | (1 | dyad_id),
+  data = ucdp_panel,
+  family = "binomial",
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 200000))
+)
+# no warning messages now
 

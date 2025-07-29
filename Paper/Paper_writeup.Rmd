@@ -885,28 +885,9 @@ $$
 
 where $\log \left( \frac{\text{provision of support}}{\text{no provision of support}} \right)$ is the natural logarithm of the odds of the dependent variable occurring, $\alpha_i$ is the intercept varying between dyads (i), and $\beta$ is the coefficient for each independent variable.
   
-*Both RE and FE models for the overall provision of support, troop support, and foreign troop presence failed to converge and were consequently re-estimated using Poisson Pseudo Maximum Likelihood (PPML) models.^[PPML is widely endorsed in the methodological literature for producing consistent estimates under conditions where logistic models with FE often encounter separation or quasi-complete separation issues (@SilvaJ.M.C.Santos2006TLoG). It is also robust to heteroscedasticity and handles high-dimensional FE efficiently - an important feature for longitudinal dyadic conflict data (@correia2020ppmlhdfe). Given these advantages, PPML offers a methodologically sound alternative to logistic regression in contexts prone to convergence problems.] The refitted PPML models used the same set of independent variables as the logistic regressions, with the dependent variable defined as the provision of each respective form of external support and were estimated using the following equations:*
+As models for the overall provision of support, troop support, foreign troop presence, and training and expertise failed to converge, they were re-estimated using Poisson Pseudo Maximum Likelihood (PPML) models.PPML is widely endorsed in the methodological literature for producing consistent estimates under conditions where logistic models with FE often encounter separation or quasi-complete separation issues (@SilvaJ.M.C.Santos2006TLoG). It is also robust to heteroscedasticity and handles high-dimensional FE efficiently - an important feature for longitudinal dyadic conflict data (@correia2020ppmlhdfe). Given these advantages, PPML offers a methodologically sound alternative to logistic regression in contexts prone to convergence problems. The refitted PPML models used the same set of independent variables as the logistic regressions, with the dependent variable defined as the provision of each respective form of external support and were estimated using the following equation:
 
-*FE PPML Regression*:
-$$
-\begin{aligned}
-\mathbb{E}(Y_{i} \mid X_{i}, \gamma_i) = \exp\bigg(&
-\gamma_i + 
-\beta_1 \cdot \text{Territorial Incompatibility}_{i} + 
-\beta_2 \cdot \text{Type}_{i} + \\
-&\beta_3 \cdot \text{Intensity}_{i} + 
-\beta_4 \cdot \text{Duration}_{i} + 
-\beta_5 \cdot \text{Post 9/11}_{i} + \\
-&\beta_6 \cdot \text{Cold War}_{i} + 
-\beta_7 \cdot \text{Coalition Support}_{i}
-\bigg)
-\end{aligned}
-$$
-
-
-$\mathbb{E}(Y_{it} \mid X_{it}, \gamma_i)$ is the expected count outcome (e.g. probability of receiving support) for unit i and $\gamma_i$ represents the dyad-specific fixed effects. The exponentiation is key to PPML, as the model estimates log-linear coefficients using a Poisson-based pseudo-likelihood, even when the dependent variable is not truly count data. Different to the RE model, $\gamma_i$ is treated as a parameter to be estimated, rather than a random draw from a distribution.
-
-*RE PPML Regression*:
+*WB PPML Regression*:
 $$
 \begin{aligned}
 \mathbb{E}(Y_{i} \mid X_{i}, \alpha_i) = \exp\bigg(&
@@ -1068,6 +1049,7 @@ ggplot(combined_type %>%
 
 ```{r Preparation Regression Analysis, include=FALSE, warning=FALSE}
 #Preparation
+library(panelr) # For panel data analysis
 library(arm) # For robust standard errors
 library(texreg) # For regression tables
 library(gmodels) # For cross-tables
@@ -1087,6 +1069,12 @@ options (scipen = 999)
 
 #Form of support provided (DV) ~ Territorial incompatibility (IV) + type of conflict (IV) + conflict intensity (IV) + cumulative duration (IV) + Cold War (IV) + 9/11 (IV) + support as a coalition (IV)
 #Running random effects logistic and linear regression for all forms of support separately
+
+# Turn dataset into panel data
+ucdp_panel <- merged_ucdp %>%
+  mutate(wave = year - 1975) %>% # Create a wave variable starting from 1975
+  panel_data(id = dyad_id,
+             wave = wave) 
 ```
 
 ```{r Regression External support, include=FALSE, warning=FALSE}
@@ -1095,7 +1083,7 @@ wbm_0 <- wbm(ext_sup ~ intensity + cumulative_duration + nine_eleven + cold_war 
              | type + territorial # all variables that change between conflicts
              | (1 | dyad_id), 
              data = ucdp_panel, 
-             family = "binomial",
+             family = "poisson", #use poisson as model didn't converge with binomial
              control = glmerControl(optimizer = "bobyqa", # Use a more robust optimizer
                                     optCtrl = list(maxfun = 200000)  # Increase from the default 10000
              )
@@ -1103,7 +1091,7 @@ wbm_0 <- wbm(ext_sup ~ intensity + cumulative_duration + nine_eleven + cold_war 
 summary(wbm_0)
 
 #Exponentiate coefficients
-exp(fixef(wbm_0)) #to exponentiate only the fixed effects coefficients.
+exp(fixef(wbm_0)) # to exponentiate only the fixed effects coefficients.
 
 #Check multicollinearity
 #Variance Inflation Factor (VIF) quantifies the extent of multicollinearity in a regression model.
@@ -1112,7 +1100,7 @@ exp(fixef(wbm_0)) #to exponentiate only the fixed effects coefficients.
   #VIF = 5–10: Moderate multicollinearity (investigate further; might require adjustments).
   #VIF > 10: High multicollinearity (likely problematic; consider corrective actions).
 vif(wbm_0)
-  #
+  # no multicollinearity
 
 #Checking linearity for binomial logistic regression
   #The linearity assumption for logistic regression requires that the log odds of the dependent variable are a linear combination of the independent variables.
@@ -1128,12 +1116,11 @@ wbm_x <- wbm(ext_x ~ intensity + cumulative_duration + nine_eleven + cold_war + 
     | type + territorial # all variables that change between conflicts
     | (1 | dyad_id), 
     data = ucdp_panel, 
-    family = "binomial",
+    family = "poisson", # Use poisson as model didn't converge with binomial
     control = glmerControl(optimizer = "bobyqa", # Use a more robust optimizer
                            optCtrl = list(maxfun = 200000)  # Increase from the default 10000
     )
 )
-  ### doesn't converge
 summary(wbm_x)
 
 #Exponentiate results
@@ -1141,7 +1128,7 @@ exp(fixef(wbm_x)) #to exponentiate only the fixed effects coefficients.
 
 #Check multicollinearity
 vif(wbm_x)
-  #
+  # no multicollinearity
 
 #Checking linearity for binomial logistic regression
 plot(allEffects(wbm_x))
@@ -1154,17 +1141,16 @@ wbm_p <- wbm(ext_p ~ intensity + cumulative_duration + nine_eleven + cold_war + 
     | type + territorial # all variables that change between conflicts
     | (1 | dyad_id), 
     data = ucdp_panel, 
-    family = "binomial",
+    family = "poisson", # Use poisson as model didn't converge with binomial
     control = glmerControl(optimizer = "bobyqa", # Use a more robust optimizer
                            optCtrl = list(maxfun = 200000)  # Increase from the default 10000
     )
 )
- ### doesn't converge
 summary(wbm_p)
   
 #Check multicollinearity
 vif(wbm_p)
-  #
+  # mean of 9/11 > 5 but < 10, so moderate multicollinearity
 
 #Check linearity
 plot(allEffects(wbm_p))
@@ -1254,7 +1240,7 @@ wbm_t <- wbm(ext_t ~ intensity + cumulative_duration + nine_eleven + cold_war + 
     | type + territorial # all variables that change between conflicts
     | (1 | dyad_id), 
     data = ucdp_panel, 
-    family = "binomial",
+    family = "poisson",
     control = glmerControl(optimizer = "bobyqa", # Use a more robust optimizer
                            optCtrl = list(maxfun = 200000)  # Increase from the default 10000
     )
@@ -1347,7 +1333,7 @@ plot(allEffects(wbm_l))
   ### not working
 ```
 
-The model for the provision of ES (Table 2) shows no statistically significant results. However, the results of the regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of ES, with notable differences between *within and between* models.
+The model for the provision of ES (Table 2) shows no statistically significant results. However, the results of the regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of ES, with notable differences between within and between models.
 
 \newpage
 
@@ -1382,39 +1368,41 @@ modelsummary(models,
 )
 ```
 
-In the *between* logistic regression (Table 3), the type of conflict — particularly internationalised intrastate conflicts — emerges as strongly correlated to the provision of ES, showing significance in seven of the nine models. Other influential factors include conflict intensity and the post-Cold War period, which are strongly correlated with multiple forms of support. Intelligence provision appears to be the most sensitive to conflict characteristics, with six out of seven independent variables reaching statistical significance. Medium-level correlations are observed for access to infrastructure, weapons, materiel and logistics, training and expertise, and funding, while troop support and troop presence exhibit the weakest correlations. While troop support was correlated to the type of conflict, troop presence was correlated to the post-Cold War and post-9/11 eras. 
+Within conflicts (Table 3a), the provision of ES is overall less correlated to conflict characteristics than in the comparison between conflicts. The era post-9/11, as well as conflict intensity and duration, show the most significance across within models. However, conflict intensity is correlated with the provision of indirect ES but not with the provision of direct support. The provision of weapons, funding, and intelligence are correlated with most conflict characteristics, with conflict intensity, duration, and the post-9/11 era being significant in all three. The provision of troop support is not correlated to any conflict characteristics, while troop presence is only correlated to conflict duration. Training and expertise is not correlated to any conflict characteristics and the provision of materiel and statistics, training and expertise,access to infrastructure, and access to territory are only correlated to one or two conflict characteristics.
 
-```{r Table 3: WBM logistic regression - statistical significance, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+In the between logistic regression (Table 3b), the type of conflict — particularly internationalised intrastate conflicts — and conflict intensity emerge as strongly correlated to the provision of ES, showing significance in six of the nine models. Other influential factors include conflict duration and the post-Cold War and post-9/11 periods, which are strongly correlated with multiple forms of support. Access to infrastructure, weapons, and materiel and statistics provision appear to be the most sensitive to conflict characteristics, with three out of seven independent variables reaching statistical significance. Troop support, training and expertise, funding, and access to territory all show correlation to two conflict characteristics, while troop presence and intelligence are only correlated to one conflict characteristic each. While troop support is correlated to the type of conflict, troop presence is correlated to the conflict intensity. 
+
+```{r Table 3: WBM logistic and PPML regression - statistical significance, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 cat("\\begin{landscape}\n")
 
 # Create the data frame 3a manually
-wbm_table <- data.frame(
-  Independent_Variable = c("Intercept", "Territorial dispute", "Type of conflict", "Intensity", "Duration", "9/11", "Cold War", "Coalition Support", "N", "AIC", "BIC"),
- # Troop_Support = c("***", "", "*** (Interstate); *** (Internationalised intrastate)", "", "", "", "", "", 1451, 949.6, 1002.4),
- # Troop_Presence = c("***", "", "", ". (War)", "", "* (After)", "", "", 1451, 326.5, 379.3),
-  Access_to_Infrastructure = c("***", "","** (Internationalised intrastate)" , "", "", "** (After)", "", "* (Coalition, within)", 208, 1108.92, 1186.92), #duration changed from * to 0, 9/11 from 0 to **, CW from ** to 0, Coalition from *** to *
-  Weapons = c("***", "", ". (Internationalised intrastate)", "** (War)", "** (within)", "*** (After, within)", "* (After, within (***, between))", "", 208, 934.89, 1012.89), #internationalised intrastate changed from * to ., intensity from *** to **, duration from 0 to **, 9/11 from * to ***, CW from *** to *
-  Materiel_and_Statistics = c("", "", "*** (Internationalised intrastate)", "* (War, within; ** between)", "* (between)", "", "", ". (within)", 208, 1046.71, 1124.71), #Intercept went from *** to 0, territorial from . to 0, internationalised intrastate from ** to ***, intensity from *** to */**, duration from 0 to *, CW from * to 0, Coalition from 0 to . (within)
-  Training_and_Expertise = c("***", "", "** (Internationalised intrastate)", "", "", "* (After)", ". (After)", "", 208, 925.53, 1003.53), #internationalised intrastate went from * to **, interstate from * to 0, duration from . to 0,  CW from ** to .
-  Funding = c("", "", "* (Internationalised intrastate)", "*** (War)", "*** (within, 0 in between)", "* (After) (within, 0 in between)", "", "* (Coalition) (within, 0 in between)", 208, 1144.66, 1222.66), #interstate went from * to 0, duration from . to ***, 9/11 from 0 to *, CW from ** to 0, coalition from . to *
-  Intelligence = c("***", "", "", "** (War) (within, 0 in between)", "*** (within, 0 in between)", "* (After) (within, *** in between)", "* (After) (within, 0 in between)", "", 208, 821.51, 899.5), #territorial from . to 0, intensity from * to ** (within), duration from * to *** (within), 9/11 from *** to * (within), CW from ** to * (within), coalition from * to 0
-  Access_to_Territory = c("*", "", "", ". (War) (between; 0 in within)", "* (between; 0 in within", "", "", "", 208, 1167.9, 1245.9) #Intercept from ** to *, Interstate from * to 0, CW from . to * (within), Coalition from ** to 0
+within_table <- data.frame(
+  Independent_Variable = c("Intercept", "Territorial dispute", "Type of conflict", "Intensity", "Duration", "9/11", "Cold War", "Coalition Support", "N", "AIC", "BIC"), ### remove territorial, type, and Intercept from table?
+ Troop_Support = c("", "", "", "", "", "", "", "", 208, 877.15, 955.15), # Intercept, territorial, type missing from model
+ Troop_Presence = c("", "", "", "", "*", "", "", "", 208, 280.2, 358.2), # Intercept, territorial, type missing from model
+ Access_to_Infrastructure = c("", "","" , "", "", "** (After)", "", "* (Coalition)", 208, 1108.92, 1186.92), # Intercept, territorial, type missing from model
+ Weapons = c("", "", "", "** (War)", "**", "*** (After)", "* (After)", "", 208, 934.89, 1012.89), # Intercept, territorial, type missing from model
+Materiel_and_Statistics = c("", "", "", "* (War)", "", "", "", ". (Coalition)", 208, 1046.71, 1124.71), # Intercept, territorial, type missing from model
+Training_and_Expertise = c("", "", "", "", "", "", "", "", 208, 2641.1, 2719.09), # Intercept, territorial, type missing from model
+Funding = c("", "", "", "*** (War)", "***", "* (After)", "", "* (Coalition)", 208, 1144.66, 1222.66), # Intercept, territorial, type missing from model
+Intelligence = c("", "", "", "** (War)", "***", "* (After)", "* (After)", "", 208, 821.51, 899.5), # Intercept, territorial, type missing from model
+Access_to_Territory = c("", "", "", "", "", "* (After)", "", "", 208, 1167.9, 1245.9) # Intercept, territorial, type missing from model
 )
 
-colnames(wbm_table)[which(names(wbm_table) == "Independent_Variable")] <- "Independent Variable"
-colnames(wbm_table)[which(names(wbm_table) == "Troop_Support")] <- "Troop Support"
-colnames(wbm_table)[which(names(wbm_table) == "Troop_Presence")] <- "Troop Presence"
-colnames(wbm_table)[which(names(wbm_table) == "Access_to_Infrastructure")] <- "Access to Infrastructure"
-colnames(wbm_table)[which(names(wbm_table) == "Materiel_and_Statistics")] <- "Materiel and Statistics"
-colnames(wbm_table)[which(names(wbm_table) == "Training_and_Expertise")] <- "Training and Expertise"
-colnames(wbm_table)[which(names(wbm_table) == "Access_to_Territory")] <- "Access to Territory"
+colnames(within_table)[which(names(within_table) == "Independent_Variable")] <- "Independent Variable"
+colnames(within_table)[which(names(within_table) == "Troop_Support")] <- "Troop Support"
+colnames(within_table)[which(names(within_table) == "Troop_Presence")] <- "Troop Presence"
+colnames(within_table)[which(names(within_table) == "Access_to_Infrastructure")] <- "Access to Infrastructure"
+colnames(within_table)[which(names(within_table) == "Materiel_and_Statistics")] <- "Materiel and Statistics"
+colnames(within_table)[which(names(within_table) == "Training_and_Expertise")] <- "Training and Expertise"
+colnames(within_table)[which(names(within_table) == "Access_to_Territory")] <- "Access to Territory"
 
 # Now print as a pdf‐friendly, auto‐sized, landscape table
-wbm_table %>%
+within_table %>%
   kable(
     format   = "latex",
     booktabs = TRUE,
-    caption  = "Table 3: Statistical Significance in the WB Logistic Regression Models",
+    caption  = "Table 3a: Statistical Significance in the Within Logistic and PPML Regression Models",
     escape   = TRUE,
     align    = "lccccccccc"
   ) %>%
@@ -1424,11 +1412,52 @@ wbm_table %>%
   ) %>%
   print()
 
+# Add some vertical space between the two tables
+cat("\\vspace{1cm}\n")
+
+# Create the data frame 3b manually
+between_table <- data.frame(
+  Independent_Variable = c("Intercept", "Territorial dispute", "Type of conflict", "Intensity", "Duration", "9/11", "Cold War", "Coalition Support", "N", "AIC", "BIC"),
+ Troop_Support = c("***", "", "*** (Interstate); *** (Internationalised intrastate)", "", "", "", "", "", 208, 877.15, 955.15),
+ Troop_Presence = c("***", "", "", ". (War)", "", "", "", "", 208, 280.2, 358.2),
+  Access_to_Infrastructure = c("***", "","** (Internationalised intrastate)" , "", "", "** (After)", ". (After)", "", 208, 1108.92, 1186.92), # duration changed from * to 0, 9/11 from 0 to **, CW from ** to ., Coalition from *** to 0
+Weapons = c("***", "", ". (Internationalised intrastate)", "** (War)", "", "", "*** (After)", "", 208, 934.89, 1012.89), # internationalised intrastate changed from * to ., intensity from *** to **, 9/11 from * to 0
+Materiel_and_Statistics = c("", "", "*** (Internationalised intrastate)", "** (War)", "*", "", "", "", 208, 1046.71, 1124.71), # Intercept went from *** to 0, territorial from . to 0, internationalised intrastate from ** to ***, intensity from *** to **, duration from 0 to *, CW from * to 0
+Training_and_Expertise = c("***", "", "* (Interstate)", "* (War)", "", "", "", "", 208, 2641.1, 2719.09), # internationalised intrastate went from * to 0, duration from . to 0, 9/11 from * to 0, CW from ** to 0
+Funding = c("", "", "* (Internationalised intrastate)", "*** (War)", "", "", "", "", 208, 1144.66, 1222.66),
+Intelligence = c("***", "", "", "", "", "*** (After)", "", "", 208, 821.51, 899.5),
+Access_to_Territory = c("*", "", "", ". (War)", "*", "", "", "", 208, 1167.9, 1245.9) # Intercept from ** to *, Interstate from * to 0, duration from 0 to *, intensity (war) from 0 to ., CW from . to 0, Coalition from ** to 0
+)
+
+colnames(between_table)[which(names(between_table) == "Independent_Variable")] <- "Independent Variable"
+colnames(between_table)[which(names(between_table) == "Troop_Support")] <- "Troop Support"
+colnames(between_table)[which(names(between_table) == "Troop_Presence")] <- "Troop Presence"
+colnames(between_table)[which(names(between_table) == "Access_to_Infrastructure")] <- "Access to Infrastructure"
+colnames(between_table)[which(names(between_table) == "Materiel_and_Statistics")] <- "Materiel and Statistics"
+colnames(between_table)[which(names(between_table) == "Training_and_Expertise")] <- "Training and Expertise"
+colnames(between_table)[which(names(between_table) == "Access_to_Territory")] <- "Access to Territory"
+
+# Now print as a pdf‐friendly, auto‐sized, landscape table
+between_table %>%
+  kable(
+    format   = "latex",
+    booktabs = TRUE,
+    caption  = "Table 3b: Statistical Significance in the Between Logistic and PPML Regression Models",
+    escape   = TRUE,
+    align    = "lccccccccc"
+  ) %>%
+  kable_styling(
+    latex_options = c("scale_down", "hold_position"),
+    font_size     = 8
+  ) %>%
+  print()
+
+
 # Close landscape environment
 cat("\\end{landscape}\n")
 ```
 
-Within conflicts, as captured by the *within* models (Table 3b), the provision of ES is overall less correlated to conflict characteristics than in the comparison between conflicts (*between*). The era post-Cold War, as well as conflict intensity, show the most significance across *within* models. However, conflict intensity is correlated with the provision of indirect ES but not with the provision of direct support. The provision of weapons and intelligence are correlated with most conflict characteristics, with conflict intensity, duration, and the post-Cold War era being significant in both. The provision of troop support is only correlated to the type of conflict, while troop presence is correlated to conflict duration. Access to infrastructure is not correlated to any conflict characteristics and the provision of materiel and statistics, training and expertise, funding, and access to territory are only correlated to one or two conflict characteristics.
+Already presented in Table 3, the models for troop support and weapons were selected for detailed analysis to explore how different conflict characteristics correlate with the provision of direct versus indirect support. Troop support is most strongly correlated to the type of conflict, whereas the provision of weapons shows broader but less consistent correlations with conflict characteristics. *In the between model (Table 4), the IRR of foreign troop support is xx units higher for interstate conflicts*, and *xx units higher for internationalised intrastate conflicts compared to intrastate conflicts*, holding all other conflict characteristics constant. *Due to issues with collinearity, the category of interstate conflicts was excluded from the within model (Table 4)*, making a comparison impossible. The *average IRR of troop support for internationalised intrastate conflicts is xx units higher than for intrastate conflicts*, holding all other factors constant. For the provision of weapons, both models find that the odds for wars are lower than that for minor ACs to receive this form of aid *(odds = xx in between; 0.33 in within)*, holding all other factors constant. Both models further indicate that conflicts occurring after the Cold War are correlated with the provision of weapons, although the effect is stronger *in the between model (odds = xx)* than in the *within model (odds = xx)*. The odds of receiving weapons increase with each year in conflict duration *(by xx in between and xx in within models)*. *While the within model suggests that weapon provision is correlated to the time period after 9/11 (odds = xx) and conflict duration*, holding all other variables constant, *these effects do not emerge as statistically significant in the between model*.
 
 ```{r Table 4: Logistic WBM regression results, results='asis', echo=FALSE, warning=FALSE}
 # Print the title manually with no captioning or numbering
@@ -1437,7 +1466,7 @@ cat("\\noindent\\textbf{Table 4: WBM Logistic Regression Results}\n\n")
 # Random Effects models
 models_wbm <- list(
   "Troop Support" = wbm_x,
-  "Intelligence" = wbm_i
+  "Weapons" = wbm_w
 )
 
 # Coefficient label mapping
@@ -1464,30 +1493,29 @@ modelsummary(
 )
 ```
 
-Already presented in Table 3, the models for troop support and intelligence were selected for detailed analysis to explore how different conflict characteristics correlate with the provision of direct versus indirect support. *Troop support is most strongly correlated to the type of conflict*, whereas *intelligence provision shows broader but less consistent correlations with conflict characteristics*. *In the RE model (Table 4), the IRR of foreign troop support is xx units higher for interstate conflicts*, and *xx units higher for internationalised intrastate conflicts compared to intrastate conflicts*, holding all other conflict characteristics constant. *Due to issues with collinearity, the category of interstate conflicts was excluded from the FE model (Table 4)*, making a comparison impossible. The *average IRR of troop support for internationalised intrastate conflicts is xx units higher than for intrastate conflicts*, holding all other factors constant. For intelligence support, both models find that the odds for wars are lower than that for minor ACs to receive this form of aid *(odds = 0.44 in RE; 0.33 in FE)*, holding all other factors constant. Both models further indicate that conflicts occurring after the Cold War are correlated with the provision of intelligence, although the effect is stronger *in the within model (odds = xx)* than in the *Between model (odds = xx)*. The odds of receiving intelligence support increase with each year in conflict duration *(by xx in between and xx in within models)*. *While the between model suggests that intelligence provision is correlated to the time period after 9/11 (odds = xx) and coalition support (odds = xx)*, holding all other variables constant, *these effects do not emerge as statistically significant in the FE model*.
 
 All models were tested against standard regression assumptions to ensure validity and reliability. UCDP data was deemed appropriate for addressing the research questions, as it comprehensively captures AC and ES characteristics, although empirical datasets rarely meet all theoretical criteria perfectly (@Gelman_Hill_2006). Table 1 confirmed the functionality of the dependent variables. Multicollinearity was assessed using VIFs, with all values below 5, indicating no significant collinearity issues (@OBRIENRobertM2007Acrr). As most predictors were categorical, the linearity assumption did not apply. *For the sole continuous variable, cumulative duration, linearity was assessed where possible (between models)*. The assumption of independent errors was violated due to repeated observations per conflict and dyad. Homoscedasticity and residual normality were not applicable to logistic models. The binary nature of the dependent variable confirmed the appropriateness of logistic regression for the analysis.
 
 # Discussion
 The findings of this study align with existing literature on conflict dynamics and external interventions. Over time, the number of wars has slightly increased, indicating a shift towards more intense conflicts, while conflict duration has increased, suggesting that many conflicts persist rather than being resolved. These trends are consistent with research highlighting the protracted nature of modern ACs (@QuinnJ.Michael2007StPD). The nature of ES has also evolved. While troop support has declined, the total number of external interventions continues to rise (Figure 4), demonstrating a persistent strategic interest in shaping conflict trajectories through both direct and indirect means (@DaviesShawn2024Ov1a; @ChangYang-Ming2022Atoc). Recent years have seen a shift toward multilateral coalitions and collaborative interventions (Appendix 5), with nearly one-third of all support instances involving such coalitions, reflecting a greater emphasis on burden-sharing and legitimacy (@MeierVanessa2023Esia). 
 
-The findings from the regression analysis suggest that while structural conflict factors are correlated to the provision of ES, temporal and contextual elements play a decisive role within individual conflicts. This aligns with existing literature on the provision of ES, which emphasises the importance of conflict characteristics in shaping external intervention strategies (@BerlinMark2023GamH; @DaviesShawn2024Ov1a). While the models examining HG1 show no statistically significant results, regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of ES, with notable differences between the *within and between* models. 
+The findings from the regression analysis suggest that while structural conflict factors are correlated to the provision of ES, temporal and contextual elements play a decisive role within individual conflicts. This aligns with existing literature on the provision of ES, which emphasises the importance of conflict characteristics in shaping external intervention strategies (@BerlinMark2023GamH; @DaviesShawn2024Ov1a). While the models examining HG1 show no statistically significant results, regression analyses for individual forms of support reveal distinct patterns in the relationship between conflict characteristics and the provision of ES, with notable differences in the within and between results. 
 
-*Between* models show that the provision of indirect support is more correlated to conflict characteristics than direct support, with intelligence provision being the most sensitive to these factors. This finding aligns with existing literature suggesting that indirect forms of support are often more prevalent in contemporary conflicts (@MeierVanessa2023Esia; @BerlinMark2023GamH). Especially the provision of intelligence is strongly correlated with conflict characteristics, suggesting that external actors tailor intelligence support to specific conflict dynamics rather than adopting a one-size-fits-all approach. While no trends could be discovered in the provision of direct forms of support and the correlation to different conflict characteristics of troop presence and troop support might seem counter intuitive at first, it could indicate an escalation in the provision of ES with the former being a precondition for the latter. Conflict intensity (*between*), and the post-Cold war era, as well as conflict duration (*within*) might be first incentives for external supporters to provide more direct support but once troops are already present, the type of conflict might then become a more important factor in the decision to provide troop support. Therefore, HG1 cannot be completely rejected but the results rather indicate that the provision of ES is not only correlated to conflict characteristics but that it may further be dependent on the form of support provided. 
+The between results show that the provision of indirect support is more correlated to conflict characteristics than direct support, with access to infrastructure, and the provision of weapons, as well as of materiel and statistics being the most sensitive to these factors. This finding aligns with existing literature suggesting that indirect forms of support are often more prevalent in contemporary conflicts (@MeierVanessa2023Esia; @BerlinMark2023GamH). While no trends could be discovered in the provision of direct forms of support and the correlation to different conflict characteristics of troop presence and troop support might seem counter intuitive at first, it could indicate an escalation in the provision of ES with the former being a precondition for the latter. Conflict intensity (between) and conflict duration (within) might be first incentives for external supporters to provide more direct support but once troops are already present, the type of conflict might then become a more important factor in the decision to provide troop support. Therefore, HG1 cannot be completely rejected but the results rather indicate that the provision of ES is not only correlated to conflict characteristics but that it may further be dependent on the form of support provided. 
 
-For HG2, which explores whether conflict characteristics influence the type of ES provided, results reveal that conflict intensity (H2a) is significantly correlated to the provision of weapons, materiel and statistics, funding, and intelligence in both *within and between* models. This aligns with the argument that higher-intensity conflicts are more likely to receive ES due to concerns about spillover effects and escalation (@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI). However, intensity does not appear to significantly impact the provision of troop support, suggesting that external actors may not relate the intensity of a conflict to increased levels of direct support. 
+For HG2, which explores whether conflict characteristics influence the type of ES provided, results reveal that conflict intensity (H2a) is significantly correlated to the provision of weapons, materiel and statistics, and funding in both within and between models. This aligns with the argument that higher-intensity conflicts are more likely to receive ES due to concerns about spillover effects and escalation (@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI). However, intensity does not appear to significantly impact the provision of troop support, suggesting that external actors may not relate the intensity of a conflict to increased levels of direct support. 
 
-Besides intensity, the provision of access to infrastructure, weapons, materiel and statistics, training and expertise, funding, and access to territory show consistent correlations with conflict duration (H2c), the type of conflict (H2d), and whether a conflict is taking place after 9/11 (H2e) or after the Cold War (H2f) in the RE models. Particularly internationalised intrastate conflicts are strongly correlated with the provision of ES. Within a conflict, conflict intensity, duration, and the post-Cold War era seem to be more correlated with the provision of indirect ES. These findings are consistent with prior research suggesting that the Cold War significantly shaped patterns of external intervention. During this period, superpowers engaged in proxy conflicts, fueling insurgencies and prolonging wars, whereas the post-Cold War era saw a shift towards more selective and strategic forms of ES (@TestermanMatthew2015RtCE; Kalyvas and Balcells (2010) in @RobertsJordan2019TaRR). The significance of the periods after the Cold War and 9/11, and conflict intensity in both *within and between* models, suggests that broader geopolitical shifts and conflict dynamics may play a crucial role in shaping ES provision, whether within one ongoing or between different conflicts. This divergence highlights the complexity of ES dynamics and suggests that different forms of support may be influenced by different factors. 
+Besides intensity, conflict duration (H2c) appears as strongly correlated to the provision of weapons, funding, and intelligence within a conflict-dyad, and to the provision of materiel and statistics and access to territory between conflict-dyads. The period after 9/11 (H2e) is correlated to the provision of multiple forms of indirect support — particularly access to infrastructure, weapons, funding, intelligence, and access to territory — within conflicts, and to access to infrastructure and intelligence in the between results. The Cold War period (H2f) is correlated to the provision of weapons and intelligence within conflicts and access to infrastructure and weapons across conflicts. The type of conflict (H2d) — particularly internationalised intrastate and interstate conflicts — is significantly correlated with ES in the between models, specifically troop support, access to infrastructure, weapons, materiel and statistics, training and expertise, and funding. These findings are consistent with research highlighting the geopolitical significance of the Cold War and post-9/11 eras, during which intervention strategies shifted from ideological proxy wars to more targeted and strategic forms of engagement (@TestermanMatthew2015RtCE; Kalyvas and Balcells (2010) in @RobertsJordan2019TaRR). The significance of temporal markers and conflict characteristics across both dimensions suggests that the dynamics shaping ES are multifaceted and vary depending on the form of assistance. This complexity underscores the importance of distinguishing between within-conflict variation and structural differences across conflicts when analysing ES provision.
 
-On the other hand, territorial incompatibility (H2b) is not significantly correlated with the provision of most ES, suggesting that this factor plays a less prominent role in shaping external intervention strategies. The lack of significant correlations between territorial incompatibility with ES provision is surprising, as previous research has highlighted the importance of this factor in shaping conflict dynamics and external interventions (@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI). The absence of a significant relationship between cumulative conflict duration and the provision of support further challenges assumptions that protracted conflicts necessarily attract sustained external intervention. 
+On the other hand, territorial incompatibility (H2b) is not significantly correlated with the provision of any ES, suggesting that this factor plays a less prominent role in shaping external intervention strategies. The lack of significant correlations between territorial incompatibility with ES provision is surprising, as previous research has highlighted the importance of this factor in shaping conflict dynamics and external interventions (@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI).
 
-Findings suggest that coalition support (H3) is significantly associated with access to infrastructure, funding, intelligence, and access to territory in the RE model. However, in the FE model, it shows no statistical significance at all. This suggests that coalition dynamics play a more prominent role in shaping the types of ES provided across different conflicts than within individual conflicts.
+Findings suggest that coalition support (H3) is significantly correlated to access to infrastructure, materiel and statistics, and funding within conflict-dyads. However, between conflict-dyads, it shows no statistical significance at all. This suggests that coalition dynamics play a more prominent role in shaping the types of ES provided within individual conflicts than across different conflicts.
 
 Model-specific results further illustrate these patterns: *troop support is most strongly correlated to the type of conflict*, whereas *intelligence provision shows broader but less consistent correlations with conflict characteristics*. The *closeness of coefficients between the within and between models* suggests that conflict type has roughly the same effect on the provision of troop support, both between and within conflicts. This suggests that the type of conflict could be a significant factor in determining the provision of troop support, with interstate and internationalised intrastate conflicts being more likely to receive this form of support than intrastate conflicts. The significance of especially internationalised intrastate conflicts might be explained by the fact that they are often more complex and involve multiple actors, which creates opportunities for external actors to provide support to one side or another, depending on their interests and objectives. These results could suggest that external actors tailor intelligence support to specific conflict dynamics and supporting the notion that intelligence-sharing plays a crucial role in modern conflict interventions, allowing external supporters to shape conflict outcomes strategically (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). The findings highlight key theoretical implications for Criminology and conflict studies. The weak correlation between direct support and conflict characteristics suggests that direct military interventions may be driven by factors beyond conflict characteristics alone, such as diplomatic or geopolitical considerations. 
 
-The inability to control for regional variation or geographic proximity limits the generalisability of the findings, as well as their interpretation from a criminological perspective. @ToblerW.R.1970ACMS law, 'everything is related to everything else, but near things are more related than distant things' suggests that geographic proximity may play a significant role in shaping the dynamics of ES. Not controlling for geographic proximity might thereby ignore important contextual factors that influence the provision of ES. Despite this, the results confirm existing theories that ES provision is influenced by conflict characteristics—particularly intensity and duration—yet also underscore that different forms of support respond to these characteristics in distinct ways. This supports a ‘cold logic’ interpretation, in which state actors rationally assess the strategic value of conflict before engaging, rather than reacting emotionally. This aligns with prior research suggesting intervention decisions are based on a rational assessment of costs, benefits, and political alignment (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). However, the absence of data on shared cultural ties or geographic proximity prevents assessment of whether certain interventions also follow a ‘hot’ logic, where emotional or identity-driven factors—such as shared ethnicity or history—play a role. This opens an important avenue for future research that more explicitly incorporates emotional, symbolic, and identity-based motivations.
+The inability to control for regional variation or geographic proximity limits the generalisability of the findings, as well as their interpretation from a criminological perspective. @ToblerW.R.1970ACMS law, 'everything is related to everything else, but near things are more related than distant things' suggests that geographic proximity may play a significant role in shaping the dynamics of ES. Not controlling for geographic proximity might thereby ignore important contextual factors that influence the provision of ES. Despite this, the results confirm existing theories that ES provision is influenced by conflict characteristics — particularly intensity and duration — yet also underscore that different forms of support respond to these characteristics in distinct ways. This supports a ‘cold logic’ interpretation, in which state actors rationally assess the strategic value of conflict before engaging, rather than reacting emotionally. This aligns with prior research suggesting intervention decisions are based on a rational assessment of costs, benefits, and political alignment (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). However, the absence of data on shared cultural ties or geographic proximity prevents assessment of whether certain interventions also follow a ‘hot’ logic, where emotional or identity-driven factors — such as shared ethnicity or history — play a role. This opens an important avenue for future research that more explicitly incorporates emotional, symbolic, and identity-based motivations.
 
-Further limitations arise from the dataset’s focus on state-based conflicts, which omits the growing influence of non-state actors and transnational networks in modern conflict. Additionally, provider and recipient characteristics—key to understanding the criminological dynamics of power, ideology, and legitimacy—could not be tested due to data constraints. Reverse causality also poses a risk: rather than resolving conflict, ES may prolong it by altering the incentives for continued violence (Fearon (2004) in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo). While model refitting and variable exclusion (i.e., 9/11 in the FE model for foreign troop presence) were necessary to achieve convergence, these changes limit comparability across models. The exclusive use of quantitative methods further restricts insight into the lived experiences and micro-level effects of ES. Future research should therefore enhance this study by incorporating qualitative data and case studies to provide a more comprehensive understanding of the relationship between ES and conflict dynamics.
+Further limitations arise from the dataset’s focus on state-based conflicts, which omits the growing influence of non-state actors and transnational networks in modern conflict. Additionally, provider and recipient characteristics — key to understanding the criminological dynamics of power, ideology, and legitimacy — could not be tested due to data constraints. Reverse causality also poses a risk: rather than resolving conflict, ES may prolong it by altering the incentives for continued violence (Fearon (2004) in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo). While model refitting and variable exclusion (i.e., 9/11 in the FE model for foreign troop presence) were necessary to achieve convergence, these changes limit comparability across models. The exclusive use of quantitative methods further restricts insight into the lived experiences and micro-level effects of ES. Future research should therefore enhance this study by incorporating qualitative data and case studies to provide a more comprehensive understanding of the relationship between ES and conflict dynamics.
 
 # Conclusion
 This study set out to examine how characteristics of AC shape the provision of ES, offering new insights into the strategic logic underlying state interventions. Contemporary examples such as Russia’s invasion of Ukraine, evidence the limitations of pacifist responses. But while military interventions can at times stabilise volatile regions, they often risk escalating violence or prolonging conflict (Fearon (2004) in @TestermanMatthew2015RtCE; @LacinaBethany2006EtSo; @OlsonLounsberyMarie2016FMIP). The findings show that ES—particularly indirect forms—is significantly associated with conflict characteristics, potentially suggesting a calculated, ‘cold’ approach to intervention. Rather than being random or purely humanitarian, ES would then reflect strategic assessments of conflict dynamics, reinforcing existing literature on the instrumental use of support in warfare (@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo; @SawyerKatherine2015TRoE). Crucially, the type of support provided varies with conflict characteristics, indicating that ES is not a one-size-fits-all strategy. These results have important implications for criminology. If states make informed, strategic decisions to intervene in armed conflicts, they may bear greater responsibility for the violence and crimes that unfold in these contexts. Yet, this dimension of liability and complicity remains underexplored in criminological research. This study offers a starting point for engaging with ES as a site of criminological concern, where questions of accountability, harm, and power intersect. By broadening its focus to include the indirect consequences of state interventions, criminology can contribute to more effective policy responses and a deeper understanding of the global production and regulation of violence.
