@@ -395,3 +395,22 @@ wbm_yi <- wbm(
 )
 # no warning messages now
 
+# Comparison troop support v weapons
+# Print table comparing wbm_x (PPML) and wbm_w (logistic binomial) 
+modelsummary(
+  list("Troop Support" = wbm_x,
+       "Weapons" = wbm_w),
+  coef_map = c(
+    "(Intercept)" = "(Intercept)",
+    "incompatibility" = "Incompatibility (territorial)",
+    "typeinterstate" = "Type (interstate)",
+    "typeinternationalised intrastate" = "Type (internationalised intrastate)",
+    "intensity" = "Intensity (war)",
+    "duration" = "Cumulative duration",
+    "nineeleven" = "After 9/11",
+    "coldwar" = "Post-Cold War",
+    "coalition" = "Coalition support"
+  ),
+  statistic = "{estimate} ({std.error})",
+  output = "gt"
+)
