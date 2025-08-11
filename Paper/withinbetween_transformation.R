@@ -414,3 +414,4 @@ modelsummary(
   statistic = "{estimate} ({std.error})",
   output = "gt"
 )
+
