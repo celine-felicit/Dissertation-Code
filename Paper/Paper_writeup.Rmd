@@ -104,11 +104,13 @@ tinytex::install_tinytex(force = TRUE) # For LaTeX installation
 
 #Load datasets into R
 #1. UCDP Dyadic Dataset
-ucdp_dyadic <- read.csv("~/Studium/Dissertation/Dissertation Code/Datasets/ucdp-dyadic-181.csv")
+#ucdp_dyadic <- read.csv("~/Studium/Dissertation/Dissertation Code/Datasets/ucdp-dyadic-181.csv")
+ucdp_dyadic <- read.csv("../Datasets/ucdp-dyadic-181.csv")
 
 #2. UCDP ESD Dataset
 # Read the first sheet from the Excel file
-ucdp_esd <- read_excel("~/Studium/Dissertation/Dissertation Code/Datasets/ucdp-esd-dy-181.xlsx")
+#ucdp_esd <- read_excel("~/Studium/Dissertation/Dissertation Code/Datasets/ucdp-esd-dy-181.xlsx")
+ucdp_esd <- read_excel("../Datasets/ucdp-esd-dy-181.xlsx")
 
 # COMBINATION OF DATSETS#
 # Step 1. Merge UCDP ESD and UCDP dyadic datasets based on conflict dyad ID
