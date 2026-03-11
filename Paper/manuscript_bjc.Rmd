@@ -1,7 +1,7 @@
 ---
 title: Cold Calculations - How Conflict Characteristics Shape External Support in Armed Conflicts
 date: "Version: `r format(Sys.time(), '%B %d, %Y')`"
-author: Celine Giese^[email address, Department of Methodology, London School of Economics and Political Science] and Thiago R. Oliveira^[thiago.oliveira@manchester.ac.uk, Department of Criminology, University of Manchester]
+author: Celine Giese^[C.F.Giese@lse.ac.uk, Department of Methodology, London School of Economics and Political Science] and Thiago R. Oliveira^[thiago.oliveira@manchester.ac.uk, Department of Criminology, University of Manchester]
 output: 
   bookdown::word_document2:
     reference_docx: 'sp_template.docx'
@@ -66,7 +66,7 @@ The landscape of armed conflict has shifted in recent decades, with a rise in in
 
 Although developing nations fight most of today's conflicts, they are often fought with weapons from industrialised countries, reflecting 20th-century technological advancements [@sivard1996world]. As geopolitical tensions rise, the role of external support in these conflicts has become a central topic of discussion [@federle2024price]. External support, defined as militarily relevant assistance provided by outside parties to active conflicts, is distinct from peacetime activities like arms trade or security reforms [@MeierVanessa2023Esia; @Meier2022]. This support aims to enhance the recipient's military capabilities and is provided with the clear intent of facilitating military victory over the opposing side [@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI]. It includes material, knowledge, or services directly aiding warfare but excludes unintentional support like sanctions that weaken a conflict party but are not intended to support the other side. Additionally, diplomatic efforts, humanitarian aid, and mediation offers do not qualify as external support since they do not directly contribute to the military outcome [@Meier2022]. The external nature of support is determined by whether the provider is not a primary warring party in the conflict, even if present in the same territory.
 
-The interplay between conflict characteristics and external support is complex, with interventions---whether direct military actions or indirect aid---often prolonging hostilities and complicating peace efforts [@SawyerKatherine2015TRoE; @KarlénNiklas2023EtDE; @regan2002third]. The provision of external support shapes the onset [@CUNNINGHAMDAVIDE.2016PCWH; @ReganPatrickM2014Doid], duration [@AydinAysegul2012Noti; @AndersonNoel2019CIPC], outcomes [@SawyerKatherine2015TRoE], and recurrence [@KarlénNiklas2017Tlof] of armed conflicts. Interventions frequently prolong conflicts by altering the cost-benefit calculations of belligerents [@LacinaBethany2006EtSo] and although external aid can alter power dynamics, it frequently intensifies conflicts, complicates negotiations, and reduces the likelihood of peaceful resolutions [@OlsonLounsberyMarie2016FMIP; @SalehyanIdean2011EESf; @PetrovaMarinaG.2019WMIW]. Although external support can improve the odds of military victory [@Balch-LindsayDylan2008TIat], it often exacerbates humanitarian crises, with rebels exploiting moral hazards to attract further intervention [@RauchhausRobertW.2009PPiH; @KarlénNiklas2017Tlof].
+The interplay between conflict characteristics and external support is complex, with interventions---whether direct military actions or indirect aid---often prolonging hostilities and complicating peace efforts [@SawyerKatherine2015TRoE; @KarlénNiklas2023EtDE; @regan2002third; @LacinaBethany2006EtSo; @OlsonLounsberyMarie2016FMIP; @SalehyanIdean2011EESf; @PetrovaMarinaG.2019WMIW]. The provision of external support shapes the onset [@CUNNINGHAMDAVIDE.2016PCWH; @ReganPatrickM2014Doid], duration [@AydinAysegul2012Noti; @AndersonNoel2019CIPC], outcomes [@SawyerKatherine2015TRoE], and recurrence [@KarlénNiklas2017Tlof] of armed conflicts. Although external support can improve the odds of military victory [@Balch-LindsayDylan2008TIat], it often exacerbates humanitarian crises, with rebels exploiting moral hazards to attract further intervention [@RauchhausRobertW.2009PPiH; @KarlénNiklas2017Tlof].
 
 ## Criminology and armed conflict {-}
 
@@ -82,7 +82,7 @@ The type and target of external support often align with intervening parties' st
 
 Previous research shows that external supporters engage in civil conflicts for diverse and strategic reasons, including geopolitical, economic, and ideological motives, as well as specific foreign policy objectives [@FindleyMichaelG.2006RTIi; @MeierVanessa2023Esia]. Economic interests often drive involvement, with external powers seeking to protect trade benefits or access resources by backing domestic victors [@ReganPatrickM.1998CtIO; @KathmanJacobD.2011CWDa]. In some instances, involvement appears benevolent, such as facilitating peace talks [@BhattaraiPrakash2016Tcic]. However, third-party intervention is rarely altruistic; states often aim to weaken adversaries, prevent conflict spillover, or maintain influence in post-colonial regions [@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI]. Strategically, sponsoring militant groups enables states to destabilise rivals or gain leverage without direct conflict. Delegating violence minimises costs while exploiting the instability inflicted on adversaries [@SchultzKennethA.2010TEPi; @BapatNavinA.2012USSo]. However, this approach carries risks, including retaliation, escalation, and the possibility that armed groups will pursue independent agendas [@SchultzKennethA.2010TEPi; @MaozZeev2012RaSS]. Shared ethnic or ideological ties between sponsors and armed groups signal shared goals and reduce the risk that resources will be misused [@BerlinMark2023GamH; @SalehyanIdean2010TDoW]. They are therefore among the strongest predictors of external support [@SalehyanIdean2011EESf; @SozerBrendan2016Dopr], as they further facilitate communication and enhance trust, improving cooperation [@alma992983194640301631; @BaconTricia2018ItEo]. However, relying on such ties can oversimplify sponsorship decisions, especially in contexts with multiple potential recipients or competing priorities [@BerlinMark2023GamH]. Ultimately, prior research suggests that external support is a calculated foreign policy tool used to influence conflict outcomes while advancing sponsors' strategic goals.
 
-Yet the literature on external support is hindered by several limitations. Much research focuses predominantly on support for non-state armed groups, particularly rebel organisations, sidelining other actors and minor armed engagements [@WalterBarbaraF.2004DCBC; @QuinnJ.Michael2007StPD; @SalehyanIdean2011EESf]. This focus introduces methodological challenges and selection bias, limiting generalisability to other armed organisations [@AbrahmsMax2018ECAT; @PhillipsBrianJ.2019TGRa] and obscuring patterns of external support across diverse settings. Furthermore, the multi-actor dimension of support is frequently overlooked, despite evidence that sponsors selectively support specific groups within fragmented conflicts [@BerlinMark2023GamH]. Studies often emphasise the initial decision to delegate support [@SalehyanIdean2010TDoW; @alma992983194640301631], neglecting how support dynamics evolve throughout a conflict's lifecycle and the strategic factors influencing its continuation or cessation [@KarlénNiklas2019TotT; @TokdemirEfe2021RRat]. The content of interventions remains underexplored, despite its impact on conflict trajectories; differentiating between support types---military training, material aid, or safe havens---can highlight distinct effects on outcomes [@RobertsJordan2019TaRR]. Moreover, while previous studies have established correlations between conflict characteristics and external support, many using UCDP data [@MeulewaeterChloé2021Meat; @SalehyanIdean2011EESf; @OlsonLounsberyMarie2016FMIP; @TestermanMatthew2015RtCE; @KarlénNiklas2017Tlof; @LeThai-Ha2022Easi], most analysed only one or two conflict characteristics at a time. Most studies further focus on the economic and social costs of conflict [e.g., @federle2024price; @TestermanMatthew2015RtCE; @LeThai-Ha2022Easi; @sivard1996world], or on the effects of external support on conflict dynamics, rather than its provision. Qualitative approaches also dominate the literature, often at the expense of quantitative analyses better suited to capturing temporal and contextual variations in support dynamics [@PetrovaMarinaG.2019WMIW]. Questions as to when, why, and how states are likely to intervene therefore remain open.
+Yet the literature on external support is hindered by several limitations. Much research focuses predominantly on support for non-state armed groups, particularly rebel organisations, sidelining other actors and minor armed engagements [@WalterBarbaraF.2004DCBC; @QuinnJ.Michael2007StPD; @SalehyanIdean2011EESf]. This focus introduces methodological challenges and selection bias, limiting generalisability to other armed organisations [@AbrahmsMax2018ECAT; @PhillipsBrianJ.2019TGRa] and obscuring patterns of external support across diverse settings. Furthermore, the multi-actor dimension of support is frequently overlooked, despite evidence that sponsors selectively support specific groups within fragmented conflicts [@BerlinMark2023GamH]. Studies often emphasise the initial decision to delegate support [@SalehyanIdean2010TDoW; @alma992983194640301631], neglecting how support dynamics evolve throughout a conflict's lifecycle and the strategic factors influencing its continuation or cessation [@KarlénNiklas2019TotT; @TokdemirEfe2021RRat]. The content of interventions remains underexplored, despite its impact on conflict trajectories; differentiating between support types---military training, material aid, or safe havens---can highlight distinct effects on outcomes [@RobertsJordan2019TaRR]. Moreover, while previous studies have established correlations between conflict characteristics and external support [@MeulewaeterChloé2021Meat; @SalehyanIdean2011EESf; @OlsonLounsberyMarie2016FMIP; @TestermanMatthew2015RtCE; @KarlénNiklas2017Tlof], most analysed only one or two conflict characteristics at a time. Most studies further focus on the economic and social costs of conflict [e.g., @federle2024price; @TestermanMatthew2015RtCE; @LeThai-Ha2022Easi; @sivard1996world], or on the effects of external support on conflict dynamics, rather than its provision. Qualitative approaches also dominate the literature, often at the expense of quantitative analyses better suited to capturing temporal and contextual variations in support dynamics [@PetrovaMarinaG.2019WMIW]. Questions as to when, why, and how states are likely to intervene therefore remain open.
 
 This research addresses these limitations by examining the interplay between conflict characteristics and different types of external support from a quantitative criminological perspective, analysing trends in provision both within and between conflict-dyads to offer a more nuanced understanding of the strategic factors shaping external support.
 
@@ -107,49 +107,52 @@ tikz_code <- r"(
 \node[below=of type, fill=OliveGreen!15, draw=OliveGreen!70!black] (intensity) {Intensity};
 \node[below=of intensity, fill=OliveGreen!15, draw=OliveGreen!70!black] (duration) {Cumulative duration};
 \node[below=of duration, fill=OliveGreen!15, draw=OliveGreen!70!black] (period) {Historical period};
+\node[right=8cm of incompatibility, fill=Orchid!15, draw=Orchid!70!black] (coalition) {Coalition support};
 
 % --- Unmeasured confounders (not included) ---
-\node[right=4cm of incompatibility, fill=gray!15, draw=gray] (relationship) {Supporter--recipient\\relationship};
-\node[below=of relationship, fill=gray!15, draw=gray] (supporter) {Supporter\\characteristics};
-\node[above=of relationship, fill=gray!15, draw=gray] (proximity) {Geographic proximity\\and salience};
+\node[above=of incompatibility, fill=gray!15, draw=gray] (proximity) {Geographic proximity\\and salience};
+\node[right=2.5cm of period, fill=gray!15, draw=gray] (relationship) {Supporter--recipient\\relationship};
+\node[right=2.5cm of proximity, fill=gray!15, draw=gray] (supporter) {Supporter\\characteristics};
 
 % --- Outcomes ---
-\node[right=4cm of supporter, fill=RoyalBlue!15, draw=RoyalBlue!70!black] (external) {Provision of\\external support};
+\node[below=2cm of coalition, fill=RoyalBlue!15, draw=RoyalBlue!70!black] (external) {Provision of\\external support};
 \node[below=2cm of external, fill=RoyalBlue!15, draw=RoyalBlue!70!black] (form) {Form of support};
-\node[left=2.5cm of form, fill=Orchid!15, draw=Orchid!70!black] (coalition) {Coalition support};
 
 % --- Edges: conflict characteristics to outcomes ---
-\draw[OliveGreen!70!black] (incompatibility) to[bend left=15] (external);
+\draw[OliveGreen!70!black] (incompatibility) -- (external);
 \draw[OliveGreen!70!black] (type) -- (external);
 \draw[OliveGreen!70!black] (intensity) -- (external);
 \draw[OliveGreen!70!black] (duration) -- (external);
-\draw[OliveGreen!70!black] (period) to[bend right=15] (external);
+\draw[OliveGreen!70!black] (period) -- (external);
 
-\draw[OliveGreen!70!black] (incompatibility) to[bend left=25] (form);
-\draw[OliveGreen!70!black] (type) to[bend left=10] (form);
+\draw[OliveGreen!70!black] (incompatibility) -- (form);
+\draw[OliveGreen!70!black] (type) -- (form);
 \draw[OliveGreen!70!black] (intensity) -- (form);
-\draw[OliveGreen!70!black] (duration) to[bend right=10] (form);
-\draw[OliveGreen!70!black] (period) to[bend right=25] (form);
+\draw[OliveGreen!70!black] (duration) -- (form);
+\draw[OliveGreen!70!black] (period) -- (form);
 
 % --- Edges: among conflict characteristics ---
 \draw[OliveGreen!70!black] (incompatibility) -- (type);
+\draw[OliveGreen!70!black] (incompatibility) to[bend right=50] (intensity);
+\draw[OliveGreen!70!black] (incompatibility) to[bend right=60] (duration);
 \draw[OliveGreen!70!black] (type) -- (intensity);
+\draw[OliveGreen!70!black] (type) to[bend right=50] (duration);
 \draw[OliveGreen!70!black] (intensity) -- (duration);
 
 % --- Edges: unmeasured to outcomes ---
 \draw[gray] (proximity) -- (external);
 \draw[gray] (relationship) -- (external);
 \draw[gray] (supporter) -- (external);
-\draw[gray] (proximity) to[bend left=15] (form);
+\draw[gray] (proximity) -- (form);
 \draw[gray] (relationship) -- (form);
-\draw[gray] (supporter) to[bend right=15] (form);
+\draw[gray] (supporter) -- (form);
 
-% --- Edges: unmeasured to conflict characteristics ---
-\draw[gray] (proximity) to[bend left=20] (incompatibility);
-\draw[gray] (relationship) -- (period);
+% --- Edges: conflict characteristics to unmeasured ---
+\draw[gray] (period) -- (relationship);
+\draw[gray] (intensity) -- (supporter);
 
 % --- Edges: coalition and outcomes ---
-\draw[Orchid!70!black] (coalition) -- (form);
+\draw[Orchid!70!black] (coalition) to[bend left=50] (form);
 \draw[RoyalBlue!70!black] (external) -- (form);
 \draw[RoyalBlue!70!black] (external) -- (coalition);
 
@@ -172,7 +175,7 @@ The green nodes on the left represent conflict characteristics included in the a
 
 The grey nodes represent factors identified in the literature as relevant to external support but not included in the present analysis due to data constraints. Geographic proximity and salience captures geographic distance, conflict spillover potential, trade connections, and media coverage---factors that shape the visibility and perceived relevance of a conflict to potential supporters. Supporter--recipient relationship encompasses shared cultural or ideological ties, colonial ties, a common enemy, and the identities of the external supporter and support recipient. Supporter characteristics includes the supporter's GDP, total defence spending, military personnel, great power status, and regime type. While these factors are likely to influence external support provision, they fall outside the scope of the current analysis and represent important avenues for future research.
 
-The blue nodes on the right represent the outcome variables. The provision of external support captures whether any form of militarily relevant assistance is provided. The form of support distinguishes between direct support (troop deployment, foreign troop presence) and indirect support (access to infrastructure, weapons, material and logistics, training and expertise, funding, intelligence, and access to territory). Coalition support, shown in purple, captures whether support is provided bilaterally or through a multilateral coalition, and is hypothesised to influence the form of support provided.
+The blue nodes on the right represent the outcome variables. The provision of external support captures whether any form of militarily relevant assistance is provided. The form of support distinguishes between direct support (troop deployment, foreign troop presence) and indirect support (access to infrastructure, weapons, materiel and logistics, training and expertise, funding, intelligence, and access to territory). Coalition support, shown in purple, captures whether support is provided bilaterally or through a multilateral coalition, and is hypothesised to influence the form of support provided.
 
 # Research design {-}
 
@@ -215,13 +218,13 @@ H1a--H1f test whether the conflict characteristics shown in green in Figure \@re
 
 ## Data {-}
 
-This study draws on two datasets from the Uppsala Conflict Data Program (UCDP): the Dyadic dataset (Version 18.1) [@HarbomLotta2008DDoA; @PetterssonTherése2018Ov1] and the External Support dataset (ESD) (Version 18.1) [@MeierVanessa2023Esia]. The Dyadic dataset provides data on armed conflicts, focusing on dyads---pairs of primary warring parties---and spans from 1946 to 2018, with the unit of analysis being the dyad-year. The ESD, covering the period from 1975 to 2017, records ten types of external support provided to conflict parties, coded from open-source material and subjected to intercoder reliability checks.
+This study draws on two datasets from the Uppsala Conflict Data Program (UCDP): the Dyadic dataset (Version 18.1) [@HarbomLotta2008DDoA; @PetterssonTherése2018Ov1] and the External Support dataset (ESD) (Version 18.1) [@MeierVanessa2023Esia]. The Dyadic dataset provides data on armed conflicts, focusing on dyads---pairs of primary warring parties---and spans from 1946 to 2018, with the unit of analysis being the dyad-year. The ESD, covering the period from 1975 to 2017, records nine types of external support provided to conflict parties, coded from open-source material and subjected to intercoder reliability checks.
 
 The two datasets were merged using the common identifiers 'dyad_id' and 'year'. The final dataset includes 2,234 observations on 472 dyads across 212 conflicts from 1975 through 2017. The study incorporates dependent, independent, and control variables (Table 1), categorised based on their measurement scales. All nominal independent variables were factorised, and the reference category for conflict type was set to 'intrastate' to aid interpretation. The 'incompatibility' variable was recoded as a binary indicator of territorial disputes, avoiding instability caused by low case counts in the combined 'territory and government' category. The dependent variables measuring external support, as defined in the literature review [see @MeierVanessa2023Esia; @Meier2022], were expanded to differentiate between types of support.
 
 These datasets present several limitations. The availability of data on external support restricts the analysis to 1975--2017, excluding recent geopolitical developments. However, the period includes major historical phases---such as the Cold War, the post-Cold War era, and the aftermath of 9/11---during which external support provision changed significantly [@TestermanMatthew2015RtCE; @RobertsJordan2019TaRR; @MeierVanessa2023Esia]. UCDP's state-based definition of armed conflict includes only incompatibilities over government or territory, and conflicts with fewer than 25 battle-related deaths per year are excluded. The ESD only records first-degree supporters---those directly aiding a conflict party---while second-degree supporters are omitted [@Meier2022]. Non-state troop support is consistently coded as zero, and support from international organisations, diaspora groups, businesses, or religious institutions is excluded [@Meier2022]. As noted in the discussion of Figure \@ref(fig:dag-figure), several factors identified in the literature as relevant to external support---including geographic proximity, supporter characteristics, and the relationship between supporters and recipients---could not be included in the analysis due to data constraints.
 
-Table \@ref(tab:descriptives-table) presents descriptive statistics for all variables included in the analysis. The dataset comprises 2,234 dyad-years across 472 dyads in 212 conflicts. External support is provided in approximately 81% of dyad-years. Among the specific forms of support, training and expertise, weapons, and material and logistics are the most prevalent, while troop presence and intelligence are relatively rare. Around 20% of dyad-years involve wars (as opposed to minor armed conflicts), and the sample is roughly evenly split between territorial and governmental incompatibilities. The majority of observations fall in the post-Cold War and post-9/11 periods.
+Table \@ref(tab:descriptives-table) presents descriptive statistics for all variables included in the analysis. The dataset comprises 2,234 dyad-years across 472 dyads in 212 conflicts. External support is provided in approximately 81% of dyad-years. Among the specific forms of support, training and expertise, weapons, and materiel and logistics are the most prevalent, while troop presence and intelligence are relatively rare. Around 20% of dyad-years involve wars (as opposed to minor armed conflicts), and the sample is roughly evenly split between territorial and governmental incompatibilities. The majority of observations fall in the post-Cold War and post-9/11 periods.
 
 ```{r descriptives-table}
 desc_data <- merged_ucdp %>%
@@ -231,7 +234,7 @@ desc_data <- merged_ucdp %>%
     `Troop presence`              = as.numeric(ext_p),
     `Access to infrastructure`    = as.numeric(ext_y),
     `Weapons`                     = as.numeric(ext_w),
-    `Material and logistics`      = as.numeric(ext_m),
+    `Materiel and logistics`      = as.numeric(ext_m),
     `Training and expertise`      = as.numeric(ext_t),
     `Funding`                     = as.numeric(ext_f),
     `Intelligence`                = as.numeric(ext_i),
@@ -400,7 +403,7 @@ coef_df %>%
 
 ### Disaggregated models by form of support {-}
 
-Figure \@ref(fig:coefplot-panel) presents exponentiated coefficients from the nine hybrid models predicting each specific form of external support. Odds ratios are shown for logistic models (infrastructure, weapons, material and logistics, funding, intelligence, access to territory) and incidence rate ratios for PPML models (troop support, troop presence, training and expertise). Within effects (red circles) capture changes over time within the same dyad; between effects (blue triangles) capture differences across dyads. Time-constant predictors (conflict type, territorial incompatibility) appear only in the between component.
+Figure \@ref(fig:coefplot-panel) presents exponentiated coefficients from the nine hybrid models predicting each specific form of external support. Odds ratios are shown for logistic models (infrastructure, weapons, materiel and logistics, funding, intelligence, access to territory) and incidence rate ratios for PPML models (troop support, troop presence, training and expertise). Within effects (red circles) capture changes over time within the same dyad; between effects (blue triangles) capture differences across dyads. Time-constant predictors (conflict type, territorial incompatibility) appear only in the between component.
 
 ```{r coefplot-panel, fig.height=12, fig.width=10, fig.cap="Hybrid model results for nine forms of external support. Points represent exponentiated coefficients with 95% confidence intervals on a log scale. Within effects (red circles) capture within-dyad variation; between effects (blue triangles) capture between-dyad variation. Time-constant predictors appear only in the between component. The dashed vertical line marks the null value of 1."}
 coef_df %>%
@@ -437,13 +440,13 @@ Several patterns emerge from the disaggregated models. First, external support p
 
 Second, indirect forms of support are more responsive to conflict characteristics than direct forms. Within dyads, the provision of weapons, funding, and intelligence is associated with the greatest number of conflict characteristics: conflict intensity, cumulative duration, and the post-9/11 period are significant predictors across all three. The provision of troop support, by contrast, is not significantly associated with any conflict characteristic within dyads, and troop presence is associated only with conflict duration. This suggests that as conflicts evolve over time, external supporters adjust indirect assistance more readily than direct military commitments.
 
-Third, conflict type---particularly internationalised intrastate conflict---emerges as a powerful between-dyad predictor. In the between-dyad models, internationalised intrastate conflicts are associated with significantly higher odds of receiving troop support, troop presence, access to infrastructure, weapons, material and logistics, training and expertise, and funding relative to intrastate conflicts. The magnitude of these associations is particularly striking for troop support, where the incidence rate for internationalised intrastate conflicts is approximately 88 times that of intrastate conflicts. This likely reflects the greater complexity and multi-actor nature of these conflicts, which creates opportunities for external actors to intervene.
+Third, conflict type---particularly internationalised intrastate conflict---emerges as a powerful between-dyad predictor. In the between-dyad models, internationalised intrastate conflicts are associated with significantly higher odds of receiving troop support, troop presence, access to infrastructure, weapons, materiel and logistics, training and expertise, and funding relative to intrastate conflicts. The magnitude of these associations is particularly striking for troop support, where the incidence rate for internationalised intrastate conflicts is approximately 88 times that of intrastate conflicts. This likely reflects the greater complexity and multi-actor nature of these conflicts, which creates opportunities for external actors to intervene.
 
 Fourth, temporal markers---especially the post-9/11 period---play a distinctive role. Within dyads, the post-9/11 period is associated with significantly higher odds of receiving weapons (OR $\approx$ 8), as well as access to infrastructure, funding, intelligence, and access to territory. Between dyads, the post-9/11 period shows particularly large associations with intelligence provision and access to infrastructure. These patterns are consistent with the shift toward targeted, intelligence-led intervention strategies following the rise of global counter-terrorism efforts [@MeierVanessa2023Esia]. The Cold War period is associated with weapons and intelligence provision within dyads, and with weapons provision between dyads, consistent with the logic of ideological proxy conflicts [@TestermanMatthew2015RtCE; @RobertsJordan2019TaRR].
 
 Fifth, territorial incompatibility is not significantly associated with any form of external support in the between models. This null finding is surprising given theoretical expectations that territorial conflicts may attract external intervention [@CunninghamDavidE.2010BrHe; @GregoryShaun2000TFMI], and may reflect the fact that territorial and governmental incompatibilities are relatively evenly distributed in the sample.
 
-Finally, coalition support is significantly associated with access to infrastructure, material and logistics, and funding within dyads, but shows no significant associations between dyads. This suggests that coalitional dynamics shape tactical decisions within specific conflicts---affecting which forms of support are channelled---more than they shape broader patterns of intervention across conflicts.
+Finally, coalition support is significantly associated with access to infrastructure, materiel and logistics, and funding within dyads, but shows no significant associations between dyads. This suggests that coalitional dynamics shape tactical decisions within specific conflicts---affecting which forms of support are channelled---more than they shape broader patterns of intervention across conflicts.
 
 
 # Discussion {-}

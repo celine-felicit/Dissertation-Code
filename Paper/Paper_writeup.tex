@@ -1,10 +1,12 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-%
 \documentclass[
 ]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
@@ -35,8 +37,6 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{xcolor}
-\usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \makeatletter
 \newsavebox\pandoc@box
@@ -52,10 +52,6 @@
 % Set default figure placement to htbp
 \def\fps@figure{htbp}
 \makeatother
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 % definitions for citeproc citations
 \NewDocumentCommand\citeproctext{}{}
 \NewDocumentCommand\citeproc{mm}{%
@@ -89,6 +85,9 @@
 \newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \usepackage{titling}
 \usepackage{booktabs}
 \usepackage{pdflscape}
@@ -1353,20 +1352,20 @@ geopolitical shifts such as the post-9/11 context.
 \begin{tabular}{lll}
 \hline
 & Troop Support & Weapons \\ \hline
-(Intercept) & \num{0.012}*** & \num{32.049}*** \\
-& [\num{0.006}, \num{0.025}] & [\num{6.970}, \num{147.360}] \\
-Type (interstate) & \num{25.803}*** & \num{0.116} \\
-& [\num{6.793}, \num{98.016}] & [\num{0.000}, \num{36.836}] \\
-Type (internationalised intrastate) & \num{87.715}*** & \num{2.310}* \\
-& [\num{45.671}, \num{168.466}] & [\num{1.018}, \num{5.241}] \\
+(Intercept) & \num{0.012}*** & \num{32.442}*** \\
+& [\num{0.006}, \num{0.025}] & [\num{7.042}, \num{149.461}] \\
+Type (interstate) & \num{25.803}*** & \num{0.117} \\
+& [\num{6.793}, \num{98.015}] & [\num{0.000}, \num{36.994}] \\
+Type (internationalised intrastate) & \num{87.715}*** & \num{2.302}* \\
+& [\num{45.671}, \num{168.465}] & [\num{1.015}, \num{5.221}] \\
 AIC & \num{877.2} & \num{935.1} \\
 BIC & \num{955.2} & \num{1013.1} \\
 min\_wave & 0 & 0 \\
 max\_wave & 42 & 42 \\
 N & 208 & 208 \\
 model & within-between & within-between \\
-pR2\_fe &  & 0.20243076168103 \\
-pR2\_total &  & 0.809335039727066 \\
+pR2\_fe &  & 0.202482056087455 \\
+pR2\_total &  & 0.80941922226455 \\
 \hline
 \end{tabular}
 
